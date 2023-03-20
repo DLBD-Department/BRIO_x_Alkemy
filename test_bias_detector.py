@@ -36,7 +36,7 @@ results = bd.compare_binary_variable_conditioned_groups(
     df_with_predictions,
     'predictions',
     'x2_sex',
-    'x3_education',
+    ['x3_education', 'x4_marriage'],
     0.1)
 
 print(results)
