@@ -3,6 +3,7 @@ mlruns/
 
 *.DS_Store
 *.swp
+notebooks/debug/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
