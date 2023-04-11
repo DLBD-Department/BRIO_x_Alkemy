@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}
+homepage
+{% endblock %}
+
+ {% block head %}
+<style>
+    h1 {
+        text-align: center;
+    }
+</style>
+ {% endblock %}
+
+{% block content %}
+<h1>welcome to my flask app</h1>
+<p>lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+{% include 'upload_home.html' %}
+{% endblock %}
+
+{% block footer %}
+<div id="footer-btns" style="text-align: center;">
+    <a href="/freqvsfreq" style="display: inline-block; margin-right: 20px;"><button>freq vs freq analysis</button></a>
+    <a href="/freqvsref" style="display: inline-block;"><button>freq vs ref analysis</button></a>
+</div>
+{% endblock %}
+
+

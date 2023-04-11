@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}
+FreqvsFreq
+{% endblock %}
+
+{% block head %}
+<style>
+    h1 {
+        text-align: center;
+    }
+</style> 
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        var slider = document.getElementById("slider");
+        var output = document.getElementById("slider_value");
+        output.innerHTML = slider.value;
+
+        slider.oninput = function() {
+            output.innerHTML = this.value;
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+<h1>Freq vs Freq</h1>
+<p>lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+{% include 'upload_freqvsfreq.html' %}
+{% endblock %}
+
+{% block footer %}
+    <div style="position: fixed; bottom: 100px; right: 100px;">
+        <button style="font-size: 20px; padding: 40px 80px;">Run</button>
+    </div>
+{% endblock %}
+
+
+
+
+

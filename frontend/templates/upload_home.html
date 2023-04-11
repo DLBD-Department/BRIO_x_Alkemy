@@ -1,0 +1,19 @@
+
+
+
+{% block content %}
+    <h1>Upload files</h1>
+    <form method="POST" action="{{ url_for('home') }}" enctype="multipart/form-data">
+        <label for="dataframe">Dataframe:</label>
+        &nbsp;&nbsp;&nbsp;
+        <input type="file" name="dataframe"><br><br>
+        <label for="model">Model:</label>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="file" name="model"><br><br>
+        <label for="predictions">Predictions:</label>
+        &nbsp;&nbsp;
+        <input type="file" name="predictions"><br><br>
+        <input type="submit" value="Upload">
+    </form>
+{% endblock %}
+
