@@ -1,8 +1,11 @@
+from itertools import combinations
+
 class TotalVariationDistance:
 
     def __init__(self, 
         aggregating_function=max):
         
+        # function needed to aggregate distances for multi-class comparisons
         self.aggregating_function = aggregating_function
 
 
@@ -23,7 +26,7 @@ class TotalVariationDistance:
         '''
 
         distances = [
-                self.aggregating_function(abs(ref - obs)) for ref, obs in zip(
+                max(abs(ref - obs)) for ref, obs in zip(
                     reference_distribution, observed_distribution
                     )
                 ]
@@ -40,14 +43,14 @@ class TotalVariationDistance:
             The lenght of the list is given by the number of categories of the root variable.
             The shape of each array is given by the number of labels of target_variable.
             
-        It works for any number of labels of the target variable, but it is 
-        currently implemented only for the binary root_variable case.
+        It works for any number of labels of the target variable and any number of classes for the root variable. 
+        The final distance is given by self.aggregating_function. 
         '''
 
-
-        # TODO generalize to root_variable with more than 2 classes. 
-        # At the moment, this compare the freqs of class 1 vs class 2. 
-        distance = self.aggregating_function( abs( observed_distribution[0] - observed_distribution[1] ) )
-
+        # Computing the TVD for each pair of distributions
+        distance = self.aggregating_function(
+                # TVD
+                [max( abs( pair[0]-pair[1] ) ) for pair in combinations(observed_distribution, 2)]
+            )
 
         return distance

@@ -1,9 +1,14 @@
 from scipy.stats import entropy
+from itertools import combinations
 
 class KLDivergence:
 
-    def __init__(self):
-        pass
+    def __init__(self, 
+        aggregating_function=max):
+        
+        # function needed to aggregate distances for multi-class comparisons
+        self.aggregating_function = aggregating_function
+
 
     def compute_distance_from_reference(self, 
             observed_distribution,
@@ -39,16 +44,15 @@ class KLDivergence:
             The lenght of the list is given by the number of categories of the root variable.
             The shape of each array is given by the number of labels of target_variable.
             
-        It works for any number of labels of the target variable, but it is 
-        currently implemented only for the binary root_variable case.
+        It works for any number of labels of the target variable and any number of classes for the root variable. 
+        The final distance is given by self.aggregating_function. 
         '''
 
+        divergences = []
+        for pair in combinations(observed_distribution, 2):
+            divergence = ( entropy(pk=pair[0], qk=pair[1]) + entropy(pk=pair[1], qk=pair[0]) )/2
+            divergences.append(divergence)
 
-        # TODO generalize to root_variable with more than 2 classes. 
-        # At the moment, this compare the freqs of class 1 vs class 2. 
-        divergence = (
-            entropy(pk=observed_distribution[0], qk=observed_distribution[1]) + entropy(pk=observed_distribution[1], qk=observed_distribution[0])
-            )/2
-
+        divergence = self.aggregating_function(divergences)
 
         return divergence
