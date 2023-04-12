@@ -1,4 +1,4 @@
-from src.bias.Distance import Distance
+from src.bias.TotalVariationDistance import TotalVariationDistance
 import numpy as np
 
 male_0_ref = 75/100
@@ -16,7 +16,7 @@ female_1_freq = 30/100
 ref = [np.array([male_0_ref, male_1_ref]), np.array([female_0_ref, female_1_ref])]
 obs = [np.array([male_0_freq, male_1_freq]), np.array([female_0_freq, female_1_freq])]
 
-d = Distance()
+d = TotalVariationDistance()
 
 distances = d.compute_distance_from_reference(obs, ref)
 

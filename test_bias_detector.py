@@ -1,3 +1,4 @@
+from src.bias.TotalVariationDistance import TotalVariationDistance
 from src.data_processing.Preprocessing import Preprocessing
 from src.bias.BiasDetector import BiasDetector
 from sklearn.model_selection import train_test_split
@@ -30,7 +31,8 @@ predicted_values = classifier.predict(X_test_ohe)
 df_with_predictions = pd.concat(
     [X_test.reset_index(drop=True), pd.Series(predicted_values)], axis=1).rename(columns={0:"predictions"})
 
-bd = BiasDetector()
+d = TotalVariationDistance()
+bd = BiasDetector(distance=d)
 
 results = bd.compare_binary_variable_conditioned_groups(
     df_with_predictions,

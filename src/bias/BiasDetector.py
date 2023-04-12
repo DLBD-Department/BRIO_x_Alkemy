@@ -1,11 +1,10 @@
-from .Distance import Distance
 import numpy as np
 from sklearn.utils.extmath import cartesian
 
 class BiasDetector:
 
-    def __init__(self):
-        self.dis = Distance() 
+    def __init__(self, distance):
+        self.dis = distance
 
 
     def get_frequencies_list(self,
