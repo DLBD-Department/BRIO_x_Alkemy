@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}
+FreqvsRef
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css')}}">
+{% endblock %}
+
+{% block content %}
+<h1>Freq vs Ref</h1>
+<p>lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+{% include 'upload_freqvsref.html' %}
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
+
+{% block footer %}
+    <div style="position: fixed; bottom: 100px; right: 100px;">
+        <a href="/freqvsfreq/results"><button style="font-size: 20px; padding: 40px 80px;">Run</button></a>
+    </div>
+{% endblock %}
+
+
+
+
+

@@ -1,0 +1,3 @@
+0.35
+x2_sex
+x1_limit_bal,x2_sex,x3_education,x4_marriage
