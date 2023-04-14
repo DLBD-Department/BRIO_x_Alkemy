@@ -33,3 +33,52 @@ form input[type="submit"] {
 input[type="file"]::before {
     font-size: 20px;
 }
+
+textarea {
+  height: 40px;
+  margin-top: 10px;
+  padding: 8px 16px;
+  font-size: 16px;
+  font-family: Arvo, serif;
+  border: 2px solid #3ca0e7;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #000;
+  box-sizing: border-box;
+  background-repeat: no-repeat;
+  background-position: right .7em top 50%, 0 0;
+  background-size: 10px auto, 100%;
+}
+
+select {
+  height: 40px;
+  margin: 0;
+  padding: 8px 16px;
+  font-size: 16px;
+  font-family: Arvo, serif;
+  border: 2px solid #3ca0e7;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #000;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-repeat: no-repeat;
+  background-position: right .7em top 50%, 0 0;
+  background-size: 10px auto, 100%;
+}
+
+select:focus {
+  outline: none;
+  box-shadow: 0 0 2px 2px #3ca0e7;
+}
+
+select:hover {
+  cursor: pointer;
+}
+
+select option {
+  font-size: 16px;
+  font-family: Arvo, serif;
+  color: #000;
+}

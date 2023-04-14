@@ -54,7 +54,7 @@ def home():
 def freqvsfreq():
     df_pickle = open(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['df_filename']), "rb")
     df = pickle.load(df_pickle)
-    list_var = df.columns[:3]
+    list_var = df.columns[:5]
     if request.method == 'POST':
         thr = request.form['Slider']
         root_var = request.form['root_var']
@@ -64,7 +64,7 @@ def freqvsfreq():
         for item in cond_vars:
             if item not in cond_vars_final:
                 cond_vars_final.append(item)
-        with open ('vars.txt', 'w') as f:
+        with open ('vars_freq.txt', 'w') as f:
             f.write(thr)
             f.write('\n')
             f.write(root_var)
@@ -78,15 +78,35 @@ def results_fvf():
     threshold = 0
     root_var = ''
     cond_vars = []
-    with open ('vars.txt') as f:
+    with open ('vars_freq.txt') as f:
         threshold = f.readline()
         root_var = f.readline()
         cond_vars = f.readline().split()
     return render_template('results_freqvsfreq.html', threshold=threshold, root_var=root_var, cond_vars=cond_vars) 
 
-@app.route('/freqvsref')
+@app.route('/freqvsref', methods=['GET', 'POST'])
 def freqvsref():
-    return "<p>Hello, World!</p>"
+    df_pickle = open(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['df_filename']), "rb")
+    df = pickle.load(df_pickle)
+    list_var = df.columns[:5]
+    if request.method == 'POST':
+        thr = request.form['Slider']
+        root_var = request.form['root_var']
+        cond_vars_raw = request.form['mytext']
+        cond_vars = cond_vars_raw.split()
+        cond_vars_final = []
+        for item in cond_vars:
+            if item not in cond_vars_final:
+                cond_vars_final.append(item)
+        with open ('vars_ref.txt', 'w') as f:
+            f.write(thr)
+            f.write('\n')
+            f.write(root_var)
+            f.write('\n')
+            f.write(','.join(str(x) for x in cond_vars_final))
+        return redirect('/freqvsref')
+    
+    return render_template('freqvsref.html', list1=list_var)
 
 @app.route('/freqvsref/results')
 def results_fvr():

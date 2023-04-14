@@ -1,3 +1,0 @@
-0.45
-id
-x2_sex,x1_limit_bal,id
