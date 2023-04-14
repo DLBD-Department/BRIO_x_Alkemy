@@ -1,9 +1,21 @@
 from flask import Flask, render_template, request, redirect, flash
+import pickle
+import os
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = os.path.abspath("uploads")
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 ALLOWED_EXTENSIONS = {'pkl'}
 
 app = Flask(__name__)
-app.secret_key = 'qw89mvcty342cvn4rcv89m4q3ynccq89xr7n4'
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+#filename='df_pickle.pkl'
+
+dict_vars = {}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -20,7 +32,7 @@ def home():
         if dataframe_file.filename == '':
             flash('No dataframe uploaded, try again')
             return redirect('/')
-
+        '''
         if  model_file.filename == '':
             flash('No model uploaded, try again')
             return redirect('/')
@@ -28,20 +40,57 @@ def home():
         if predictions_file.filename == '':
             flash('No predictions uploaded, try again')
             return redirect('/')
+        '''
         #TODO: scrivi il codice per manipolare i file
-        
+        if dataframe_file:
+            dict_vars['df_filename'] = dataframe_file.filename
+            #filename = secure_filename(dataframe_file.filename)
+            dataframe_file.save(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['df_filename']))
         return redirect('/')
     
     return render_template('home.html')
 
 @app.route('/freqvsfreq', methods=['GET', 'POST'])
 def freqvsfreq():
-    return render_template('freqvsfreq.html')
+    df_pickle = open(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['df_filename']), "rb")
+    df = pickle.load(df_pickle)
+    list_var = df.columns[:3]
     if request.method == 'POST':
-        return redirect('/')
+        thr = request.form['Slider']
+        root_var = request.form['root_var']
+        cond_vars_raw = request.form['mytext']
+        cond_vars = cond_vars_raw.split()
+        cond_vars_final = []
+        for item in cond_vars:
+            if item not in cond_vars_final:
+                cond_vars_final.append(item)
+        with open ('vars.txt', 'w') as f:
+            f.write(thr)
+            f.write('\n')
+            f.write(root_var)
+            f.write('\n')
+            f.write(','.join(str(x) for x in cond_vars_final))
+        return redirect('/freqvsfreq')
+    return render_template('freqvsfreq.html', list1=list_var)
 
-@app.route('/freqvsrel')
-def freqvsrel():
+@app.route('/freqvsfreq/results')
+def results_fvf():
+    threshold = 0
+    root_var = ''
+    cond_vars = []
+    with open ('vars.txt') as f:
+        threshold = f.readline()
+        root_var = f.readline()
+        cond_vars = f.readline().split()
+    return render_template('results_freqvsfreq.html', threshold=threshold, root_var=root_var, cond_vars=cond_vars) 
+
+@app.route('/freqvsref')
+def freqvsref():
     return "<p>Hello, World!</p>"
+
+@app.route('/freqvsref/results')
+def results_fvr():
+    return "<p>Results here!</p>"
+
 
 

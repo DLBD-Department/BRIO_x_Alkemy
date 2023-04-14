@@ -2,25 +2,35 @@
 
 {% block content %}
 <form action="{{ url_for('freqvsfreq') }}" method="POST" enctype="multipart/form-data">
-    <label for="dataframe">Dataframe:</label>
-    <input type="file" name="dataframe"><br><br>
-    <label for="model">Model:</label>
-    <input type="file" name="model"><br><br>
-    <label for="slider">Slider:</label>
-    <input type="range" name="slider" min="0" max="1" step="0.01"><br><br>
-    <output id="slider_value">{{slider_value}}</output><br><br>
-    <label for="dropdown1">Dropdown 1:</label>
-    <select name="dropdown1">
-        <option value="option1">Option 1</option>
-        <option value="option2">Option 2</option>
-        <option value="option3">Option 3</option>
+    <label for="distance">Distance:</label>
+    <input type="file" name="distance"><br><br>
+    <label for="agg_func">Aggregation Function:</label>
+    <input type="file" name="agg_func"><br><br><br><br>
+    <label for="slider">Threshold:</label>
+    <input type="range" name="Slider" min="0" max="1" step="0.05" oninput="this.form.amountInput.value=this.value" />
+    <input type="number" name="amountInput" min="0" max="1" step="0.05" oninput="this.form.amountRange.value=this.value" /><br><br>
+    <label for="root_var">Root Variable:</label>
+    <select name="root_var">
+        {% for item in list1 -%}
+            <option value="{{item}}">{{ item }}</option>
+        {%- endfor %}
     </select><br><br>
-    <label for="dropdown2">Dropdown 2:</label>
-    <select name="dropdown2">
-        <option value="option4">Option 4</option>
-        <option value="option5">Option 5</option>
-        <option value="option6">Option 6</option>
-    </select><br><br>
+    <label for="cond_var">Conditioning variables:</label>
+    <select name="cond_var" id="cond_var">
+        {% for item in list1 -%}
+            <option value="{{item}}">{{ item }}</option>
+        {%- endfor %}
+    </select>
+    <textarea name="mytext" id="mytext"></textarea><br><br>
+    <script type="text/javascript">
+	var mytextbox = document.getElementById('mytext');
+	var mydropdown = document.getElementById('cond_var');
+
+	mydropdown.onchange = function(){
+	      mytextbox.value = mytextbox.value + this.value + " "; //to appened
+	     //mytextbox.innerHTML = this.value;
+	}
+    </script>
     <input type="submit" value="Upload">
 </form>
 {% endblock %}
