@@ -1,10 +1,22 @@
 import numpy as np
 from sklearn.utils.extmath import cartesian
+from itertools import chain
+from itertools import combinations as itertools_combinations
 
 class BiasDetector:
 
     def __init__(self, distance):
         self.dis = distance
+
+
+    def powerset(self, iterable):
+        '''
+        Recipe from itertool documentation. 
+        https://docs.python.org/3/library/itertools.html#itertools-recipes
+        '''
+        "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+        s = list(iterable)
+        return chain.from_iterable(itertools_combinations(s, r) for r in range(len(s)+1))
 
 
     def get_frequencies_list(self,
@@ -121,19 +133,18 @@ class BiasDetector:
         target_variable_labels = dataframe[target_variable].unique()
 
         conditioned_frequencies = {}
-        var_index = 1
 
-        # The conditioning variables are used to condition the dataset in a tree-based way:
-        # the first variable is used, and for each of its categories a further conditioning 
-        # is performed using the subsequent variables. 
-        while var_index <= len(conditioning_variables):
-            conditioning_variables_subset = conditioning_variables[:var_index]
+        conditioning_variables_subsets = list(self.powerset(conditioning_variables))
+
+        # All the possible subsets of conditioning variables are inspected. The first one
+        # is excluded being the empty set. 
+        for conditioning_variables_subset in conditioning_variables_subsets[1:]:
 
             combinations = cartesian([dataframe[v].unique() for v in conditioning_variables_subset])
 
             for comb in combinations:
                 condition = " & ".join(
-                    [f'{conditioning_variables[i[0]]}=={i[1]}' for i in enumerate(comb)]
+                    [f'{conditioning_variables_subset[i[0]]}=={i[1]}' for i in enumerate(comb)]
                 )
 
                 dataframe_subset = dataframe.query(condition)
@@ -151,8 +162,6 @@ class BiasDetector:
                             )
                 else:
                     conditioned_frequencies[condition] = (num_of_obs, None)
-
-            var_index += 1
             
         if reference_distribution is None:
             distances = {
