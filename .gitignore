@@ -1,7 +1,8 @@
 # mlflow
 mlruns/
 
-*.DS_Store
+.DS_Store
+**/.DS_Store
 *.swp
 notebooks/debug/
 
