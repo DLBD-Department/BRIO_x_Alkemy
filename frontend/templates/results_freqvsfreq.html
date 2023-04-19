@@ -6,69 +6,53 @@ Results
 
 {% block head %}
 <style>
+
 .results-container {
   display: flex;
+  padding: 100px;
   justify-content: space-between;
-  padding: 200px;
 }
 
 .result-box {
+  width: 50%;
+  margin-top: 100px;
   border: 2px solid black;
-  margin-left: 20%;
   padding: 20px;
   background-color: lightgrey;
+  word-break: break-all;
 }
+
 .violation-box {
   border: 2px solid black;
-  margin-right: 20%;
+  margin-top: 100px;
+  width: 50%;
+  margin-right: 10%;
   padding: 20px;
   background-color: lightgrey;
+  word-break: break-all;
 }
 
 .result-box h2, .violation-box h2 {
   text-align: center;
 }
-	
-    .first-box {
-	width:300px; 
-	float:left;
-	border: 2px solid black;
-    	background-color: #E5E5E5; 
-        height: 150px;
-	margin: 50px
-    }
-
-    .first-box h2 {
-	padding-left: 120px;
-	padding-top: 50px;
-    }
-	
-    .second-box {
-	width:300px; 
-	height: 150px; 
-	border: 2px solid black;
-    	background-color: #E5E5E5; 
-	float:right; 
-	margin: 50px
-    }
-
-    .second-box h2 {
-	padding-left: 40px;
-	padding-top: 50px;
-    }
 </style>
 {% endblock %}
 
 {% block content %}
    <div class="results-container">
      <div class="result-box">
-       <h2>Results</h2>
-       <p>Threshold: {{ threshold }}</p>
-       <p>Root Variable: {{ root_var }}</p>
-       <p>Conditional Variables: {% for cond_var in cond_vars %} {{ cond_var }} {% endfor %}</p>
+       <h2>Results_1</h2>
+        {{ results1 }}<br>
+       <h2>Results_2</h2>
+        {% for key, value in results2.items() %}
+        {{ key }} : {{ value }}<br>
+        {% endfor %}
      </div>
      <div class="violation-box">
        <h2>Violations</h2>
+	{% for key, value in violations.items() %}
+	{{ key }} : {{ value }}<br>
+	{% endfor %} 
      </div>
    </div>
 {% endblock %}

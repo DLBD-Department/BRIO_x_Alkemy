@@ -3,6 +3,10 @@ h1 {
     font-size: 2.5em;
 }
 
+fieldset {
+    width: 450px;
+}
+
 h2 {
     text-align: center;
     font-size: 2em;
