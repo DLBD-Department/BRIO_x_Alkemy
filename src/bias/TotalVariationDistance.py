@@ -45,6 +45,9 @@ class TotalVariationDistance:
             
         It works for any number of labels of the target variable and any number of classes for the root variable. 
         The final distance is given by self.aggregating_function. 
+
+        It breaks if aggregating_function=stdev when the root_variable is binary (we would have a stdev
+        of a single number)
         '''
 
         # Computing the TVD for each pair of distributions

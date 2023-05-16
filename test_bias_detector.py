@@ -3,9 +3,9 @@ from src.data_processing.Preprocessing import Preprocessing
 from src.bias.BiasDetector import BiasDetector
 from sklearn.model_selection import train_test_split
 import numpy as np
-from src.bias.Distance import Distance
 from pickle import dump, load
 import pandas as pd
+import statistics
 
 input_data_path = "./data/raw_data/uci-default-of-credit-card/data/data.csv"
 
@@ -31,14 +31,14 @@ predicted_values = classifier.predict(X_test_ohe)
 df_with_predictions = pd.concat(
     [X_test.reset_index(drop=True), pd.Series(predicted_values)], axis=1).rename(columns={0:"predictions"})
 
-d = TotalVariationDistance()
+d = TotalVariationDistance(aggregating_function=statistics.stdev)
 bd = BiasDetector(distance=d)
 
-results = bd.compare_binary_variable_conditioned_groups(
+results = bd.compare_root_variable_conditioned_groups(
     df_with_predictions,
     'predictions',
-    'x2_sex',
-    ['x3_education', 'x4_marriage'],
+    'x3_education',
+    ['x2_sex', 'x4_marriage'],
     0.1)
 
 print(results)

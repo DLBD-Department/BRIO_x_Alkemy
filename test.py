@@ -1,5 +1,6 @@
 from src.bias.TotalVariationDistance import TotalVariationDistance
 import numpy as np
+from statistics import mean, stdev
 
 male_0_ref = 75/100
 male_1_ref = 25/100
@@ -16,7 +17,7 @@ female_1_freq = 30/100
 ref = [np.array([male_0_ref, male_1_ref]), np.array([female_0_ref, female_1_ref])]
 obs = [np.array([male_0_freq, male_1_freq]), np.array([female_0_freq, female_1_freq])]
 
-d = TotalVariationDistance()
+d = TotalVariationDistance(aggregating_function=max)
 
 distances = d.compute_distance_from_reference(obs, ref)
 
