@@ -8,11 +8,10 @@ jobs:
       - checkout
 
       - run:
-        name: Unit Tests for Bias Detector
-
-        command: |
-          pip3 install -r requirements
-          python3 -m tests.unit.TestBiasDetector
+          name: Unit Tests for Bias Detector
+          command: |
+            pip3 install -r requirements
+            python3 -m tests.unit.TestBiasDetector
 
 workflows:
   version: 2
