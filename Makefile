@@ -26,3 +26,4 @@ shell:
 	@docker exec -it ${CONTAINER_NAME} /bin/bash
 stop:
 	@docker stop ${CONTAINER_NAME}
+	@docker rm ${CONTAINER_NAME}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Violation: {{ violation }}
+{% endblock %}
+
+{% block content %}
+   <div class="containter my-5 mx-5">
+    <div class="row pb-4 mx-5 pe-lg-0 pt-lg-5 align-items-center rounded-3 border shadow-lg">
+	<h2 class="display-6 fw-bold text-center">Violation: {{ viol }}</h2>
+	{{ res2 | safe}}
+    </div>
+   </div>
+{% endblock %}
+
+

@@ -1,21 +1,3 @@
-{% extends 'base.html' %}
-
-{% block title %}
-FreqvsRef
-{% endblock %}
-
-{% block content %}
-<div class="px-4 py-5 my-2 text-center">
-	<h1 class="display-5 fw-bold text-body-emphasis">BRIO X Alkemy</h1>
-	<div class="col-lg-6 mx-auto">
-	<p class="lead mb-4">lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-</div>
-{% include 'upload_freqvsref.html' %}
-{% endblock %}
-
-{% block scripts %}
-<script type="text/javascript">
-
 function handle_disab() {
     $('#cond_var').selectpicker('toggle');
     var disab = document.getElementById("root_var");
@@ -24,7 +6,7 @@ function handle_disab() {
     var dd = document.getElementById("bs-select-2");
     var lis = dd.firstElementChild.getElementsByTagName('li');
     for (var j = 0; j < lis.length; j++) {
-	if (lis[j].firstElementChild.lastElementChild.innerText == selected_option.value) {
+        if (lis[j].firstElementChild.lastElementChild.innerText == selected_option.value) {
             console.log(lis[j]);
             lis[j].className = "disabled";
             $('li.disabled').hide();
@@ -44,7 +26,7 @@ function sel_all() {
     var options = select.options;
     var values = [];
     for (var i = 0; i < options.length; i++) {
-	values.push(options[i].value);
+        values.push(options[i].value);
     }
     textarea.value = values.join(" ");
 }
@@ -58,23 +40,8 @@ document.addEventListener("DOMContentLoaded", function() {
     var disab = document.getElementById("root_var");
     disab.addEventListener("change", handle_disab);
     var select = document.getElementById("cond_var");
-    select.addEventListener("change", handle_select);
     var select_all = document.getElementsByClassName("bs-actionsbox")[0].firstElementChild.firstElementChild;
     select_all.addEventListener("click", sel_all);
     var deselect_all = document.getElementsByClassName("bs-actionsbox")[0].firstElementChild.children[1];
     deselect_all.addEventListener("click", desel_all);
 });
-
-</script>
-{% endblock %}
-
-{% block footer %}
-    <div class="modal-footer">
-        <a href="/freqvsref/results"><button type="button" class="btn btn-lg btn-secondary" data-dismiss="modal">Run</button>
-    </div>
-{% endblock %}
-
-
-
-
-

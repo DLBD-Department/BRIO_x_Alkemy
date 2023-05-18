@@ -4,21 +4,30 @@
 Homepage
 {% endblock %}
 
- {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
- {% endblock %}
 
 {% block content %}
-<h1>BRIO X Alkemy</h1>
-<p>lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+<div class="px-4 py-5 my-2 text-center">
+    <img class="d-block mx-auto mb-2" src="{{ url_for('static', filename='alkemy.png') }}" alt="" width="72" height="72">
+    <h1 class="display-5 fw-bold text-body-emphasis">BRIO X Alkemy</h1>
+    <div class="col-lg-6 mx-auto">
+      <p class="lead mb-4">lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+    </div>
+
 {% include 'upload_home.html' %}
+  </div>
 {% endblock %}
 
 {% block footer %}
+<div class="d-grid gap-2 d-sm-flex justify-content-sm-center my-3">
+	<a href="/freqvsfreq" style="display: inline-block; margin-right: 20px; bottom: 200px; right: 200px;"><button class="btn btn-primary btn-lg px-4 gap-3" type="button">Freq vs freq analysis</button></a>
+    <a href="/freqvsref" style="display: inline-block; right: 200px; bottom: 200px;"><button class="btn btn-primary btn-lg px-4 gap-3" type="button">Freq vs ref analysis</button></a>
+</div>
+{% endblock %}
+<!--
 <div id="footer-btns" style="text-align: center;">
     <a href="/freqvsfreq" style="display: inline-block; margin-right: 20px; bottom: 200px; right: 200px;"><button>Freq vs freq analysis</button></a>
     <a href="/freqvsref" style="display: inline-block; bottom: 200px; right: 200px;"><button>Freq vs ref analysis</button></a>
 </div>
-{% endblock %}
+-->
 
 

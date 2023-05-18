@@ -1,6 +1,9 @@
 # mlflow
 mlruns/
 
+#uploads
+frontend/uploads
+
 .DS_Store
 **/.DS_Store
 *.swp

@@ -1,19 +1,21 @@
-
-
-
 {% block content %}
-    <h2>Upload files</h2>
+    <h2>Upload files</h2><br>
     <form method="POST" action="{{ url_for('home') }}" enctype="multipart/form-data">
-        <label for="dataframe">Dataframe:</label>
-        &nbsp;&nbsp;&nbsp;
-        <input type="file" name="dataframe"><br><br>
-        <label for="model">Model:</label>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <input type="file" name="model"><br><br>
-        <label for="predictions">Predictions:</label>
-        &nbsp;&nbsp;
-        <input type="file" name="predictions"><br><br>
-        <input type="submit" value="Upload">
+        <div class="form-group row mb-2 w-50 mx-auto">
+                <label for="dataframe" class="col-sm-2 col-form-label col-form-label-lg font-weight-bold">Dataframe:</label>
+                <div class="col-sm-10">
+                    <input type="file" class="form-control form-control-lg ml-4" name="dataframe"><br> 
+                </div><br><br>
+                <label for="model" class="col-sm-2 col-form-label col-form-label-lg font-weight-bold">Model:</label>
+                <div class="col-sm-10">
+                    <input type="file" class="form-control form-control-lg ml-4" name="model"><br> 
+                </div><br><br>
+                <label for="predictions" class="col-sm-2 col-form-label col-form-label-lg font-weight-bold">Predictions:</label>
+                <div class="col-sm-10">
+                    <input type="file" class="form-control form-control-lg" name="predictions">
+                </div><br>
+        </div>
+	<button type="submit" class="btn btn-secondary btn-lg ml-3 mx-auto">Upload</button>
     </form>
 {% endblock %}
 
