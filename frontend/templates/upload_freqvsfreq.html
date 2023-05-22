@@ -2,17 +2,25 @@
 <form action="{{ url_for('freqvsfreq') }}" method="POST" enctype="multipart/form-data">
     <fieldset>
 	<legend>Select a distance:</legend>
-	<input type="radio" name="distance1" id="distance1" value="TotalVariation" checked>
-	<label for="distance1">TotalVariation</label>
-	<input type="radio" name="distance1" id="distance2" value="KLDivergence">
-	<label for="distance2">KLDivergence</label>
+        <div class="btn-group">
+            <input type="radio" class="btn-check" name="distance" id="distance1" value="TotalVariation" autocomplete="off" checked>
+            <label class="btn btn-success btn-lg" for="distance1">TotalVariation</label>
+            <input type="radio" class="btn-check" name="distance" id="distance2" value="KLDivergence" autocomplete="off">
+            <label class="btn btn-success btn-lg" for="distance2">Symmetrical KL</label>
+        </div>
     </fieldset><br><br>
     <fieldset>
 	<legend>Select an aggregation function:</legend>
-	<input type="radio" name="agg_func" id="agg_func1" value="min" checked>
-	<label for="agg_func1">Min</label>
-	<input type="radio" name="agg_func" id="agg_func2" value="max">
-	<label for="agg_func2">Max</label>
+        <div class="btn-group">
+            <input type="radio" class="btn-check" name="agg_func" id="agg_func1" value="min" autocomplete="off" checked>
+            <label class="btn btn-success btn-lg" for="agg_func1">Min</label>
+            <input type="radio" class="btn-check" name="agg_func" id="agg_func2" value="max">
+            <label class="btn btn-success btn-lg" for="agg_func2">Max</label>
+            <input type="radio" class="btn-check" name="agg_func" id="agg_func3" value="mean">
+            <label class="btn btn-success btn-lg" for="agg_func3">Mean</label>
+            <input type="radio" class="btn-check" name="agg_func" id="agg_func4" value="stdev">
+            <label class="btn btn-success btn-lg {{hide}}" for="agg_func4">Stddev</label>
+        </div>
         <!--
 	<input type="radio" name="agg_func" id="agg_func3" value="avg">
 	<label for="agg_func3">Mean</label>
@@ -20,24 +28,23 @@
 	<label for="agg_func4">Std Dev</label>
         -->
     </fieldset><br><br>
+    <legend>Select other parameters:</legend><br><br>
     <label for="slider">Threshold:</label>
     <input type="range" name="Slider" min="0" max="1" step="0.05" oninput="this.form.amountInput.value=this.value" />
     <input type="number" name="amountInput" min="0" max="1" step="0.05" oninput="this.form.amountRange.value=this.value" /><br><br>
     <label for="root_var">Root Variable:</label>
-    <select name="root_var">
+    <select class="selectpicker" data-style="btn-info" name="root_var" id="root_var">
         {% for item in list1 -%}
             <option value="{{item}}">{{ item }}</option>
         {%- endfor %}
-    </select><br>
+    </select><br><br>
     <label for="cond_var">Conditioning variables:</label>
-    <select name="cond_var" id="cond_var">
-        <option name="dummy"> </option>
-        <option value="select_all" onclick="select_all()" id="select_all">Select All</option>
+    <select class="selectpicker" data-style="btn-info" name="cond_var" id="cond_var" multiple data-actions-box="true">
         {% for item in list1 -%}
-            <option value="{{item}}">{{ item }}</option>
+            <option value="{{item}}" >{{ item }}</option>
         {%- endfor %}
     </select>
-    <textarea name="mytext" id="mytext"></textarea><br>
-    <input type="submit" value="Upload">
+    <textarea class="form-control w-50 mx-auto mt-2" rows="3" name="mytext" id="mytext"></textarea><br>
+    <input class="btn btn-primary btn-lg mb-3 mt-3" type="submit" value="Upload">
 </form>
 {% endblock %}
