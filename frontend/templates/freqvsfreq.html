@@ -32,9 +32,6 @@ function handle_disab() {
             $('li.disabled').hide();
         }
     }
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://172.28.3.185:5000/freqvsfreq", false);
-    xhr.send(selected_option.value);
 }
 
 function handle_select() {
