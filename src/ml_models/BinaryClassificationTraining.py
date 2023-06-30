@@ -1,6 +1,7 @@
 import mlflow
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.tree import DecisionTreeClassifier
 from pickle import dump
 from hyperopt import STATUS_OK
 import xgboost as xgb
@@ -30,6 +31,56 @@ class BinaryClassificationTraining(Training):
             mlflow.log_params(params)
 
             cl = LogisticRegression(**params)
+
+            cl.fit(X_train, Y_train)
+
+            Y_pred_train_prob = cl.predict_proba(X_train)
+            Y_pred_test_prob = cl.predict_proba(X_test)
+
+            
+            cl_metrics = self.classification_evaluation(
+                Y_train=Y_train, 
+                Y_test=Y_test, 
+                Y_pred_train_prob=Y_pred_train_prob, 
+                Y_pred_test_prob=Y_pred_test_prob,
+                threshold=threshold)
+
+            mlflow.log_metrics(cl_metrics)
+
+            mlflow.log_artifact(
+                    local_path = self.local_path_save + '_ohe.pkl',
+                    artifact_path='preprocessing'
+                )
+            mlflow.log_artifact(
+                    local_path = self.local_path_save + '_scaler.pkl',
+                    artifact_path='preprocessing'
+                )
+
+            mlflow.sklearn.log_model(cl, artifact_path='model')
+
+            return {'loss': cl_metrics['roc_auc_test'], 'status': STATUS_OK}
+
+
+    def objective_decision_tree(self,
+            params,
+            X_train,
+            X_test,
+            Y_train,
+            Y_test,
+            run_name: str = 'Unnamed',
+            threshold=0.5):
+        '''
+        Fitting function for Classification Tree
+        '''
+        with mlflow.start_run(run_name=run_name):
+            mlflow.set_tag('model_type', 'ClassificationTree')
+
+            mlflow.log_param('model_type', 'ClassificationTree')
+            mlflow.log_param('data', self.input_data_path)
+            mlflow.log_param('threshold', threshold)
+            mlflow.log_params(params)
+
+            cl = DecisionTreeClassifier(**params)
 
             cl.fit(X_train, Y_train)
 
