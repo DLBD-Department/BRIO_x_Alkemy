@@ -3,10 +3,17 @@ from sklearn.utils.extmath import cartesian
 from itertools import chain
 from itertools import combinations as itertools_combinations
 
+import threshold_calculator
+
 class BiasDetector:
 
-    def __init__(self, distance):
+    def __init__(self, distance, A1="high"):
+        '''
+            distance: which distance will be used to compute the bias detection
+            A1: sensitivity parameter used to computer the parametric threshold
+        '''
         self.dis = distance
+        self.A1 = A1
 
 
     def powerset(self, iterable):
@@ -68,6 +75,7 @@ class BiasDetector:
         '''
 
         root_variable_labels = dataframe[root_variable].unique()
+        A2 = len(root_variable_labels)
         target_variable_labels = dataframe[target_variable].unique()
 
         freqs = self.get_frequencies_list(
@@ -77,6 +85,9 @@ class BiasDetector:
                             root_variable,
                             root_variable_labels) 
         
+        #TODO needed A3, but I need to compute absolute freqs using get_frequencies list or ad hoc function
+        A3 = 0
+        threshold = threshold_calculator(self.A1, A2, A3)
         if reference_distribution is None:
             distance = self.dis.compute_distance_between_frequencies(freqs)
             return (distance, distance<=threshold)
