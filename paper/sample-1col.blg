@@ -1,0 +1,53 @@
+This is BibTeX, Version 0.99d (TeX Live 2022/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: sample-1col.aux
+The style file: elsarticle-num-names.bst
+Database file #1: sample-ceur.bib
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Warning--can't use both volume and number fields in JCohen96
+Warning--empty pages in Editor00
+Warning--empty pages in Editor00a
+Warning--empty pages in VanGundy07
+Warning--empty author in 2004:ITE:1009386.1010128
+You've used 34 entries,
+            2918 wiz_defined-function locations,
+            1138 strings with 15658 characters,
+and the built_in function-call counts, 18210 in all, are:
+= -- 1309
+> -- 470
+< -- 41
++ -- 204
+- -- 146
+* -- 1986
+:= -- 2516
+add.period$ -- 61
+call.type$ -- 34
+change.case$ -- 228
+chr.to.int$ -- 32
+cite$ -- 39
+duplicate$ -- 1573
+empty$ -- 1563
+format.name$ -- 206
+if$ -- 3459
+int.to.chr$ -- 3
+int.to.str$ -- 1
+missing$ -- 281
+newline$ -- 145
+num.names$ -- 137
+pop$ -- 534
+preamble$ -- 1
+purify$ -- 219
+quote$ -- 0
+skip$ -- 440
+stack$ -- 0
+substring$ -- 661
+swap$ -- 1031
+text.length$ -- 14
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 282
+warning$ -- 5
+while$ -- 121
+width$ -- 0
+write$ -- 468
+(There were 5 warnings)

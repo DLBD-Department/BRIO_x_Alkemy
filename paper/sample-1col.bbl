@@ -1,0 +1,250 @@
+\begin{thebibliography}{34}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\href}[2]{#2}
+\providecommand{\path}[1]{#1}
+\providecommand{\DOIprefix}{doi:}
+\providecommand{\ArXivprefix}{arXiv:}
+\providecommand{\URLprefix}{URL: }
+\providecommand{\Pubmedprefix}{pmid:}
+\providecommand{\doi}[1]{\href{http://dx.doi.org/#1}{\path{#1}}}
+\providecommand{\Pubmed}[1]{\href{pmid:#1}{\path{#1}}}
+\providecommand{\bibinfo}[2]{#2}
+\ifx\xfnm\relax \def\xfnm[#1]{\unskip,\space#1}\fi
+%Type = Book
+\bibitem[{Lamport(1986)}]{Lamport:LaTeX}
+\bibinfo{author}{L.~Lamport}, \bibinfo{title}{{\LaTeX}: A Document Preparation
+  System}, \bibinfo{publisher}{Addison-Wesley}, \bibinfo{address}{Reading,
+  MA.}, \bibinfo{year}{1986}.
+%Type = Article
+\bibitem[{Abril and Plant(2007)}]{Abril07}
+\bibinfo{author}{P.~S. Abril}, \bibinfo{author}{R.~Plant},
+\newblock \bibinfo{title}{The patent holder's dilemma: Buy, sell, or troll?},
+\newblock \bibinfo{journal}{Communications of the ACM} \bibinfo{volume}{50}
+  (\bibinfo{year}{2007}) \bibinfo{pages}{36--44}.
+  \DOIprefix\doi{10.1145/1188913.1188915}.
+%Type = Article
+\bibitem[{Cohen et~al.(2007)Cohen, Nutt, and Sagic}]{Cohen07}
+\bibinfo{author}{S.~Cohen}, \bibinfo{author}{W.~Nutt},
+  \bibinfo{author}{Y.~Sagic},
+\newblock \bibinfo{title}{Deciding equivalances among conjunctive aggregate
+  queries},
+\newblock \bibinfo{journal}{J. ACM} \bibinfo{volume}{54}
+  (\bibinfo{year}{2007}). \DOIprefix\doi{10.1145/1219092.1219093}.
+%Type = Proceedings
+\bibitem[{Cohen(1996)}]{JCohen96}
+\bibinfo{editor}{J.~Cohen} (Ed.), \bibinfo{title}{Special issue: Digital
+  Libraries}, volume~\bibinfo{volume}{39}, \bibinfo{year}{1996}.
+%Type = Book
+\bibitem[{Kosiur(2001)}]{Kosiur01}
+\bibinfo{author}{D.~Kosiur}, \bibinfo{title}{Understanding Policy-Based
+  Networking}, \bibinfo{edition}{2nd.} ed., \bibinfo{publisher}{Wiley},
+  \bibinfo{address}{New York, NY}, \bibinfo{year}{2001}.
+%Type = Book
+\bibitem[{Harel(1979)}]{Harel79}
+\bibinfo{author}{D.~Harel}, \bibinfo{title}{First-Order Dynamic Logic},
+  volume~\bibinfo{volume}{68} of \textit{\bibinfo{series}{Lecture Notes in
+  Computer Science}}, \bibinfo{publisher}{Springer-Verlag},
+  \bibinfo{address}{New York, NY}, \bibinfo{year}{1979}.
+  \DOIprefix\doi{10.1007/3-540-09237-4}.
+%Type = Inbook
+\bibitem[{Editor(2007)}]{Editor00}
+\bibinfo{editor}{I.~Editor} (Ed.), \bibinfo{title}{The title of book one},
+  volume~\bibinfo{volume}{9} of \textit{\bibinfo{series}{The name of the series
+  one}}, \bibinfo{edition}{1st.} ed., \bibinfo{publisher}{University of Chicago
+  Press}, \bibinfo{address}{Chicago}, \bibinfo{year}{2007}.
+  \DOIprefix\doi{10.1007/3-540-09237-4}.
+%Type = Inbook
+\bibitem[{Editor(2008)}]{Editor00a}
+\bibinfo{editor}{I.~Editor} (Ed.), \bibinfo{title}{The title of book two}, The
+  name of the series two, \bibinfo{edition}{2nd.} ed.,
+  \bibinfo{publisher}{University of Chicago Press}, \bibinfo{address}{Chicago},
+  \bibinfo{year}{2008}. \DOIprefix\doi{10.1007/3-540-09237-4}.
+%Type = Incollection
+\bibitem[{Spector(1990)}]{Spector90}
+\bibinfo{author}{A.~Z. Spector},
+\newblock \bibinfo{title}{Achieving application requirements},
+\newblock in: \bibinfo{editor}{S.~Mullender} (Ed.),
+  \bibinfo{booktitle}{Distributed Systems}, \bibinfo{edition}{2nd.} ed.,
+  \bibinfo{publisher}{ACM Press}, \bibinfo{address}{New York, NY},
+  \bibinfo{year}{1990}, pp. \bibinfo{pages}{19--33}.
+  \DOIprefix\doi{10.1145/90417.90738}.
+%Type = Incollection
+\bibitem[{Douglass et~al.(1998)Douglass, Harel, and Trakhtenbrot}]{Douglass98}
+\bibinfo{author}{B.~P. Douglass}, \bibinfo{author}{D.~Harel},
+  \bibinfo{author}{M.~B. Trakhtenbrot},
+\newblock \bibinfo{title}{Statecarts in use: structured analysis and
+  object-orientation},
+\newblock in: \bibinfo{editor}{G.~Rozenberg}, \bibinfo{editor}{F.~W.
+  Vaandrager} (Eds.), \bibinfo{booktitle}{Lectures on Embedded Systems}, volume
+  \bibinfo{volume}{1494} of \textit{\bibinfo{series}{Lecture Notes in Computer
+  Science}}, \bibinfo{publisher}{Springer-Verlag}, \bibinfo{address}{London},
+  \bibinfo{year}{1998}, pp. \bibinfo{pages}{368--394}.
+  \DOIprefix\doi{10.1007/3-540-65193-4_29}.
+%Type = Book
+\bibitem[{Knuth(1997)}]{Knuth97}
+\bibinfo{author}{D.~E. Knuth}, \bibinfo{title}{The Art of Computer Programming,
+  Vol. 1: Fundamental Algorithms (3rd. ed.)}, \bibinfo{publisher}{Addison
+  Wesley Longman Publishing Co., Inc.}, \bibinfo{year}{1997}.
+%Type = Inproceedings
+\bibitem[{Andler(1979)}]{Andler79}
+\bibinfo{author}{S.~Andler},
+\newblock \bibinfo{title}{Predicate path expressions},
+\newblock in: \bibinfo{booktitle}{Proceedings of the 6th. ACM SIGACT-SIGPLAN
+  symposium on Principles of Programming Languages}, POPL '79,
+  \bibinfo{publisher}{ACM Press}, \bibinfo{address}{New York, NY},
+  \bibinfo{year}{1979}, pp. \bibinfo{pages}{226--236}.
+  \DOIprefix\doi{10.1145/567752.567774}.
+%Type = Inproceedings
+\bibitem[{Smith(2010)}]{Smith10}
+\bibinfo{author}{S.~W. Smith},
+\newblock \bibinfo{title}{An experiment in bibliographic mark-up: Parsing
+  metadata for xml export},
+\newblock in: \bibinfo{editor}{R.~N. Smythe}, \bibinfo{editor}{A.~Noble}
+  (Eds.), \bibinfo{booktitle}{Proceedings of the 3rd. annual workshop on
+  Librarians and Computers}, volume~\bibinfo{volume}{3} of
+  \textit{\bibinfo{series}{LAC '10}}, \bibinfo{publisher}{Paparazzi Press},
+  \bibinfo{address}{Milan Italy}, \bibinfo{year}{2010}, pp.
+  \bibinfo{pages}{422--431}. \DOIprefix\doi{99.9999/woot07-S422}.
+%Type = Inproceedings
+\bibitem[{Gundy et~al.(2007)Gundy, Balzarotti, and Vigna}]{VanGundy07}
+\bibinfo{author}{M.~V. Gundy}, \bibinfo{author}{D.~Balzarotti},
+  \bibinfo{author}{G.~Vigna},
+\newblock \bibinfo{title}{Catch me, if you can: Evading network signatures with
+  web-based polymorphic worms},
+\newblock in: \bibinfo{booktitle}{Proceedings of the first USENIX workshop on
+  Offensive Technologies}, WOOT '07, \bibinfo{publisher}{USENIX Association},
+  \bibinfo{address}{Berkley, CA}, \bibinfo{year}{2007}.
+%Type = Techreport
+\bibitem[{Harel(1978)}]{Harel78}
+\bibinfo{author}{D.~Harel}, \bibinfo{title}{LOGICS of Programs: AXIOMATICS and
+  DESCRIPTIVE POWER}, \bibinfo{type}{MIT Research Lab Technical Report}
+  \bibinfo{number}{TR-200}, Massachusetts Institute of Technology,
+  \bibinfo{address}{Cambridge, MA}, \bibinfo{year}{1978}.
+%Type = Phdthesis
+\bibitem[{Clarkson(1985)}]{Clarkson85}
+\bibinfo{author}{K.~L. Clarkson}, \bibinfo{title}{Algorithms for Closest-Point
+  Problems (Computational Geometry)}, Ph.D. thesis, Stanford University,
+  \bibinfo{address}{Palo Alto, CA}, \bibinfo{year}{1985}. \bibinfo{note}{UMI
+  Order Number: AAT 8506171}.
+%Type = Masterthesis
+\bibitem[{Anisi(2003)}]{anisi03}
+\bibinfo{author}{D.~A. Anisi}, \bibinfo{title}{Optimal Motion Control of a
+  Ground Vehicle}, Master's thesis, Royal Institute of Technology (KTH),
+  Stockholm, Sweden, \bibinfo{year}{2003}.
+%Type = Misc
+\bibitem[{Thornburg(2001)}]{Thornburg01}
+\bibinfo{author}{H.~Thornburg}, \bibinfo{title}{Introduction to bayesian
+  statistics}, \bibinfo{year}{2001}. \URLprefix
+  \url{http://ccrma.stanford.edu/~jos/bayes/bayes.html}.
+%Type = Misc
+\bibitem[{Ablamowicz and Fauser(2007)}]{Ablamowicz07}
+\bibinfo{author}{R.~Ablamowicz}, \bibinfo{author}{B.~Fauser},
+  \bibinfo{title}{Clifford: a maple 11 package for clifford algebra
+  computations, version 11}, \bibinfo{year}{2007}. \URLprefix
+  \url{http://math.tntech.edu/rafal/cliff11/index.html}.
+%Type = Misc
+\bibitem[{Poker-Edge.Com(2006)}]{Poker06}
+\bibinfo{author}{Poker-Edge.Com}, \bibinfo{title}{Stats and analysis},
+  \bibinfo{year}{2006}. \URLprefix \url{http://www.poker-edge.com/stats.php}.
+%Type = Misc
+\bibitem[{Obama(2008)}]{Obama08}
+\bibinfo{author}{B.~Obama}, \bibinfo{title}{A more perfect union},
+  \bibinfo{howpublished}{Video}, \bibinfo{year}{2008}. \URLprefix
+  \url{http://video.google.com/videoplay?docid=6528042696351994555}.
+%Type = Inproceedings
+\bibitem[{Novak(2003)}]{Novak03}
+\bibinfo{author}{D.~Novak},
+\newblock \bibinfo{title}{Solder man},
+\newblock in: \bibinfo{booktitle}{ACM SIGGRAPH 2003 Video Review on Animation
+  theater Program: Part I - Vol. 145 (July 27--27, 2003)},
+  \bibinfo{publisher}{ACM Press}, \bibinfo{address}{New York, NY},
+  \bibinfo{year}{2003}, p.~\bibinfo{pages}{4}. \URLprefix
+  \url{http://video.google.com/videoplay?docid=6528042696351994555}.
+  \DOIprefix\doi{99.9999/woot07-S422}.
+%Type = Article
+\bibitem[{Lee(2005)}]{Lee05}
+\bibinfo{author}{N.~Lee},
+\newblock \bibinfo{title}{Interview with bill kinder: January 13, 2005},
+\newblock \bibinfo{journal}{Comput. Entertain.} \bibinfo{volume}{3}
+  (\bibinfo{year}{2005}). \DOIprefix\doi{10.1145/1057270.1057278}.
+%Type = Misc
+\bibitem[{Scientist(2009)}]{JoeScientist001}
+\bibinfo{author}{J.~Scientist}, \bibinfo{title}{The fountain of youth},
+  \bibinfo{year}{2009}. \bibinfo{note}{Patent No. 12345, Filed July 1st., 2008,
+  Issued Aug. 9th., 2009}.
+%Type = Article
+\bibitem[{Rous(2008)}]{rous08}
+\bibinfo{author}{B.~Rous},
+\newblock \bibinfo{title}{The enabling of digital libraries},
+\newblock \bibinfo{journal}{Digital Libraries} \bibinfo{volume}{12}
+  (\bibinfo{year}{2008}). \bibinfo{note}{To appear}.
+%Type = Article
+\bibitem[{Saeedi et~al.(2010{\natexlab{a}})Saeedi, Zamani, and
+  Sedighi}]{SaeediMEJ10}
+\bibinfo{author}{M.~Saeedi}, \bibinfo{author}{M.~S. Zamani},
+  \bibinfo{author}{M.~Sedighi},
+\newblock \bibinfo{title}{A library-based synthesis methodology for reversible
+  logic},
+\newblock \bibinfo{journal}{Microelectron. J.} \bibinfo{volume}{41}
+  (\bibinfo{year}{2010}{\natexlab{a}}) \bibinfo{pages}{185--194}.
+%Type = Article
+\bibitem[{Saeedi et~al.(2010{\natexlab{b}})Saeedi, Zamani, Sedighi, and
+  Sasanian}]{SaeediJETC10}
+\bibinfo{author}{M.~Saeedi}, \bibinfo{author}{M.~S. Zamani},
+  \bibinfo{author}{M.~Sedighi}, \bibinfo{author}{Z.~Sasanian},
+\newblock \bibinfo{title}{Synthesis of reversible circuit using cycle-based
+  approach},
+\newblock \bibinfo{journal}{J. Emerg. Technol. Comput. Syst.}
+  \bibinfo{volume}{6} (\bibinfo{year}{2010}{\natexlab{b}}).
+%Type = Article
+\bibitem[{Kirschmer and Voight(2010)}]{Kirschmer:2010:AEI:1958016.1958018}
+\bibinfo{author}{M.~Kirschmer}, \bibinfo{author}{J.~Voight},
+\newblock \bibinfo{title}{Algorithmic enumeration of ideal classes for
+  quaternion orders},
+\newblock \bibinfo{journal}{SIAM J. Comput.} \bibinfo{volume}{39}
+  (\bibinfo{year}{2010}) \bibinfo{pages}{1714--1747}. \URLprefix
+  \url{http://dx.doi.org/10.1137/080734467}. \DOIprefix\doi{10.1137/080734467}.
+%Type = Book
+\bibitem[{H{\"o}rmander(1985{\natexlab{a}})}]{MR781536}
+\bibinfo{author}{L.~H{\"o}rmander}, \bibinfo{title}{The analysis of linear
+  partial differential operators. {IV}}, volume \bibinfo{volume}{275} of
+  \textit{\bibinfo{series}{Grundlehren der Mathematischen Wissenschaften
+  [Fundamental Principles of Mathematical Sciences]}},
+  \bibinfo{publisher}{Springer-Verlag}, \bibinfo{address}{Berlin, Germany},
+  \bibinfo{year}{1985}{\natexlab{a}}. \bibinfo{note}{Fourier integral
+  operators}.
+%Type = Book
+\bibitem[{H{\"o}rmander(1985{\natexlab{b}})}]{MR781537}
+\bibinfo{author}{L.~H{\"o}rmander}, \bibinfo{title}{The analysis of linear
+  partial differential operators. {III}}, volume \bibinfo{volume}{275} of
+  \textit{\bibinfo{series}{Grundlehren der Mathematischen Wissenschaften
+  [Fundamental Principles of Mathematical Sciences]}},
+  \bibinfo{publisher}{Springer-Verlag}, \bibinfo{address}{Berlin, Germany},
+  \bibinfo{year}{1985}{\natexlab{b}}. \bibinfo{note}{Pseudodifferential
+  operators}.
+%Type = Inproceedings
+\bibitem[{IEEE(2004)}]{2004:ITE:1009386.1010128}
+IEEE,
+\newblock \bibinfo{title}{Ieee tcsc executive committee},
+\newblock in: \bibinfo{booktitle}{Proceedings of the IEEE International
+  Conference on Web Services}, ICWS '04, \bibinfo{publisher}{IEEE Computer
+  Society}, \bibinfo{address}{Washington, DC, USA}, \bibinfo{year}{2004}, pp.
+  \bibinfo{pages}{21--22}. \DOIprefix\doi{10.1109/ICWS.2004.64}.
+%Type = Misc
+\bibitem[{TUG(2017)}]{TUGInstmem}
+TUG, \bibinfo{title}{Institutional members of the {\TeX} users group},
+  \bibinfo{year}{2017}. \URLprefix \url{http://www.tug.org/instmem.html}.
+%Type = Misc
+\bibitem[{{R Core Team}(2019)}]{R}
+\bibinfo{author}{{R Core Team}}, \bibinfo{title}{R: A language and environment
+  for statistical computing}, \bibinfo{year}{2019}. \URLprefix
+  \url{https://www.R-project.org/}.
+%Type = Misc
+\bibitem[{Anzaroot and McCallum(2013)}]{UMassCitations}
+\bibinfo{author}{S.~Anzaroot}, \bibinfo{author}{A.~McCallum},
+  \bibinfo{title}{{UMass} citation field extraction dataset},
+  \bibinfo{year}{2013}. \URLprefix
+  \url{http://www.iesl.cs.umass.edu/data/data-umasscitationfield}.
+
+\end{thebibliography}
