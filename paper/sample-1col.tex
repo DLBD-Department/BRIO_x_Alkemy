@@ -20,6 +20,8 @@
 %% auto break lines
 \lstset{breaklines=true}
 
+
+\newcommand[#1]{\color{red}#1}}
 %%
 %% end of the preamble, start of the body of the document source.
 \begin{document}
@@ -27,15 +29,14 @@
 %%
 %% Rights management information.
 %% CC-BY is default license.
-\copyrightyear{2022}
+\copyrightyear{2023}
 \copyrightclause{Copyright for this paper by its authors.
   Use permitted under Creative Commons License Attribution 4.0
   International (CC BY 4.0).}
 
 %%
 %% This command is for the conference information
-\conference{Woodstock'22: Symposium on the irreproducible science,
-  June 07--11, 2022, Woodstock, NY}
+\conference{BEWARE23: Workshop on Bias, Risk, Explainability and the role of Logic and Logic Programming, 6--9 Novevember 2023, Rome, Italy}
 
 %%
 %% The "title" command
@@ -108,7 +109,7 @@ url=http://conceptbase.sourceforge.net/mjf/,
 \maketitle
 
 \section{Introduction}
-
+\label{sec:intro}
 
 @UNIMI
 
@@ -124,7 +125,7 @@ This software application is meant as an analysis tool for helping developers an
 The system we are presenting is based on the theoretical, foundational works presented in \cite{pk16}, \cite{dap21}, \cite{dagp22}, and \cite{gp23}.
 
 
-The system presents two autonomous modules for the analysis of bias and opacity of AI models and a module depending on these two concerning risk evaluation. This paper contains a presentation of the implementation of the first module (for bias analysis) to be integrated in the complete system. The paper discusses the motivation behind the definition of the system, the intuition and the formal ideas behind the implementation of the module for bias analysis, its technical description and an analysis of data obtained form an initial case study.
+The system presents two autonomous modules for the analysis of bias and opacity of AI models and a module depending on these two concerning risk evaluation. This paper contains a presentation of the implementation of the first module (for bias analysis) to be integrated in the complete system. The paper discusses the motivation behind the definition of the system, the intuition and the formal ideas behind the implementation of the module for bias analysis, its technical description and an analysis of data obtained from an initial case study.
 
 \section{Theory}
 
@@ -147,7 +148,7 @@ Since the divergence $D_{\mathrm{KL}}$ is not symmetric, when we have to compare
 A second choice is to go for the very simple but intuitive $D_{\mathrm{TV}}$:\[D_{\mathrm{TV}}(P\parallel Q)= \sup _{x\in X} \vert P(x) - Q(x)\vert\]which simply computes the greatest difference between the probability of obtaining an output $o$ when we run our AI system on the individuals of the sensitive class $c_1\in F$ and the probability of obtaining the same output $o$ when we run our AI system on the individuals of the sensitive class $c_2\in F$.
 
 
-{\color{red} Finally, in order to normalise the values of the different divergences that we use in the system and be able to select common, reasonable thresholds for all of them, we project the values of $D_{\mathrm{KL}}$ and $D^{\mathrm{Sym}}_{\mathrm{KL}}$---which are not bewteen $0$ and $1$ by default---onto the interval $[0,1]$ as follows: instead of $D_{\mathrm{KL}}(P\parallel Q)$ we use $1-\frac{1}{D_{\mathrm{KL}}(P\parallel Q)}$ and instead of $D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)$ we use $1-\frac{1}{D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)}$.}
+{\ehi Finally, in order to normalise the values of the different divergences that we use in the system and be able to select common, reasonable thresholds for all of them, we project the values of $D_{\mathrm{KL}}$ and $D^{\mathrm{Sym}}_{\mathrm{KL}}$---which are not bewteen $0$ and $1$ by default---onto the interval $[0,1]$ as follows: instead of $D_{\mathrm{KL}}(P\parallel Q)$ we use $1-\frac{1}{D_{\mathrm{KL}}(P\parallel Q)}$ and instead of $D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)$ we use $1-\frac{1}{D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)}$.}
 
 
 \subsection{How to handle sensitive features corresponding to more than two classes}
@@ -218,6 +219,14 @@ The number $n_C$ of classes related to the sensitive feature and the number $n_D
 \section{Conclusions and Further Work}
 
 @UNIMI
+
+
+{\ehi FURTHER WORK?}
+
+As already mentioned in Section \ref{sec:intro}, while we presented a tool for the detection of biased behaviours in AI systems, a more general software framework including the presented one is  
+
+The system presents two autonomous modules for the analysis of bias and opacity of AI models and a module depending on these two concerning risk evaluation. This paper contains a presentation of the implementation of the first module (for bias analysis) to be integrated in the complete system. The paper discusses the motivation behind the definition of the system, the intuition and the formal ideas behind the implementation of the module for bias analysis, its technical description and an analysis of data obtained from an initial case study.
+
 
 \section{Acknowledgments}
 
