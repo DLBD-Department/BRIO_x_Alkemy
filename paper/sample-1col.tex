@@ -116,15 +116,16 @@ url=http://conceptbase.sourceforge.net/mjf/,
 
 The project BRIO aims at developing formal and conceptual frameworks for the analysis of AI systems and for the advancement of the technical and philosophical understanding of the notions of Bias, Risk and Opacity in AI, with the ultimate objective of generally contributing to the development of trustworthy AI. 
 
-
 The collaboration between BRIO and Alkemy aims at the development of software applications for the analysis of bias and risk with regard to AI technologies which often rely on probabilistic computations and  are often opaque in nature. One of the most challenging aspects of modern AI systems, indeed, is the fact that they do not operate in a deterministic way, namely they do not simply implement a function that associates a unique output to each input, and they are not transparent, in the sense that a general formal description of their behaviour might not be available.
 
-This software application is meant as an analysis tool for helping developers and data scientists to test and use more responsibly software system tools that rely on AI technologies.
+We present a software application for the detection and analysis of biases in AI systems. The application is meant to help developers and data scientists that wish to test software systems relying on probabilistic and learning mechanisms in order to detect misbehaviours, collect data about them and develop the systems in order to provide less biased versions of them\dots  
 
-The system we are presenting is based on the theoretical, foundational works presented in \cite{pk16}, \cite{dap21}, \cite{dagp22}, and \cite{gp23}.
+The system we are presenting is based on the theoretical, foundational works presented in
+%\cite{pk16}, 
+\cite{dap21}, \cite{dagp22}, and \cite{gp23}.
 
+This paper contains a presentation of the implementation of the application, a discussion of the motivation behind the definition of the system, the intuition and the formal ideas behind the implementation of the module for bias analysis, its technical description and an analysis of data obtained from an initial case study.
 
-The system presents two autonomous modules for the analysis of bias and opacity of AI models and a module depending on these two concerning risk evaluation. This paper contains a presentation of the implementation of the first module (for bias analysis) to be integrated in the complete system. The paper discusses the motivation behind the definition of the system, the intuition and the formal ideas behind the implementation of the module for bias analysis, its technical description and an analysis of data obtained from an initial case study.
 
 \section{Theory}
 
@@ -220,12 +221,8 @@ The number $n_C$ of classes related to the sensitive feature and the number $n_D
 @UNIMI
 
 
-{\ehi FURTHER WORK?}
 
-As already mentioned in Section \ref{sec:intro}, while we presented a tool for the detection of biased behaviours in AI systems, a more general software framework including the presented one is  
-
-The system presents two autonomous modules for the analysis of bias and opacity of AI models and a module depending on these two concerning risk evaluation. This paper contains a presentation of the implementation of the first module (for bias analysis) to be integrated in the complete system. The paper discusses the motivation behind the definition of the system, the intuition and the formal ideas behind the implementation of the module for bias analysis, its technical description and an analysis of data obtained from an initial case study.
-
+The presented tool for the detection of biases in AI systems is a part of a more complex software consisting of three, partly inter-dependent modules. The complete system will present two autonomous modules for the analysis of bias---the one just presented---and opacity of AI systems and a module depending on these two concerning risk evaluation. 
 
 \section{Acknowledgments}
 
