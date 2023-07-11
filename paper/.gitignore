@@ -1,0 +1,9 @@
+*.aux
+*.abs
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex.gz
+*.toc
+sample-col1.pdf

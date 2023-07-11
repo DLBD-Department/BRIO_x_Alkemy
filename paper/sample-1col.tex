@@ -16,9 +16,12 @@
 %% Minted listings support 
 %% Need pygment <http://pygments.org/> <http://pypi.python.org/pypi/Pygments>
 \usepackage{listings}
+\usepackage{xcolor}
 %% auto break lines
 \lstset{breaklines=true}
 
+
+\newcommand[#1]{\color{red}#1}}
 %%
 %% end of the preamble, start of the body of the document source.
 \begin{document}
@@ -26,23 +29,23 @@
 %%
 %% Rights management information.
 %% CC-BY is default license.
-\copyrightyear{2022}
+\copyrightyear{2023}
 \copyrightclause{Copyright for this paper by its authors.
   Use permitted under Creative Commons License Attribution 4.0
   International (CC BY 4.0).}
 
 %%
 %% This command is for the conference information
-\conference{Woodstock'22: Symposium on the irreproducible science,
-  June 07--11, 2022, Woodstock, NY}
+\conference{BEWARE23: Workshop on Bias, Risk, Explainability and the role of Logic and Logic Programming, 6--9 November 2023, Rome, Italy}
 
 %%
 %% The "title" command
 \title{BRIOxAlkemy: A Bias detecting tool}
 
 \tnotemark[1]
-\tnotetext[1]{You can use this document as the template for preparing your
-  publication. We recommend using the latest version of the ceurart style.}
+\tnotetext[1]{%
+% You can use this document as the template for preparing your publication. We recommend using the latest version of the ceurart style.
+Work funded by the PRIN project n.2020SSKZ7R BRIO (Bias, Risk and Opacity in AI).}
 
 %%
 %% The "author" command and its associated commands are used to define
@@ -59,13 +62,11 @@ url=https://yamadharma.github.io/,
 \address[2]{Joint Institute for Nuclear Research,
   6 Joliot-Curie, Dubna, Moscow region, 141980, Russian Federation}
 
-\author[3]{Ilaria Tiddi}[%
-orcid=0000-0001-7116-9338,
-email=i.tiddi@vu.nl,
-url=https://kmitd.github.io/ilaria/,
+\author[3]{Francesco A. Genco}[%
+email=francesco.genco@unimi.it,
 ]
 \fnmark[1]
-\address[3]{Vrije Universiteit Amsterdam, De Boelelaan 1105, 1081 HV Amsterdam, The Netherlands}
+\address[3]{LUCI Group, University of Milan, via Festa del Perdono 7, 20122 Milan, Italy}
 
 \author[4]{Manfred Jeusfeld}[%
 orcid=0000-0002-9421-8566,
@@ -107,13 +108,101 @@ url=http://conceptbase.sourceforge.net/mjf/,
 \maketitle
 
 \section{Introduction}
-
+\label{sec:intro}
 
 @UNIMI
+
+
+The project BRIO aims at developing formal and conceptual frameworks for the analysis of AI systems and for the advancement of the technical and philosophical understanding of the notions of Bias, Risk and Opacity in AI, with the ultimate objective of generally contributing to the development of trustworthy AI. 
+
+The collaboration between BRIO and Alkemy aims at the development of software applications for the analysis of bias and risk with regard to AI technologies which often rely on probabilistic computations and  are often opaque in nature. One of the most challenging aspects of modern AI systems, indeed, is the fact that they do not operate in a deterministic way, namely they do not simply implement a function that associates a unique output to each input, and they are not transparent, in the sense that a general formal description of their behaviour might not be available.
+
+We present a software application for the detection and analysis of biases in AI systems. The application is meant to help developers and data scientists that wish to test software systems relying on probabilistic and learning mechanisms in order to detect misbehaviours, collect data about them and develop the systems in order to provide less biased versions of them\dots  
+
+The system we are presenting is based on the theoretical, foundational works presented in
+%\cite{pk16}, 
+\cite{dap21}, \cite{dagp22}, and \cite{gp23}.
+
+This paper contains a presentation of the implementation of the application, a discussion of the motivation behind the definition of the system, the intuition and the formal ideas behind the implementation of the module for bias analysis, its technical description and an analysis of data obtained from an initial case study.
+
 
 \section{Theory}
 
 @UNIMI
+
+Intuitively, the system takes as input a set of individuals associated with their properties, the answer that the AI model under investigation gave when presented with the individuals in our set, and a series of parameter settings chosen by the user (including the designation of a sensitive feature).
+
+The output is a complex evaluation of the possibility that the considered AI model is biased with respect to the features designated as sensitive by the user. 
+
+Even though the system closely guides the user in the process of setting the parameters and provides it with detailed explanations, the user has a great freedom of customisation with respect to the mathematical details of the analysis. The choices left to the user are those that actually make a conceptual difference in the outcome of the analysis and this difference is explained to the user during the setting of these parameters.
+
+The analysis conducted by our system are of two kids: comparison between the behaviour of the AI system and a target desirable behaviour, and comparison between the behaviour of the AI system with respect to a sensitive class $c_1\in F$ and the behaviour of the AI system with respect to another sensitive class $c_2\in F$ related to the same sensitive feature $F$. The second comparison includes a subsequent check, in case we find a biased behaviour, on some (or all) the subclasses of the considered sensitive classes. This second-stage check is supposed to tell us if the bias encountered at the level of the classes can be explained away by other features of the individuals in the sensitive classes considered that are not related to the sensitive feature at hand. 
+ 
+\subsection{Divergences}
+In order to compute the difference between the behaviour of the AI system under investigation and an optimal behaviour, in case some data about such an optimal behaviour is available, we employ a divergence borrowed from information theory: The Kullback–Leibler divergence $D_{\mathrm{KL}}$. This measure is mathematically expressed by the following equation: 
+\[D_{\mathrm{KL}}(P\parallel Q)= \sum _{x\in X} P(x)\cdot \log ( \frac{P(x)}{Q(x)})\]
+It intuitively indicates the difference, in probabilistic terms, between the input-output behaviour of the AI system at hand---corresponding to the probability distribution $Q$---and a reference probability distribution $P$ describing how the AI system should ideally behave. Before adding up all the the differences computed for each possible output of the AI system, these differences are weighted by the actual probability of correctly obtaining that output.
+
+Since the divergence $D_{\mathrm{KL}}$ is not symmetric, when we have to compare the behaviour of the system on a sensitive class with the behaviour of the system on another sensitive class, we must adopt another measure. A first choice is to simply adopt a symmetric version $D^{\mathrm{Sym}}_{\mathrm{KL}}$ of $D_{\mathrm{KL}}$:\[D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)=\frac{D_{\mathrm{KL}}(P\parallel Q)+D_{\mathrm{KL}}(Q\parallel P)}{2}\]
+A second choice is to go for the very simple but intuitive $D_{\mathrm{TV}}$:\[D_{\mathrm{TV}}(P\parallel Q)= \sup _{x\in X} \vert P(x) - Q(x)\vert\]which simply computes the greatest difference between the probability of obtaining an output $o$ when we run our AI system on the individuals of the sensitive class $c_1\in F$ and the probability of obtaining the same output $o$ when we run our AI system on the individuals of the sensitive class $c_2\in F$.
+
+Finally, in order to normalise the values of the different divergences that we use in the system and be able to select common, reasonable thresholds for all of them, we project the values of $D_{\mathrm{KL}}$ and $D^{\mathrm{Sym}}_{\mathrm{KL}}$---which are not bewteen $0$ and $1$ by default---onto the interval $[0,1]$ as follows: instead of $D_{\mathrm{KL}}(P\parallel Q)$ we use $1-\frac{1}{D_{\mathrm{KL}}(P\parallel Q)}$ and instead of $D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)$ we use $1-\frac{1}{D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)}$.
+
+
+\subsection{How to handle sensitive features corresponding to more than two classes}
+
+
+Since the divergences the system uses are binary functions, it is not obvious how to handle the case in which the sensitive feature we are considering partitions the domain in three or more classes. It is, indeed, easy to compute the divergence for pairs of classes, but we also need, in this case, a sensible way of aggregating the obtained results in order to obtain one value describing well how the AI model behaves with respect to the sensitive feature under consideration. It turns out that there are several ways of doing this and each of them tells us something of value if we wish to reach a meaningful conclusion about the AI model.
+
+Suppose that we are studying the behaviour of the model with respect to the feature $F=\{c_1, \ldots , c_n\}$ which induces a partition of our domain of individuals into the classes $c_1, \ldots , c_n$. The first step, required in any case, is the pairwise calculation of the divergences with respect to the different classes induced by $F$. Hence, for each pair $(c_i\parallel c_j)$ such that $c_i, c_j\in F$, we compute $D(c_i\parallel c_j) $ where $D$ is the  preselected divergence and consider the set $\{D(c_i\parallel c_j) : c_i,c_j\in F \& i\neq j\}$. For instance, if we are considering age as our feature  $F$ and we partition our domain into three age groups, we might have
+\[F=\{over\_50\_yo, between\_40\_and\_50\_yo, below\_40\_yo\}\]
+We can then use the following ways of aggregating the obtained values.
+
+\paragraph{The maximal divergence}
+
+$\max (\{D(c_i\parallel c_j): c_i,c_j\in C \& i\neq j\})$
+
+The maximal divergence corresponds to the worst case scenario with respect to the bias of our AI system. This measure indicates how much the AI system favours the most favoured class with respect to the least favoured class related to our sensitive feature.
+
+\paragraph{The minimal divergence}
+
+$\min (\{D(c_i\parallel c_j): c_i,c_j\in C \& i\neq j\})$
+
+
+The minimal divergence, on the other hand, corresponds to the best case scenario.  This measure indicates the minimal bias expressed by our AI system with respect to the sensitive feature. If this measure is $0$, we do not know much, but if it is much above our threshold, then we know that the AI system under analyis expresses strong biases with respect to all classes related to the sensitive feature.
+
+
+\paragraph{The average of the divergences}
+
+$\sum_{c_i,c_j\in C} D(c_i\parallel c_j)/\binom{\mid C\mid}{2}$ That is, the sum of the divergences between the two elements of each pair $c_i,c_j\in C$ divided by the total number $\binom{\mid C\mid}{2}$ of these pairs.
+
+This measure indicates the average bias expressed by the AI system. Unlike the previous measures, this one meaningfully combines information about the behaviour of the system with respect to all classes related to the sensitive feature.  What this measure still does not tell us, though, is the variability of the behaviour of the system in terms of bias. The same average, indeed, could be due to a few very biased behaviours or to many mildly biased behaviours.
+
+
+\paragraph{The standard deviation of the divergences}
+
+\[\sqrt{ (\sum_{c_i,c_j\in C} (D(c_i\parallel c_j)-\mu)^2 / \binom{\mid C\mid}{2}  )}\]
+ where  $\mu = \sum_{c_i,c_j\in C} D(c_i\parallel c_j)/\binom{\mid C\mid}{2}$. That is, the square root of the average of the squares of the divergences between each value $D(c_i\parallel c_j)$ and the average value of $D(c_i\parallel c_j)$ for each pair $c_i,c_j$. In other terms,  we calculate the average of the divergences, then the difference of each divergence with respect to their average, then we square this differences and calculate their average. Finally, we compute the square root of this average.
+
+This measure indicates the variability of the bias expressed by the AI system we are inspecting. That is, how much difference there is between the cases in which the system is behaving in a very biased way and the cases in which the system is behaving in a mildly biased way. This information complements the information we can gather by computing the previous measure.
+
+\subsection{Parametrisation of the threshold for the divergence}
+
+Most of the times the system computes a divergence between the results of the model and a reference distribution or the results of the model for one class ad another class, a threshold is employed to check whether the divergence is significant---and should be treated as a possible violation of our fairness criteria---or negligible---and thus should be simply ignored. Obviously, fixing this threshold once and for all would give a rather inflexible system.
+
+For instance, setting the threshold to $1/100$ might be reasonable if we are considering the results of the model on a set of $100$ individuals, but it is clearly too strict if our domain only contains $40$ individuals. Indeed, in the latter case, even a difference only concerning one individual would constitute a mistake much greater than the one admitted by the threshold.   
+
+This is why we parametrised the threshold on the basis of several factors. First, the user has to decide how much rigour is required when analysing the behaviour of the model with respect to the feature indicated as sensitive for the present analysis. Two settings are possible: $\mathtt{high}$ and $\mathtt{low}$. The setting $\mathtt{high}$ implies that the considered feature is very sensitive and that the system should be extra attentive about the behaviour of the model in relation to it, while $\mathtt{low}$ implies that differences in the behaviour of the model with respect to the considered feature are significant only if they are particularly strong or extreme. This setting distinguishes between a thorough and rigorous investigation and a simple routine check, one might say.
+
+The second factor considered in computing the threshold is the number of classes related to the sensitive feature under consideration. We could call this the {\it granularity} of the predicates related to the sensitive feature, and it indicates how specific the predicates determining the studied classes are. Specific predicates describe in more detail the objects of our domain and determine more specific classes. When the classes that we are considering are very specific, the divergence generated by the bias of the model can be spread over several different classes. Hence, we need to be more attentive about the small divergences that appear locally---that is, when we check pairs of these classes. The threshold should thus be stricter.
+
+
+Finally, each time we compute a divergence relative to two classes, we scale the threshold with respect to the cardinality of the two classes. Large classes mean a stricter threshold. This is a rather obvious choice related to the fact that statistical data related to a large number of individuals tend to be more precise and fine grained. We already gave an example of this few lines ago.
+
+Technically, the threshold is always between $0.05$ and $0.005$, the setting $\mathtt{high}$ restricts this range to the interval $[0.0275, 0.005]$ and the setting $\mathtt{low}$ to the interval $[0.05, 0.0275]$.
+
+
+The number $n_C$ of classes related to the sensitive feature and the number $n_D$ of individuals in our local domain (that is, the cardinality of the union of the two classes with respect to which we are computing the divergence) are used to decrease the threshold (in other words, to make it stricter) proportionally with respect to the interval selected. The greater the number $n_C$, the smaller the threshold, the greater the number $n_D$, again, the smaller the threshold. The mathematicla formula used is the following:  $((n_C \cdots n_D) x M) + ((1-(n_C \cdot n_D)) \cdot m)$ where $M$ is the upper limit of our interval and $m$ is its lower limit.
 
 \section{Implementation}
 
@@ -127,6 +216,8 @@ url=http://conceptbase.sourceforge.net/mjf/,
 \section{Conclusions and Further Work}
 
 @UNIMI
+
+The presented tool for the detection of biases in AI systems is a part of a more complex software consisting of three, partly inter-dependent modules. The complete system will present two autonomous modules for the analysis of bias---the one just presented---and opacity of AI systems and a module depending on these two concerning risk evaluation. 
 
 \section{Acknowledgments}
 
