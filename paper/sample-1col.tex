@@ -117,16 +117,12 @@ The project BRIO aims at developing formal and conceptual frameworks for the ana
 
 The collaboration between BRIO and Alkemy aims at the development of software applications for the analysis of bias and risk with regard to AI technologies which often rely on probabilistic computations and  are often opaque in nature. One of the most challenging aspects of modern AI systems, indeed, is the fact that they do not operate in a deterministic way, namely they do not simply implement a function that associates a unique output to each input, and they are not transparent, in the sense that a general formal description of their behaviour might not be available.
 
-We present a software application for the detection and analysis of biases in AI systems. The application is meant to help developers and data scientists that wish to test software systems relying on probabilistic and learning mechanisms in order to detect misbehaviours, collect data about them and develop the systems in order to provide less biased versions of them\dots  
-
-The system we are presenting is based on the theoretical, foundational works presented in
-%\cite{pk16}, 
-\cite{dap21}, \cite{dagp22}, and \cite{gp23}.
-
-This paper contains a presentation of the implementation of the application, a discussion of the motivation behind the definition of the system, the intuition and the formal ideas behind the implementation of the module for bias analysis, its technical description and an analysis of data obtained from an initial case study.
+We present a software application for the detection and analysis of biased behaviours in AI systems. The application is meant as a tool for developers and data scientists that wish to test software systems relying on probabilistic and learning mechanisms in order to detect misbehaviours related to biases and collect data about them. The ultimate goal is to provide them with useful insights and data for the improvement of the AI systems with respect to bias.
 
 
-\section{Theory}
+The system we are presenting is based on the theoretical, foundational works presented in \cite{dap21}, \cite{dagp22}, and \cite{gp23}, and in this paper we discuss the formal ideas behind the definition of the software (Section \ref{sec:theory}), the technical details of its implentation implementation  (Section \ref{sec:implementation}), the data obtained from a case study that validates the usefulness of the software (Section \ref{sec:validation}), and the projected further developments aimed at integrating the presented software in a more general tool for the analysis of AI systems (Section \ref{sec:conclusions}).
+
+\section{Theory}\label{sec:theory}
 
 @UNIMI
 
@@ -205,19 +201,21 @@ Technically, the threshold is always between $0.05$ and $0.005$, the setting $\m
 The number $n_C$ of classes related to the sensitive feature and the number $n_D$ of individuals in our local domain (that is, the cardinality of the union of the two classes with respect to which we are computing the divergence) are used to decrease the threshold (in other words, to make it stricter) proportionally with respect to the interval selected. The greater the number $n_C$, the smaller the threshold, the greater the number $n_D$, again, the smaller the threshold. The mathematicla formula used is the following:  $((n_C \cdots n_D) x M) + ((1-(n_C \cdot n_D)) \cdot m)$ where $M$ is the upper limit of our interval and $m$ is its lower limit.
 
 \section{Implementation}
+\label{sec:implementation}
 
 @Alkemy
 
 \section{Validation}
+\label{sec:validation}
 
 @Alkemy
 
 
 \section{Conclusions and Further Work}
-
+\label{sec:conclusions}
 @UNIMI
 
-The presented tool for the detection of biases in AI systems is a part of a more complex software consisting of three, partly inter-dependent modules. The complete system will present two autonomous modules for the analysis of bias---the one just presented---and opacity of AI systems and a module depending on these two concerning risk evaluation. 
+The presented tool for the detection of biases in AI systems is meant to be a module integrated into a more complex software application consisting of three, partly inter-dependent modules. The complete system will present two autonomous modules for the analysis of bias and opacity of AI systems---the first of which we just presented---and a module depending on these two concerning risk evaluation.
 
 \section{Acknowledgments}
 

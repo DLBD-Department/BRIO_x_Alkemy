@@ -15,9 +15,6 @@
 % The code was originally based on 'CAS Bundle' code.
 % 
 
-% 2023-07-02: pulled from https://github.com/yamadharma/ceurart/archive/refs/tags/v0.4.11.tar.gz
-% fix boldface for abstract title
-
 \def\RCSfile{ceurart}%
 \def\RCSversion{0.4.11}%
 \def\RCSdate{2023/06/14}%
