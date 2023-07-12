@@ -5,10 +5,10 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
 
-from src.data_processing.Preprocessing import Preprocessing
-from src.bias.BiasDetector import BiasDetector
-from src.bias.TotalVariationDistance import TotalVariationDistance
-from src.bias.KLDivergence import KLDivergence
+from brio.data_processing.Preprocessing import Preprocessing
+from brio.bias.BiasDetector import BiasDetector
+from brio.bias.TotalVariationDistance import TotalVariationDistance
+from brio.bias.KLDivergence import KLDivergence
 
 class TestBiasDetector(unittest.TestCase):
 
