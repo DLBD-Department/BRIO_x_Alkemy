@@ -3,10 +3,17 @@ from sklearn.utils.extmath import cartesian
 from itertools import chain
 from itertools import combinations as itertools_combinations
 
+from .threshold_calculator import threshold_calculator
+
 class BiasDetector:
 
-    def __init__(self, distance):
+    def __init__(self, distance, A1="high"):
+        '''
+            distance: which distance will be used to compute the bias detection
+            A1: sensitivity parameter used to computer the parametric threshold
+        '''
         self.dis = distance
+        self.A1 = A1
 
 
     def powerset(self, iterable):
@@ -34,9 +41,9 @@ class BiasDetector:
         The shape of each array is given by the number of labels of target_variable.
         '''
 
-        #TODO cosa succede se non tutte le labels di root_variable
-        # sono presenti nel dataframe?
+        #TODO cosa succede se non tutte le labels di root_variable sono presenti nel dataframe?
         freq_list = []
+        abs_freq_list = []
         for label in root_variable_labels:
             dataframe_subset = dataframe.loc[
                 dataframe[root_variable]==label
@@ -49,14 +56,21 @@ class BiasDetector:
                 )
             )
 
-        return freq_list
+            abs_freq_list.append(
+                np.array(
+                    dataframe_subset[target_variable].value_counts(normalize=False)
+                    .reindex(target_variable_labels, fill_value=0)
+                )
+            )
+
+        return freq_list, abs_freq_list
     
 
     def compare_root_variable_groups(self,
             dataframe,
             target_variable,
             root_variable,
-            threshold,
+            threshold=None,
             reference_distribution=None):
         '''
         This function compares for the two groups given by
@@ -68,21 +82,24 @@ class BiasDetector:
         '''
 
         root_variable_labels = dataframe[root_variable].unique()
+        A2 = len(root_variable_labels)
         target_variable_labels = dataframe[target_variable].unique()
 
-        freqs = self.get_frequencies_list(
+        freqs, abs_freqs = self.get_frequencies_list(
                             dataframe,
                             target_variable,
                             target_variable_labels,
                             root_variable,
                             root_variable_labels) 
         
+        A3 = sum(sum(abs_freqs))
+        computed_threshold = threshold_calculator(self.A1, A2, A3, default_threshold=threshold)
         if reference_distribution is None:
             distance = self.dis.compute_distance_between_frequencies(freqs)
-            return (distance, distance<=threshold)
+            return (distance, distance<=computed_threshold)
         else:
             distance = self.dis.compute_distance_from_reference(freqs, reference_distribution)
-            return (distance, [d<=threshold for d in distance])
+            return (distance, [d<=computed_threshold for d in distance])
 
 
     def compare_root_variable_conditioned_groups(self, 
@@ -90,7 +107,7 @@ class BiasDetector:
             target_variable,
             root_variable,
             conditioning_variables,
-            threshold,
+            threshold=None,
             min_obs_per_group=30,
             reference_distribution=None):
         '''
@@ -132,6 +149,9 @@ class BiasDetector:
         root_variable_labels = dataframe[root_variable].unique()
         target_variable_labels = dataframe[target_variable].unique()
 
+        # Second parameter for threshold calculator
+        A2 = len(root_variable_labels)
+
         conditioned_frequencies = {}
 
         conditioning_variables_subsets = list(self.powerset(conditioning_variables))
@@ -158,7 +178,7 @@ class BiasDetector:
                                 target_variable,
                                 target_variable_labels,
                                 root_variable,
-                                root_variable_labels) 
+                                root_variable_labels)[0] #taking the relative freqs, the absolute freqs are not needed here
                             )
                 else:
                     conditioned_frequencies[condition] = (num_of_obs, None)
@@ -174,9 +194,9 @@ class BiasDetector:
     
             results = {group: (
                     (
-                        obs_and_dist[0], 
+                        obs_and_dist[0], #This will also be the A3 for threshold_calculator, being it the number of obs of the group
                         obs_and_dist[1], 
-                        obs_and_dist[1]<=threshold
+                        obs_and_dist[1]<=threshold_calculator(A1=self.A1, A2=A2, A3=obs_and_dist[0], default_threshold=threshold)
                     ) if obs_and_dist[1] is not None else (obs_and_dist[0], obs_and_dist[1], 'Not enough observations')
                 ) for group, obs_and_dist in distances.items()}
         else:
@@ -193,7 +213,7 @@ class BiasDetector:
                     (
                         obs_and_dist[0], 
                         obs_and_dist[1], 
-                        [d<=threshold for d in obs_and_dist[1]]
+                        [d<=threshold_calculator(A1=self.A1, A2=A2, A3=obs_and_dist[0], default_threshold=threshold) for d in obs_and_dist[1]]
                     ) if obs_and_dist[1] is not None else (obs_and_dist[0], obs_and_dist[1], 'Not enough observations')
                 ) for group, obs_and_dist in distances.items()}
     
