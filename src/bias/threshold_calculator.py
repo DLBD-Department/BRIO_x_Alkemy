@@ -26,7 +26,7 @@ def threshold_calculator(A1: str, A2: int, A3: int, default_threshold=None):
     
     scalA2 = 1 - 1/A2
     scalA3 = 1 - 1/A3
-    epsilon = ((scalA2 * scalA3) * maxi) + ((1-(scalA2 * scalA3)) * mini)
+    epsilon = ((1 - (scalA2 * scalA3)) * maxi) + (scalA2 * scalA3 * mini)
 
     return epsilon
 

@@ -26,11 +26,14 @@ class KLDivergence:
             The shape of each array is given by the number of labels of target_variable.
         '''
 
-        divergences = [
-                entropy(pk=ref, qk=obs) for ref, obs in zip(
-                    reference_distribution, observed_distribution
-                    )
-                ]
+        divergences = []
+        for ref, obs in zip(reference_distribution, observed_distribution):
+            kl = entropy(pk=ref, qk=obs)
+            try:
+                divergence = 1 - 1/kl
+            except ZeroDivisionError:
+                divergence = 1
+            divergences.append(divergence)
 
         return divergences
 
@@ -50,8 +53,15 @@ class KLDivergence:
 
         divergences = []
         for pair in combinations(observed_distribution, 2):
-            divergence = ( entropy(pk=pair[0], qk=pair[1]) + entropy(pk=pair[1], qk=pair[0]) )/2
+            kl = ( entropy(pk=pair[0], qk=pair[1]) + entropy(pk=pair[1], qk=pair[0]) )/2
+            print(kl)
+            try:
+                divergence = 1 - (1/kl)
+            except ZeroDivisionError:
+                divergence = 1
             divergences.append(divergence)
+        
+        print(divergences)
 
         divergence = self.aggregating_function(divergences)
 
