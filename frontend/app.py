@@ -46,8 +46,8 @@ def home():
         if all(x == '' for x in uploads):
             flash('No files uploaded, try again!', 'danger')
             return redirect('/')
-        if 'dataframe' in list(request.files.keys()):
-            dataframe_file = request.files['dataframe']
+        if 'dataset' in list(request.files.keys()):
+            dataframe_file = request.files['dataset']
             dict_vars['dataset'] = dataframe_file.filename
             dataframe_file.save(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['dataset']))
             flash('Dataframe uploaded successfully!', 'success')
@@ -56,31 +56,32 @@ def home():
             dict_vars['notebook'] = request.files['notebook'].filename
             request.files['dataset_custom'].save(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['dataset_custom']))
             request.files['notebook'].save(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['notebook']))
-            flash('Custom preprocessing pipeline uploaded successfully!', 'success')
             if request.files['artifacts'].filename != '':
                 handle_multiupload(request, 'artifacts', app.config['UPLOAD_FOLDER'])
+            os.system("jupyter nbconvert --to python " + os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['notebook']))
+            note_name = dict_vars['notebook'].split('.')[0]
+            subprocess.run(["python3", os.path.join(app.config['UPLOAD_FOLDER'], note_name + ".py")])
+            flash('Custom preprocessing pipeline uploaded and processed successfully!', 'success')
         return redirect('/')
     return render_template('home.html')
 
 @app.route('/freqvsfreq', methods=['GET', 'POST'])
 def freqvsfreq():
 
-    if dict_vars['dataset_custom'] and dict_vars['notebook']:
-        os.system("jupyter nbconvert --to python " + os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['notebook']))
-        note_name = dict_vars['notebook'].split('.')[0]
-        subprocess.run(["python3", os.path.join(app.config['UPLOAD_FOLDER'], note_name + ".py")])
+    if ('dataset_custom' and 'notebook') in list(dict_vars.keys()):
         list_of_files =  glob.glob(os.path.join(app.config['UPLOAD_FOLDER']) + "/*")
         latest_file = max(list_of_files, key=os.path.getctime)
         df_pickle = open(latest_file, "rb")
         dict_vars['df'] = pickle.load(df_pickle)
-    if dict_vars['dataset']:
+    if 'dataset' in list(dict_vars.keys()):
         df_pickle = open(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['dataset']), "rb")
         dict_vars['df'] = pickle.load(df_pickle)
+
     list_var = dict_vars['df'].columns
     if request.method == 'POST':
         if list(request.form.keys()):
             dict_vars['root_var']= request.form['root_var']
-            if (request.form['agg_func'] == 'stdev') and (len(df[dict_vars['root_var']].unique()) < 3):
+            if (request.form['agg_func'] == 'stdev') and (len(dict_vars['df'][dict_vars['root_var']].unique()) < 3):
                 flash("Can't use Standard deviation as aggregating function if number of categories of root variable is < 3", 'danger')
                 return redirect('/freqvsfreq')
             dict_vars['distance'] = request.form['distance']
@@ -130,10 +131,10 @@ def details_fvf(violation):
     bd=BiasDetector(distance=d)
     
     results_viol1 = bd.get_frequencies_list(focus_df, dict_vars['predictions'],
-                            dict_vars['df'].predictions.unique(),
+                            dict_vars['df'][dict_vars['predictions']].unique(),
                             dict_vars['root_var'],  dict_vars['df'][dict_vars['root_var']].unique()
                             )
-    results_viol2 = focus_df.groupby(dict_vars['root_var']).predictions.value_counts(normalize=True)
+    results_viol2 = focus_df.groupby(dict_vars['root_var'])[dict_vars['predictions']].value_counts(normalize=True)
     return render_template('violation_specific_fvf.html', viol = violation, res2 = results_viol2.to_frame().to_html(classes=['table table-hover mx-auto w-75']))
 
 @app.route('/freqvsref', methods=['GET', 'POST'])
@@ -145,7 +146,7 @@ def freqvsref():
     if request.method == 'POST':
         if list(request.form.keys()):
             dict_vars['root_var']= request.form['root_var']
-            if (request.form['agg_func'] == 'stdev') and (len(df[dict_vars['root_var']].unique()) < 3):
+            if (request.form['agg_func'] == 'stdev') and (len(dict_vars['df'][dict_vars['root_var']].unique()) < 3):
                 flash("Can't use Standard deviation as aggregating function if number of categories of root variable is < 3", 'danger')
                 return redirect('/freqvsfreq')
             dict_vars['distance'] = request.form['distance']
@@ -202,8 +203,8 @@ def details_fvr(violation):
     bd=BiasDetector(distance=d)
     
     results_viol1 = bd.get_frequencies_list(focus_df, 'predictions',
-                            dict_vars['df'].predictions.unique(),
+                            dict_vars['df'].dict_vars['predictions'].unique(),
                             dict_vars['root_var'],  dict_vars['df'][dict_vars['root_var']].unique()
                             )
-    results_viol2 = focus_df.groupby(dict_vars['root_var']).predictions.value_counts(normalize=True)
+    results_viol2 = focus_df.groupby(dict_vars['root_var']).dict_vars['predictions'].value_counts(normalize=True)
     return render_template('violation_specific_fvr.html', viol = violation, res2 = results_viol2.to_frame().to_html(classes=['table table-hover mx-auto w-75']))
