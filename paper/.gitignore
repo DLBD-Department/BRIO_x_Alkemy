@@ -5,5 +5,6 @@
 *.log
 *.out
 *.synctex.gz
+*.synctex(busy)
 *.toc
 sample-col1.pdf
