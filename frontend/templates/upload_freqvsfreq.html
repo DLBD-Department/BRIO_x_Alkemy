@@ -11,7 +11,7 @@
     </fieldset><br><br>
     <fieldset>
 	<legend>Select an aggregation function:</legend>
-        <div class="btn-group">
+        <div class="btn-group" id="agg_funcs">
             <input type="radio" class="btn-check" name="agg_func" id="agg_func1" value="min" autocomplete="off" checked>
             <label class="btn btn-success btn-lg" for="agg_func1">Min</label>
             <input type="radio" class="btn-check" name="agg_func" id="agg_func2" value="max">
@@ -19,28 +19,30 @@
             <input type="radio" class="btn-check" name="agg_func" id="agg_func3" value="mean">
             <label class="btn btn-success btn-lg" for="agg_func3">Mean</label>
             <input type="radio" class="btn-check" name="agg_func" id="agg_func4" value="stdev">
-            <label class="btn btn-success btn-lg {{hide}}" for="agg_func4">Stddev</label>
+            <label class="btn btn-success btn-lg" for="agg_func4" title="Use it only when root variable is not binary">Stddev</label>
         </div>
-        <!--
-	<input type="radio" name="agg_func" id="agg_func3" value="avg">
-	<label for="agg_func3">Mean</label>
-	<input type="radio" name="agg_func" id="agg_func4" value="stddev">
-	<label for="agg_func4">Std Dev</label>
-        -->
     </fieldset><br><br>
     <legend>Select other parameters:</legend><br><br>
     <label for="slider">Threshold:</label>
     <input type="range" name="Slider" min="0" max="1" step="0.05" oninput="this.form.amountInput.value=this.value" />
-    <input type="number" name="amountInput" min="0" max="1" step="0.05" oninput="this.form.amountRange.value=this.value" /><br><br>
+    <input type="number" name="amountInput" min="0" max="1" step="0.05" oninput="this.form.amountRange.value=this.value" />
+    <input type="checkbox" class="form-check-input" name="auto_thr" id="auto_thr" value="active">
+    <label class="form-check-label" for="auto_thr">Set automatic threshold</label><br><br>
+    <label for="predictions">Predictions:</label>
+    <select class="selectpicker" data-style="btn-info" name="predictions" id="predictions">
+        {% for item in var_list -%}
+            <option value="{{item}}">{{ item }}</option>
+        {%- endfor %}
+    </select><br><br>
     <label for="root_var">Root Variable:</label>
     <select class="selectpicker" data-style="btn-info" name="root_var" id="root_var">
-        {% for item in list1 -%}
+        {% for item in var_list -%}
             <option value="{{item}}">{{ item }}</option>
         {%- endfor %}
     </select><br><br>
     <label for="cond_var">Conditioning variables:</label>
     <select class="selectpicker" data-style="btn-info" name="cond_var" id="cond_var" multiple data-actions-box="true">
-        {% for item in list1 -%}
+        {% for item in var_list -%}
             <option value="{{item}}" >{{ item }}</option>
         {%- endfor %}
     </select>
