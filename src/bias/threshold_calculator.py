@@ -1,3 +1,5 @@
+import numpy as np
+
 def threshold_calculator(A1: str, A2: int, A3: int, default_threshold=None):
     '''
     This function computes a parametric threshold for comparing the distances between groups
@@ -25,7 +27,7 @@ def threshold_calculator(A1: str, A2: int, A3: int, default_threshold=None):
         raise Exception('Only "high" or "low" are allowed for parameter A1')
     
     scalA2 = 1 - 1/A2
-    scalA3 = 1 - 1/A3
+    scalA3 = 1 - 1/np.sqrt(A3)
     epsilon = ((1 - (scalA2 * scalA3)) * maxi) + (scalA2 * scalA3 * mini)
 
     return epsilon
