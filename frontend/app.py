@@ -9,10 +9,11 @@ import sys
 import subprocess
 from statistics import mean, stdev
 
-from utils.funcs import handle_multiupload
+from utils.funcs import handle_multiupload, write_reference_distributions_html, handle_ref_distributions
 from utils.Preprocessing import Preprocessing
 
 from sklearn.model_selection import train_test_split
+from src.bias.threshold_calculator import threshold_calculator
 from src.bias.BiasDetector import BiasDetector
 from src.bias.TotalVariationDistance import TotalVariationDistance
 from src.bias.KLDivergence import KLDivergence
@@ -26,7 +27,6 @@ app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-
 dict_vars = {}
 agg_funcs = {
 	'min' : min,
@@ -38,14 +38,18 @@ agg_funcs = {
 ips = check_output(['hostname', '-I'])
 localhost_ip = ips.decode().split(" ")[0]
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def home():
+    return render_template('homepage.html')
+
+@app.route('/bias', methods=['GET', 'POST'])
+def home_bias():
     if request.method == 'POST':
         keys = list(request.files.keys())
         uploads = [request.files[x].filename for x in keys if x != '']
         if all(x == '' for x in uploads):
             flash('No files uploaded, try again!', 'danger')
-            return redirect('/')
+            return redirect('/bias')
         if 'dataset' in list(request.files.keys()):
             dataframe_file = request.files['dataset']
             dict_vars['dataset'] = dataframe_file.filename
@@ -62,10 +66,10 @@ def home():
             note_name = dict_vars['notebook'].split('.')[0]
             subprocess.run(["python3", os.path.join(app.config['UPLOAD_FOLDER'], note_name + ".py")])
             flash('Custom preprocessing pipeline uploaded and processed successfully!', 'success')
-        return redirect('/')
-    return render_template('home.html')
+        return redirect('/bias')
+    return render_template('bias/home.html')
 
-@app.route('/freqvsfreq', methods=['GET', 'POST'])
+@app.route('/bias/freqvsfreq', methods=['GET', 'POST'])
 def freqvsfreq():
 
     if ('dataset_custom' and 'notebook') in list(dict_vars.keys()):
@@ -80,23 +84,31 @@ def freqvsfreq():
     list_var = dict_vars['df'].columns
     if request.method == 'POST':
         if list(request.form.keys()):
+            if 'rv_selected' in list(request.form.keys()):
+                html = open("templates/bias/stdev.html", "r")
+                btn_opt = html.read()
+                html.close()
+                split_html = btn_opt.split('class="')
+                rvar = request.form['rv_selected']
+                print(rvar, flush=True)
+                hide_option = ""
+                if len(dict_vars['df'][rvar].unique()) < 3:
+                    hide_option = "d-none "
+                return {'response' : split_html[0] + 'class="' + hide_option + split_html[1] }
             dict_vars['root_var']= request.form['root_var']
-            if (request.form['agg_func'] == 'stdev') and (len(dict_vars['df'][dict_vars['root_var']].unique()) < 3):
-                flash("Can't use Standard deviation as aggregating function if number of categories of root variable is < 3", 'danger')
-                return redirect('/freqvsfreq')
             dict_vars['distance'] = request.form['distance']
             dict_vars['predictions'] = request.form['predictions']
             dict_vars['agg_func'] = request.form['agg_func']
             dict_vars['thr'] = request.form['Slider']
-            if 'auto_thr' in list(request.form.keys()):
-                dict_vars['auto_thr'] = request.form['auto_thr']
-            dict_vars['root_var']= request.form['root_var']
             dict_vars['cond_vars']= request.form.getlist('cond_var')
+            if 'auto_thr' in list(request.form.keys()):
+                if request.form['auto_thr'] == 'active':
+                    dict_vars['thr'] = threshold_calculator('high', len(dict_vars['df'][dict_vars['root_var']].unique()), dict_vars['df'][dict_vars['root_var']].count() )
             print(dict_vars, flush=True)
-        return redirect('/freqvsfreq')
-    return render_template('freqvsfreq.html', var_list=list_var, local_ip=localhost_ip)
+        return redirect('/bias/freqvsfreq')
+    return render_template('bias/freqvsfreq.html', var_list=list_var, local_ip=localhost_ip)
 
-@app.route('/freqvsfreq/results')
+@app.route('/bias/freqvsfreq/results')
 def results_fvf():
     
     d=TotalVariationDistance(aggregating_function=agg_funcs[dict_vars['agg_func']])
@@ -120,9 +132,9 @@ def results_fvf():
 	)
     
     violations = {k: v for k, v in results2.items() if not v[2]}
-    return render_template('results_freqvsfreq.html', results1=results1, results2=results2, violations=violations)
+    return render_template('bias/results_freqvsfreq.html', results1=results1, results2=results2, violations=violations)
 
-@app.route('/freqvsfreq/results/<violation>')
+@app.route('/bias/freqvsfreq/results/<violation>')
 def details_fvf(violation):
     focus_df = dict_vars['df'].query(violation)
     d=TotalVariationDistance(aggregating_function=agg_funcs[dict_vars['agg_func']])
@@ -135,36 +147,50 @@ def details_fvf(violation):
                             dict_vars['root_var'],  dict_vars['df'][dict_vars['root_var']].unique()
                             )
     results_viol2 = focus_df.groupby(dict_vars['root_var'])[dict_vars['predictions']].value_counts(normalize=True)
-    return render_template('violation_specific_fvf.html', viol = violation, res2 = results_viol2.to_frame().to_html(classes=['table table-hover mx-auto w-75']))
+    return render_template('bias/violation_specific_fvf.html', viol = violation, res2 = results_viol2.to_frame().to_html(classes=['table table-hover mx-auto w-75']))
 
-@app.route('/freqvsref', methods=['GET', 'POST'])
+@app.route('/bias/freqvsref', methods=['GET', 'POST'])
 def freqvsref():
 
     df_pickle = open(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['dataset']), "rb")
     dict_vars['df'] = pickle.load(df_pickle)
+    df_pickle.close()
     list_var = dict_vars['df'].columns
     if request.method == 'POST':
         if list(request.form.keys()):
+            if ('pr_selected' and 'rv_selected') in list(request.form.keys()):
+                html = open("templates/bias/stdev.html", "r")
+                btn_opt = html.read()
+                html.close()
+                split_html = btn_opt.split('class="')
+                rvar = request.form['rv_selected']
+                print(rvar, flush=True)
+                hide_option = ""
+                if len(dict_vars['df'][rvar].unique()) < 3:
+                    hide_option = "d-none "
+                pvar = request.form['pr_selected']
+                return {'response_stdev': split_html[0] + 'class="' + hide_option + split_html[1],
+                        'response_refs' : write_reference_distributions_html(rvar, pvar, dict_vars['df'])}
             dict_vars['root_var']= request.form['root_var']
-            if (request.form['agg_func'] == 'stdev') and (len(dict_vars['df'][dict_vars['root_var']].unique()) < 3):
-                flash("Can't use Standard deviation as aggregating function if number of categories of root variable is < 3", 'danger')
-                return redirect('/freqvsfreq')
-            dict_vars['distance'] = request.form['distance']
             dict_vars['predictions'] = request.form['predictions']
+            dict_vars['distance'] = request.form['distance']
             dict_vars['agg_func'] = request.form['agg_func']
             dict_vars['thr'] = request.form['Slider']
             if 'auto_thr' in list(request.form.keys()):
-                dict_vars['auto_thr'] = request.form['auto_thr']
+                if request.form['auto_thr'] == 'active':
+                    dict_vars['thr'] = threshold_calculator('high', len(dict_vars['df'][dict_vars['root_var']].unique()), dict_vars['df'][dict_vars['root_var']].count() )
             dict_vars['root_var']= request.form['root_var']
             dict_vars['cond_vars']= request.form.getlist('cond_var')
-            dict_vars['prob_a_0'] = float(request.form['prob_a_0'])
-            dict_vars['prob_a_1'] = float(request.form['prob_a_1'])
-            dict_vars['prob_b_0'] = float(request.form['prob_b_0'])
-            dict_vars['prob_b_1'] = float(request.form['prob_b_1'])
-        return redirect('/freqvsref')
-    return render_template('freqvsref.html', var_list=list_var)
+            nroot = len(dict_vars['df'][dict_vars['root_var']].unique())
+            ntarget = len(dict_vars['df'][dict_vars['predictions']].unique())
+            for i in range(nroot):
+                for j in range(ntarget):
+                    cat = f'prob_{i}_{j}'
+                    dict_vars[cat] = float(request.form[cat])
+        return redirect('/bias/freqvsref')
+    return render_template('bias/freqvsref.html', var_list=list_var, local_ip=localhost_ip)
 
-@app.route('/freqvsref/results')
+@app.route('/bias/freqvsref/results')
 def results_fvr():
     
     d=TotalVariationDistance(aggregating_function=agg_funcs[dict_vars['agg_func']])
@@ -172,7 +198,7 @@ def results_fvr():
         d=KLDivergence(aggregating_function=agg_funcs[dict_vars['agg_func']])
     bd=BiasDetector(distance=d)
 
-    ref_distribution = [np.array([dict_vars['prob_a_0'], dict_vars['prob_a_1']]), np.array([dict_vars['prob_b_0'], dict_vars['prob_b_1']])]
+    ref_distribution = handle_ref_distributions(dict_vars['root_var'], dict_vars['predictions'], dict_vars['df'], dict_vars)
 
     results1 = bd.compare_root_variable_groups(
 		dataframe=dict_vars['df'],
@@ -192,9 +218,9 @@ def results_fvr():
 	)
     
     violations = {k: v for k, v in results2.items() if (not v[2][0] or not v[2][1])}
-    return render_template('results_freqvsref.html', results1=results1, results2=results2, violations=violations)
+    return render_template('bias/results_freqvsref.html', results1=results1, results2=results2, violations=violations)
 
-@app.route('/freqvsref/results/<violation>')
+@app.route('/bias/freqvsref/results/<violation>')
 def details_fvr(violation):
     focus_df = dict_vars['df'].query(violation)
     d=TotalVariationDistance(aggregating_function=agg_funcs[dict_vars['agg_func']])
@@ -207,4 +233,4 @@ def details_fvr(violation):
                             dict_vars['root_var'],  dict_vars['df'][dict_vars['root_var']].unique()
                             )
     results_viol2 = focus_df.groupby(dict_vars['root_var']).dict_vars['predictions'].value_counts(normalize=True)
-    return render_template('violation_specific_fvr.html', viol = violation, res2 = results_viol2.to_frame().to_html(classes=['table table-hover mx-auto w-75']))
+    return render_template('bias/violation_specific_fvr.html', viol = violation, res2 = results_viol2.to_frame().to_html(classes=['table table-hover mx-auto w-75']))
