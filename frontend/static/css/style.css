@@ -1,88 +1,13 @@
-h1 {
-    text-align: center;
-    font-size: 2.5em;
+.my-grid {
+  display: inline-grid !important;
+  grid-template-columns: 1fr 1fr !important;
 }
 
-fieldset {
-    width: 450px;
-}
-
-h2 {
-    text-align: center;
-    font-size: 2em;
-}
-
-#footer-btns button {
-    font-size: 24px;
-    padding: 12px 24px;
-}
-
-label {
-    font-size: 22px;
-    font-weight: bold;
-    padding: 10px;
-}
-
-input[type="submit"] {
-    font-size: 20px;
-    padding: 10px;
-}
-
-form input[type="file"],
-form input[type="submit"] {
-    font-size: 18px;
-    padding: 10px 20px;
-}
-
-input[type="file"]::before {
-    font-size: 20px;
-}
-
-textarea {
-  height: 40px;
-  margin-top: 10px;
-  padding: 8px 16px;
-  font-size: 16px;
-  font-family: Arvo, serif;
-  border: 2px solid #3ca0e7;
-  border-radius: 4px;
-  background-color: #fff;
-  color: #000;
-  box-sizing: border-box;
-  background-repeat: no-repeat;
-  background-position: right .7em top 50%, 0 0;
-  background-size: 10px auto, 100%;
-}
-
-select {
-  height: 40px;
-  margin: 0;
-  padding: 8px 16px;
-  font-size: 16px;
-  font-family: Arvo, serif;
-  border: 2px solid #3ca0e7;
-  border-radius: 4px;
-  background-color: #fff;
-  color: #000;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-repeat: no-repeat;
-  background-position: right .7em top 50%, 0 0;
-  background-size: 10px auto, 100%;
-}
-
-select:focus {
-  outline: none;
-  box-shadow: 0 0 2px 2px #3ca0e7;
-}
-
-select:hover {
-  cursor: pointer;
-}
-
-select option {
-  font-size: 16px;
-  font-family: Arvo, serif;
-  color: #000;
+.btn-xl {
+  padding: 50px 100px !important;
+  font-size: 40px !important;
+  border-radius: 30px !important;
+  width: 100% !important;
+  justify-content: center !important;
+  align-items: center !important;
 }

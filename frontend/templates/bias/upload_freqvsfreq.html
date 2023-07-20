@@ -19,7 +19,7 @@
             <input type="radio" class="btn-check" name="agg_func" id="agg_func3" value="mean">
             <label class="btn btn-success btn-lg" for="agg_func3">Mean</label>
             <input type="radio" class="btn-check" name="agg_func" id="agg_func4" value="stdev">
-            <label class="btn btn-success btn-lg" for="agg_func4" title="Use it only when root variable is not binary">Stddev</label>
+            {% include 'bias/stdev.html' %}
         </div>
     </fieldset><br><br>
     <legend>Select other parameters:</legend><br><br>

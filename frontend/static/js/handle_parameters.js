@@ -1,22 +1,3 @@
-{% extends 'base.html' %}
-
-{% block title %}
-FreqvsRef
-{% endblock %}
-
-{% block content %}
-<div class="px-4 py-5 my-2 text-center">
-	<h1 class="display-5 fw-bold text-body-emphasis">Freq vs Ref Analysis</h1>
-	<div class="col-lg-6 mx-auto">
-	<p class="lead mb-4">Check how much the predictions for the target variable differ with respect to a reference distribution provided as input, overall and conditioning to the categories of other selected predictors. <br>
-Using the max as aggregating function, you are checking the "worst case scenario". Using the min as aggregating function, you are checking the "best case scenario"..</p>
-</div>
-{% include 'upload_freqvsref.html' %}
-{% endblock %}
-
-{% block scripts %}
-<script type="text/javascript">
-
 function handle_disab_frompred() {
     $('#root_var').selectpicker('toggle');
     var disab = document.getElementById("predictions");
@@ -25,7 +6,7 @@ function handle_disab_frompred() {
     var dd_root = document.getElementById("bs-select-2");
     var lis_root = dd_root.firstElementChild.getElementsByTagName('li');
     for (var j = 0; j < lis_root.length; j++) {
-        if (lis_root[j].firstElementChild.lastElementChild.innerText == selected_option.value) {
+	if (lis_root[j].firstElementChild.lastElementChild.innerText == selected_option.value) {
             lis_root[j].className = "disabled";
             $('li.disabled').hide();
         }
@@ -42,7 +23,7 @@ function handle_disab_frompred() {
     var dd_cond = document.getElementById("bs-select-3");
     var lis_cond = dd_cond.firstElementChild.getElementsByTagName('li');
     for (var j = 0; j < lis_cond.length; j++) {
-        if (lis_cond[j].firstElementChild.lastElementChild.innerText == selected_option.value) {
+	if (lis_cond[j].firstElementChild.lastElementChild.innerText == selected_option.value) {
             lis_cond[j].className = "disabled";
             $('li.disabled').hide();
         }
@@ -63,7 +44,7 @@ function handle_disab_fromroot() {
     var dd = document.getElementById("bs-select-3");
     var lis = dd.firstElementChild.getElementsByTagName('li');
     for (var j = 0; j < lis.length; j++) {
-        if (lis[j].firstElementChild.lastElementChild.innerText == selected_option.value) {
+	if (lis[j].firstElementChild.lastElementChild.innerText == selected_option.value) {
             lis[j].className = "disabled";
             $('li.disabled').hide();
         }
@@ -86,7 +67,7 @@ function sel_all() {
     var options = select.options;
     var values = [];
     for (var i = 0; i < options.length; i++) {
-        values.push(options[i].value);
+	values.push(options[i].value);
     }
     textarea.value = values.join(" ");
 }
@@ -95,6 +76,7 @@ function desel_all() {
     var textarea = document.getElementById("mytext");
     textarea.value = "";
 }
+
 
 document.addEventListener("DOMContentLoaded", function() {
     var disabfrompred = document.getElementById("predictions");
@@ -108,18 +90,3 @@ document.addEventListener("DOMContentLoaded", function() {
     var deselect_all = document.getElementsByClassName("bs-actionsbox")[0].firstElementChild.children[1];
     deselect_all.addEventListener("click", desel_all);
 });
-
-
-</script>
-{% endblock %}
-
-{% block footer %}
-    <div class="modal-footer">
-        <a href="/freqvsref/results"><button type="button" class="btn btn-lg btn-secondary" data-dismiss="modal">Run</button>
-    </div>
-{% endblock %}
-
-
-
-
-
