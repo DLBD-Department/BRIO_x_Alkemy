@@ -128,8 +128,6 @@ we provide the means to compare the action of the user's algorithm of choice on 
 \section{Introduction}
 \label{sec:intro}
 
-@UNIMI
-
 
 The project BRIO aims at developing formal and conceptual frameworks for the analysis of AI systems and for the advancement of the technical and philosophical understanding of the notions of Bias, Risk and Opacity in AI, with the ultimate objective of generally contributing to the development of trustworthy AI.\footnote{\url{sites.unimi.it/brio}} 
 
@@ -137,13 +135,11 @@ The aim of the collaboration between BRIO and Alkemy is to produce software appl
 
 We present a first tool developed within the BRIOxAlkemy collaboration for the detection and analysis of biased behaviours in AI systems. The tool is aimed at developers and data scientists that wish to test their algorithms relying on probabilistic and learning mechanisms in order to detect misbehaviours related to biases and collect data about them. The ultimate goal is to provide them with useful insights and data for the improvement of the AI systems with respect to bias.
 
-The system presented is based on the theoretical, foundational works presented in \cite{dap21}, \cite{dagp22}, and \cite{gp23}, and in this paper we discuss the formal ideas behind the definition of the software (Section \ref{sec:theory}), the technical details of its implementation  (\Cref{sec:implementation}), the data obtained from a case study that validates the usefulness of the software (\Cref{sec:validation}), and the projected further developments aimed at integrating the presented software in a more general tool for the analysis of AI systems (\Cref{sec:conclusions}).
+The system presented is based on the theoretical, foundational works presented in \cite{dap21}, \cite{dagp22}, and \cite{gp23}, and in this paper we discuss the formal ideas behind its development (Section \ref{sec:theory}), the technical details of its implementation  (\Cref{sec:implementation}), the data obtained from a case study that validates the usefulness of the software (\Cref{sec:validation}), and the projected further developments aimed at integrating the presented software in a more general tool for the analysis of AI systems (\Cref{sec:conclusions}).
 
 \section{Theory}\label{sec:theory}
 
-@UNIMI
-
-Intuitively, the system takes as input a set of individuals associated with their properties, the answer that the AI model under investigation gave when presented with the individuals in our set, and a series of parameter settings chosen by the user (including the designation of a sensitive feature). The output is an evaluation of the possibility that the considered AI model is biased with respect to the features designated as sensitive by the user. 
+Our tool  takes as input a set of individuals associated with their properties, the answer that the AI model under investigation gave when presented with the individuals in our set, and a series of parameter settings chosen by the user (including the designation of a sensitive feature). The output is an evaluation of the possibility that the considered AI model is biased with respect to the features designated as sensitive by the user. 
 
 Even though the system closely guides the user in the process of setting the parameters and provides it with detailed explanations, the user has a great freedom of customisation with respect to the mathematical details of the analysis. The choices left to the user are those that actually make a conceptual difference in the outcome of the analysis and this difference is explained to the user during the setting of these parameters.
 
