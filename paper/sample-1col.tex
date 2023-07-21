@@ -17,11 +17,12 @@
 %% Need pygment <http://pygments.org/> <http://pypi.python.org/pypi/Pygments>
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{cleveref}
 %% auto break lines
 \lstset{breaklines=true}
 
 
-\newcommand[#1]{\color{red}#1}}
+\newcommand{\red}[1]{\color{red}#1}
 %%
 %% end of the preamble, start of the body of the document source.
 \begin{document}
@@ -50,46 +51,55 @@ Work funded by the PRIN project n.2020SSKZ7R BRIO (Bias, Risk and Opacity in AI)
 %%
 %% The "author" command and its associated commands are used to define
 %% the authors and their affiliations.
-\author[1,2]{Dmitry S. Kulyabov}[%
-orcid=0000-0002-0877-7063,
-email=kulyabov-ds@rudn.ru,
-url=https://yamadharma.github.io/,
-]
-\cormark[1]
-\fnmark[1]
-\address[1]{Peoples' Friendship University of Russia (RUDN University),
-  6 Miklukho-Maklaya St, Moscow, 117198, Russian Federation}
-\address[2]{Joint Institute for Nuclear Research,
-  6 Joliot-Curie, Dubna, Moscow region, 141980, Russian Federation}
 
-\author[3]{Francesco A. Genco}[%
-email=francesco.genco@unimi.it,
+\author[1]{Greta Coraglia}[
+email=greta.coraglia@unimi.it
 ]
-\fnmark[1]
-\address[3]{LUCI Group, University of Milan, via Festa del Perdono 7, 20122 Milan, Italy}
+\author[1]{Francesco A. Genco}[%
+email=francesco.genco@unimi.it
+]
+\author[2]{Davide Giannuzzi}
+\author[2]{Davide Posillipo}[
+email=davide.posillipo@alkemy.com
+]
+\author[1]{Giuseppe Primiero}[
+email=giuseppe.primiero@unimi.it
+]
+\author[2]{Christian Quaggio}
 
-\author[4]{Manfred Jeusfeld}[%
-orcid=0000-0002-9421-8566,
-email=Manfred.Jeusfeld@acm.org,
-url=http://conceptbase.sourceforge.net/mjf/,
-]
-\fnmark[1]
-\address[4]{University of Skövde, Högskolevägen 1, 541 28 Skövde, Sweden}
+%\author[1,2]{Dmitry S. Kulyabov}[%
+%orcid=0000-0002-0877-7063,
+%email=kulyabov-ds@rudn.ru,
+%url=https://yamadharma.github.io/,
+%]
+%\cormark[1]
+%\fnmark[1]
+%\address[1]{Peoples' Friendship University of Russia (RUDN University),
+%  6 Miklukho-Maklaya St, Moscow, 117198, Russian Federation}
+%\address[2]{Joint Institute for Nuclear Research,
+%  6 Joliot-Curie, Dubna, Moscow region, 141980, Russian Federation}
+
+%\fnmark[1]
+\address[1]{LUCI Group, University of Milan, via Festa del Perdono 7, 20122 Milan, Italy}
+\address[2]{Alkemy, \dots}
+
+%\author[4]{Manfred Jeusfeld}[%
+%orcid=0000-0002-9421-8566,
+%email=Manfred.Jeusfeld@acm.org,
+%url=http://conceptbase.sourceforge.net/mjf/,
+%]
+%\fnmark[1]
+%\address[4]{University of Skövde, Högskolevägen 1, 541 28 Skövde, Sweden}
 
 %% Footnotes
 \cortext[1]{Corresponding author.}
-\fntext[1]{These authors contributed equally.}
+%\fntext[1]{These authors contributed equally.}
 
 %%
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-  A clear and well-documented \LaTeX{} document is presented as an
-  article formatted for publication by CEUR-WS in a conference
-  proceedings. Based on the ``ceurart'' document class, this article
-  presents and explains many of the common variations, as well as many
-  of the formatting elements an author may use in the preparation of
-  the documentation of their work.
+  We present a tool for the detection of biased behaviours in AI systems. Using a specific probability-based typed $\lambda$-calculus, we provide the means to compare the action of the user's algorithm of choice on a specific feature that they deem ``sensible'' with respect to fixed classes and to a known optimal behaviour.
 \end{abstract}
 
 %%
@@ -115,35 +125,42 @@ url=http://conceptbase.sourceforge.net/mjf/,
 
 The project BRIO aims at developing formal and conceptual frameworks for the analysis of AI systems and for the advancement of the technical and philosophical understanding of the notions of Bias, Risk and Opacity in AI, with the ultimate objective of generally contributing to the development of trustworthy AI. 
 
-The collaboration between BRIO and Alkemy aims at the development of software applications for the analysis of bias and risk with regard to AI technologies which often rely on probabilistic computations and  are often opaque in nature. One of the most challenging aspects of modern AI systems, indeed, is the fact that they do not operate in a deterministic way, namely they do not simply implement a function that associates a unique output to each input, and they are not transparent, in the sense that a general formal description of their behaviour might not be available.
+The collaboration between BRIO and Alkemy aspires to produce software applications for the analysis of bias and risk with regard to AI technologies which often rely on probabilistic computations and  are often opaque in nature. One of the most challenging aspects of modern AI systems, indeed, is the fact that they do not operate in a deterministic way, namely they do not simply implement a function that associates a unique output to each input, and they are not transparent, in the sense that a general formal description of their behaviour might not be available.
 
-We present a software application for the detection and analysis of biased behaviours in AI systems. The application is meant as a tool for developers and data scientists that wish to test software systems relying on probabilistic and learning mechanisms in order to detect misbehaviours related to biases and collect data about them. The ultimate goal is to provide them with useful insights and data for the improvement of the AI systems with respect to bias.
+We present a piece of software for the detection and analysis of biased behaviours in AI systems. The application is meant as a tool for developers and data scientists that wish to test their algorithms relying on probabilistic and learning mechanisms in order to detect misbehaviours related to biases and collect data about them. The ultimate goal is to provide them with useful insights and data for the improvement of the AI systems with respect to bias.
 
 
-The system we are presenting is based on the theoretical, foundational works presented in \cite{dap21}, \cite{dagp22}, and \cite{gp23}, and in this paper we discuss the formal ideas behind the definition of the software (Section \ref{sec:theory}), the technical details of its implentation implementation  (Section \ref{sec:implementation}), the data obtained from a case study that validates the usefulness of the software (Section \ref{sec:validation}), and the projected further developments aimed at integrating the presented software in a more general tool for the analysis of AI systems (Section \ref{sec:conclusions}).
+The system we are presenting is based on the theoretical, foundational works presented in \cite{dap21}, \cite{dagp22}, and \cite{gp23}, and in this paper we discuss the formal ideas behind the definition of the software (Section \ref{sec:theory}), the technical details of its implementation  (\Cref{sec:implementation}), the data obtained from a case study that validates the usefulness of the software (\Cref{sec:validation}), and the projected further developments aimed at integrating the presented software in a more general tool for the analysis of AI systems (\Cref{sec:conclusions}).
 
 \section{Theory}\label{sec:theory}
 
 @UNIMI
 
-Intuitively, the system takes as input a set of individuals associated with their properties, the answer that the AI model under investigation gave when presented with the individuals in our set, and a series of parameter settings chosen by the user (including the designation of a sensitive feature).
-
-The output is a complex evaluation of the possibility that the considered AI model is biased with respect to the features designated as sensitive by the user. 
+Intuitively, the system takes as input a set of individuals associated with their properties, the answer that the AI model under investigation gave when presented with the individuals in our set, and a series of parameter settings chosen by the user (including the designation of a sensitive feature). The output is an evaluation of the possibility that the considered AI model is biased with respect to the features designated as sensitive by the user. 
 
 Even though the system closely guides the user in the process of setting the parameters and provides it with detailed explanations, the user has a great freedom of customisation with respect to the mathematical details of the analysis. The choices left to the user are those that actually make a conceptual difference in the outcome of the analysis and this difference is explained to the user during the setting of these parameters.
 
-The analysis conducted by our system are of two kids: comparison between the behaviour of the AI system and a target desirable behaviour, and comparison between the behaviour of the AI system with respect to a sensitive class $c_1\in F$ and the behaviour of the AI system with respect to another sensitive class $c_2\in F$ related to the same sensitive feature $F$. The second comparison includes a subsequent check, in case we find a biased behaviour, on some (or all) the subclasses of the considered sensitive classes. This second-stage check is supposed to tell us if the bias encountered at the level of the classes can be explained away by other features of the individuals in the sensitive classes considered that are not related to the sensitive feature at hand. 
+The analysis conducted by our system are of two kids: comparison between the behaviour of the AI system and a target desirable behaviour, and comparison between the behaviour of the AI system with respect to a sensitive class $c_1\in F$ and the behaviour of the AI system with respect to another sensitive class $c_2\in F$ related to the same sensitive feature $F$. The second comparison includes a subsequent check, in case we find a biased behaviour, on some (or all) the subclasses of the considered sensitive classes. This second-stage check is supposed to tell us if the bias encountered at the level of the classes can be explained away by other features of the individuals in the sensitive classes considered that are not related to the sensitive feature at hand.
+
+Before we delve into the technical details, let us give a little example: say we have a database of individuals, and of each we know their age, gender, and level of education. Our algorithm tries to predict whether they are likely to default their credit card or not. Now, suppose we wish to check if age is a sensitive factor when deciding on it: we feed the tool our dataset, the output of the run of our algorithm on it, and mark the feature of age as sensitive. The program allows us to compare either how the behaviour of the algorithm with respect to age differs from an ``optimal'' behaviour (in this case, we might consider optimal the case where each age group equally succeeds), or how different age groups perform with respect to one another.
  
 \subsection{Divergences}
-In order to compute the difference between the behaviour of the AI system under investigation and an optimal behaviour, in case some data about such an optimal behaviour is available, we employ a divergence borrowed from information theory: The Kullback–Leibler divergence $D_{\mathrm{KL}}$. This measure is mathematically expressed by the following equation: 
-\[D_{\mathrm{KL}}(P\parallel Q)= \sum _{x\in X} P(x)\cdot \log ( \frac{P(x)}{Q(x)})\]
-It intuitively indicates the difference, in probabilistic terms, between the input-output behaviour of the AI system at hand---corresponding to the probability distribution $Q$---and a reference probability distribution $P$ describing how the AI system should ideally behave. Before adding up all the the differences computed for each possible output of the AI system, these differences are weighted by the actual probability of correctly obtaining that output.
+In order to compute the difference between the behaviour of the AI system under investigation -- which we identify with the probability distribution $Q$ -- and an optimal behaviour $P$, in case some data about such an optimal behaviour is available, we might employ different divergences.
 
-Since the divergence $D_{\mathrm{KL}}$ is not symmetric, when we have to compare the behaviour of the system on a sensitive class with the behaviour of the system on another sensitive class, we must adopt another measure. A first choice is to simply adopt a symmetric version $D^{\mathrm{Sym}}_{\mathrm{KL}}$ of $D_{\mathrm{KL}}$:\[D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)=\frac{D_{\mathrm{KL}}(P\parallel Q)+D_{\mathrm{KL}}(Q\parallel P)}{2}\]
-A second choice is to go for the very simple but intuitive $D_{\mathrm{TV}}$:\[D_{\mathrm{TV}}(P\parallel Q)= \sup _{x\in X} \vert P(x) - Q(x)\vert\]which simply computes the greatest difference between the probability of obtaining an output $o$ when we run our AI system on the individuals of the sensitive class $c_1\in F$ and the probability of obtaining the same output $o$ when we run our AI system on the individuals of the sensitive class $c_2\in F$.
+A first possibility is a divergence borrowed from information theory: The Kullback–Leibler divergence $D_{\mathrm{KL}}$ \cite{dkl}. This measure is mathematically expressed by the following equation
+\[D_{\mathrm{KL}}(P\parallel Q)= \sum _{x\in X} P(x)\cdot \log \Big( \frac{P(x)}{Q(x)}\Big)\]
+and it intuitively indicates the difference, in probabilistic terms, between the input-output behaviour of the AI system at hand and a reference probability distribution. Before adding up all the the differences computed for each possible output of the AI system, these differences are weighted by the actual probability of correctly obtaining that output.
 
-Finally, in order to normalise the values of the different divergences that we use in the system and be able to select common, reasonable thresholds for all of them, we project the values of $D_{\mathrm{KL}}$ and $D^{\mathrm{Sym}}_{\mathrm{KL}}$---which are not bewteen $0$ and $1$ by default---onto the interval $[0,1]$ as follows: instead of $D_{\mathrm{KL}}(P\parallel Q)$ we use $1-\frac{1}{D_{\mathrm{KL}}(P\parallel Q)}$ and instead of $D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)$ we use $1-\frac{1}{D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)}$.
+Since the divergence $D_{\mathrm{KL}}$ is not symmetric, when we have to compare the behaviour of the system on a sensitive class with the behaviour of the system on another sensitive class, we must adopt another measure. We could either simply adopt a symmetric version $D^{\mathrm{Sym}}_{\mathrm{KL}}$ of $D_{\mathrm{KL}}$,
+\[D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)=\frac{D_{\mathrm{KL}}(P\parallel Q)+D_{\mathrm{KL}}(Q\parallel P)}{2},\]
+or go for the very simple but intuitive $D_{\mathrm{TV}}$\[D_{\mathrm{TV}}(P\parallel Q)= \sup _{x\in X} \vert P(x) - Q(x)\vert,\]
+which computes the greatest difference between the probability of obtaining an output $o$ when we run our AI system on the individuals of the sensitive class $c_1\in F$ and the probability of obtaining the same output $o$ when we run our AI system on the individuals of the sensitive class $c_2\in F$.
 
+Finally, in order to normalise the values of the different divergences that we use in the system and be able to select common, reasonable thresholds for all of them, we project the values of $D_{\mathrm{KL}}$ and $D^{\mathrm{Sym}}_{\mathrm{KL}}$ -- which are not between $0$ and $1$ by default -- onto the interval $[0,1]$ as follows: instead of $D_{\mathrm{KL}}(P\parallel Q)$ and $D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)$, respectively, we use
+
+\[
+1-\frac{1}{D_{\mathrm{KL}}(P\parallel Q)} \quad\text{and}\quad 1-\frac{1}{D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)}\;.
+\]
 
 \subsection{How to handle sensitive features corresponding to more than two classes}
 
@@ -170,8 +187,9 @@ The minimal divergence, on the other hand, corresponds to the best case scenario
 
 \paragraph{The average of the divergences}
 
-$\sum_{c_i,c_j\in C} D(c_i\parallel c_j)/\binom{\mid C\mid}{2}$ That is, the sum of the divergences between the two elements of each pair $c_i,c_j\in C$ divided by the total number $\binom{\mid C\mid}{2}$ of these pairs.
+$\sum_{c_i,c_j\in C} D(c_i\parallel c_j)/\binom{\mid C\mid}{2}$
 
+That is, the sum of the divergences between the two elements of each pair $c_i,c_j\in C$ divided by the total number $\binom{\mid C\mid}{2}$ of these pairs.
 This measure indicates the average bias expressed by the AI system. Unlike the previous measures, this one meaningfully combines information about the behaviour of the system with respect to all classes related to the sensitive feature.  What this measure still does not tell us, though, is the variability of the behaviour of the system in terms of bias. The same average, indeed, could be due to a few very biased behaviours or to many mildly biased behaviours.
 
 
@@ -179,26 +197,29 @@ This measure indicates the average bias expressed by the AI system. Unlike the p
 
 \[\sqrt{ (\sum_{c_i,c_j\in C} (D(c_i\parallel c_j)-\mu)^2 / \binom{\mid C\mid}{2}  )}\]
  where  $\mu = \sum_{c_i,c_j\in C} D(c_i\parallel c_j)/\binom{\mid C\mid}{2}$. That is, the square root of the average of the squares of the divergences between each value $D(c_i\parallel c_j)$ and the average value of $D(c_i\parallel c_j)$ for each pair $c_i,c_j$. In other terms,  we calculate the average of the divergences, then the difference of each divergence with respect to their average, then we square this differences and calculate their average. Finally, we compute the square root of this average.
-
 This measure indicates the variability of the bias expressed by the AI system we are inspecting. That is, how much difference there is between the cases in which the system is behaving in a very biased way and the cases in which the system is behaving in a mildly biased way. This information complements the information we can gather by computing the previous measure.
 
 \subsection{Parametrisation of the threshold for the divergence}
 
-Most of the times the system computes a divergence between the results of the model and a reference distribution or the results of the model for one class ad another class, a threshold is employed to check whether the divergence is significant---and should be treated as a possible violation of our fairness criteria---or negligible---and thus should be simply ignored. Obviously, fixing this threshold once and for all would give a rather inflexible system.
+Most of the times the system computes a divergence between the results of the model and a reference distribution or the results of the model for one class and another class, a threshold is employed to check whether the divergence is significant---and should be treated as a possible violation of our fairness criteria---or negligible---and thus should be simply ignored. Obviously, fixing this threshold once and for all would give a rather inflexible system.
 
 For instance, setting the threshold to $1/100$ might be reasonable if we are considering the results of the model on a set of $100$ individuals, but it is clearly too strict if our domain only contains $40$ individuals. Indeed, in the latter case, even a difference only concerning one individual would constitute a mistake much greater than the one admitted by the threshold.   
 
-This is why we parametrised the threshold on the basis of several factors. First, the user has to decide how much rigour is required when analysing the behaviour of the model with respect to the feature indicated as sensitive for the present analysis. Two settings are possible: $\mathtt{high}$ and $\mathtt{low}$. The setting $\mathtt{high}$ implies that the considered feature is very sensitive and that the system should be extra attentive about the behaviour of the model in relation to it, while $\mathtt{low}$ implies that differences in the behaviour of the model with respect to the considered feature are significant only if they are particularly strong or extreme. This setting distinguishes between a thorough and rigorous investigation and a simple routine check, one might say.
+This is why we parametrise the threshold on the basis of several factors. First, the user has to decide how much rigour is required when analysing the behaviour of the model with respect to the feature indicated as sensitive for the present analysis. Two settings are possible: $\mathtt{high}$ and $\mathtt{low}$. The setting $\mathtt{high}$ implies that the considered feature is very sensitive and that the system should be extra attentive about the behaviour of the model in relation to it, while $\mathtt{low}$ implies that differences in the behaviour of the model with respect to the considered feature are significant only if they are particularly strong or extreme. This setting distinguishes between a thorough and rigorous investigation and a simple routine check, one might say.
 
 The second factor considered in computing the threshold is the number of classes related to the sensitive feature under consideration. We could call this the {\it granularity} of the predicates related to the sensitive feature, and it indicates how specific the predicates determining the studied classes are. Specific predicates describe in more detail the objects of our domain and determine more specific classes. When the classes that we are considering are very specific, the divergence generated by the bias of the model can be spread over several different classes. Hence, we need to be more attentive about the small divergences that appear locally---that is, when we check pairs of these classes. The threshold should thus be stricter.
 
 
 Finally, each time we compute a divergence relative to two classes, we scale the threshold with respect to the cardinality of the two classes. Large classes mean a stricter threshold. This is a rather obvious choice related to the fact that statistical data related to a large number of individuals tend to be more precise and fine grained. We already gave an example of this few lines ago.
 
-Technically, the threshold is always between $0.05$ and $0.005$, the setting $\mathtt{high}$ restricts this range to the interval $[0.0275, 0.005]$ and the setting $\mathtt{low}$ to the interval $[0.05, 0.0275]$.
+Technically, the threshold is always between $0.05$ and $0.005$, the setting $\mathtt{high}$ restricts this range to the interval $[0.005,0.0275]$ and the setting $\mathtt{low}$ to the interval $[0.0275,0.05]$.
 
 
-The number $n_C$ of classes related to the sensitive feature and the number $n_D$ of individuals in our local domain (that is, the cardinality of the union of the two classes with respect to which we are computing the divergence) are used to decrease the threshold (in other words, to make it stricter) proportionally with respect to the interval selected. The greater the number $n_C$, the smaller the threshold, the greater the number $n_D$, again, the smaller the threshold. The mathematicla formula used is the following:  $((n_C \cdots n_D) x M) + ((1-(n_C \cdot n_D)) \cdot m)$ where $M$ is the upper limit of our interval and $m$ is its lower limit.
+The number $n_C$ of classes related to the sensitive feature and the number $n_D$ of individuals in our local domain (that is, the cardinality of the union of the two classes with respect to which we are computing the divergence) are used to decrease the threshold (in other words, to make it stricter) proportionally with respect to the interval selected. The greater the number $n_C$, the smaller the threshold, the greater the number $n_D$, again, the smaller the threshold. The threshold is then computed as
+\[
+\epsilon = (n_C \cdot n_D) \cdot m + (1-(n_C \cdot n_D)) \cdot M
+\]
+where $m$ is the lower limit of our interval and $M$ is its upper limit.
 
 \section{Implementation}
 \label{sec:implementation}
@@ -217,26 +238,26 @@ The number $n_C$ of classes related to the sensitive feature and the number $n_D
 
 The presented tool for the detection of biases in AI systems is meant to be a module integrated into a more complex software application consisting of three, partly inter-dependent modules. The complete system will present two autonomous modules for the analysis of bias and opacity of AI systems---the first of which we just presented---and a module depending on these two concerning risk evaluation.
 
-\section{Acknowledgments}
-
-Identification of funding sources and other support, and thanks to
-individuals and groups that assisted in the research and the
-preparation of the work should be included in an acknowledgment
-section, which is placed just before the reference section in your
-document.
-
-This section has a special environment:
-\begin{lstlisting}
-\begin{acknowledgments}
-  These are different acknowledgments.
-\end{acknowledgments}
-\end{lstlisting}
-so that the information contained therein can be more easily collected
-during the article metadata extraction phase, and to ensure
-consistency in the spelling of the section heading.
-
-Authors should not prepare this section as a numbered or unnumbered
-\verb|\section|; please use the ``\verb|acknowledgments|'' environment.
+%\section{Acknowledgments}
+%
+%Identification of funding sources and other support, and thanks to
+%individuals and groups that assisted in the research and the
+%preparation of the work should be included in an acknowledgment
+%section, which is placed just before the reference section in your
+%document.
+%
+%This section has a special environment:
+%\begin{lstlisting}
+%\begin{acknowledgments}
+%  These are different acknowledgments.
+%\end{acknowledgments}
+%\end{lstlisting}
+%so that the information contained therein can be more easily collected
+%during the article metadata extraction phase, and to ensure
+%consistency in the spelling of the section heading.
+%
+%Authors should not prepare this section as a numbered or unnumbered
+%\verb|\section|; please use the ``\verb|acknowledgments|'' environment.
 
 
 %%
@@ -245,10 +266,7 @@ Authors should not prepare this section as a numbered or unnumbered
 %% identification of the section in the article metadata, and the
 %% consistent spelling of the heading.
 \begin{acknowledgments}
-  Thanks to the developers of ACM consolidated LaTeX styles
-  \url{https://github.com/borisveytsman/acmart} and to the developers
-  of Elsevier updated \LaTeX{} templates
-  \url{https://www.ctan.org/tex-archive/macros/latex/contrib/els-cas-templates}.  
+This research has been partially funded by the Project PRIN2020 "BRIO - Bias, Risk and Opacity in AI" (2020SSKZ7R) and by by the Department of Philosophy “Piero Martinetti” of the University of Milan under the Project “Departments of Excellence 2023-2027”, both awarded by the Ministry of University and Research (MUR).
 \end{acknowledgments}
 
 %%
@@ -260,17 +278,15 @@ Authors should not prepare this section as a numbered or unnumbered
 \appendix
 
 \section{Online Resources}
-
-
-The sources for the ceur-art style are available via
-\begin{itemize}
-\item \href{https://github.com/yamadharma/ceurart}{GitHub},
-% \item \href{https://www.overleaf.com/project/5e76702c4acae70001d3bc87}{Overleaf},
-\item
-  \href{https://www.overleaf.com/latex/templates/template-for-submissions-to-ceur-workshop-proceedings-ceur-ws-dot-org/pkfscdkgkhcq}{Overleaf
-    template}.
-\end{itemize}
-
+%The sources for the ceur-art style are available via
+%\begin{itemize}
+%\item \href{https://github.com/yamadharma/ceurart}{GitHub},
+%% \item \href{https://www.overleaf.com/project/5e76702c4acae70001d3bc87}{Overleaf},
+%\item
+%  \href{https://www.overleaf.com/latex/templates/template-for-submissions-to-ceur-workshop-proceedings-ceur-ws-dot-org/pkfscdkgkhcq}{Overleaf
+%    template}.
+%\end{itemize}
+The tool.
 \end{document}
 
 %%
