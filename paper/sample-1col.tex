@@ -154,18 +154,26 @@ Whenever the second behaviour alerts of a possibly biased behaviour, a subsequen
 Before we delve into the technical details, let us give a little example: given a database of individuals, with their age, gender, and level of education detailed, consider an algorithm which tries to predict whether they are likely to default on credit. We wish to check if age is a sensitive factor in such prediction. We feed the tool our dataset, the output of the run of the predictive algorithm, and mark the feature of age as sensitive. The program allows us to compare either how the behaviour of the algorithm with respect to age differs from an ``optimal'' behaviour (in this case, we might consider optimal the case where each age group equally succeeds), or how different age groups perform with respect to one another.
  
 \subsection{Divergences}
-In order to compute the difference between the behaviour of the AI system under investigation -- which we identify with the probability distribution $Q$ -- and an optimal behaviour $P$, in case some data about such an optimal behaviour is available, we might employ different divergences.
 
-A first possibility is a divergence borrowed from information theory: The Kullback–Leibler divergence $D_{\mathrm{KL}}$ \cite{dkl}. This measure is mathematically expressed by the following equation
+The comparisons above are computed on probability distributions, each taken to express the behaviour of a stochastic system. In order to compute the difference between the behaviour of the AI system under investigation -- denoted by the probability distribution $Q$ -- and an optimal behaviour $P$ when available, different divergences might be considered.
+
+A first possibility is the Kullback–Leibler divergence $D_{\mathrm{KL}}$ \cite{dkl} known from information theory:
+
 \[D_{\mathrm{KL}}(P\parallel Q)= \sum _{x\in X} P(x)\cdot \log \Big( \frac{P(x)}{Q(x)}\Big)\]
-and it intuitively indicates the difference, in probabilistic terms, between the input-output behaviour of the AI system at hand and a reference probability distribution. Before adding up all the the differences computed for each possible output of the AI system, these differences are weighted by the actual probability of correctly obtaining that output.
 
-Since the divergence $D_{\mathrm{KL}}$ is not symmetric, when we have to compare the behaviour of the system on a sensitive class with the behaviour of the system on another sensitive class, we must adopt another measure. We could either simply adopt a symmetric version $D^{\mathrm{Sym}}_{\mathrm{KL}}$ of $D_{\mathrm{KL}}$,
+it intuitively indicates the difference, in probabilistic terms, between the input-output behaviour of the AI system at hand and a reference probability distribution. It sums up all the differences computed for each possible output of the AI system weighted by the actual probability of correctly obtaining that output.
+
+As the divergence $D_{\mathrm{KL}}$ is not symmetric, comparison of the behaviour of the system on two distinct sensitive classes requires another measure. One could either simply adopt a symmetric version of $D_{\mathrm{KL}}$
+
 \[D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)=\frac{D_{\mathrm{KL}}(P\parallel Q)+D_{\mathrm{KL}}(Q\parallel P)}{2},\]
-or go for the very simple but intuitive $D_{\mathrm{TV}}$\[D_{\mathrm{TV}}(P\parallel Q)= \sup _{x\in X} \vert P(x) - Q(x)\vert,\]
-which computes the greatest difference between the probability of obtaining an output $o$ when we run our AI system on the individuals of the sensitive class $c_1\in F$ and the probability of obtaining the same output $o$ when we run our AI system on the individuals of the sensitive class $c_2\in F$.
 
-Finally, in order to normalise the values of the different divergences that we use in the system and be able to select common, reasonable thresholds for all of them, we project the values of $D_{\mathrm{KL}}$ and $D^{\mathrm{Sym}}_{\mathrm{KL}}$ -- which are not between $0$ and $1$ by default -- onto the interval $[0,1]$ as follows: instead of $D_{\mathrm{KL}}(P\parallel Q)$ and $D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)$, respectively, we use
+or choose for the simple but intuitive 
+
+$D_{\mathrm{TV}}$\[D_{\mathrm{TV}}(P\parallel Q)= \sup _{x\in X} \vert P(x) - Q(x)\vert,\]
+
+which computes the largest difference between the probability of obtaining an output $o$ given in input individuals of distinct sensitive classes $c_1\in F$ and $c_2\in F$.
+
+In order to normalise the values of the different divergences that we use in the system and be able to select common, reasonable thresholds for all of them, we project the values of $D_{\mathrm{KL}}$ and $D^{\mathrm{Sym}}_{\mathrm{KL}}$ onto the interval $[0,1]$. The divergences $D_{\mathrm{KL}}(P\parallel Q)$ and $D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)$ are replaced, respectively, by
 
 \[
 1-\frac{1}{D_{\mathrm{KL}}(P\parallel Q)} \quad\text{and}\quad 1-\frac{1}{D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)}\;.
