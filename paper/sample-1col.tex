@@ -55,6 +55,9 @@ Work funded by the PRIN project n.2020SSKZ7R BRIO (Bias, Risk and Opacity in AI)
 \author[1]{Greta Coraglia}[
 email=greta.coraglia@unimi.it
 ]
+\author[3]{Fabio Aurelio D'Asaro}[
+email=fabio.dasaro@univr.it
+]
 \author[1]{Francesco A. Genco}[%
 email=francesco.genco@unimi.it
 ]
@@ -65,7 +68,9 @@ email=davide.posillipo@alkemy.com
 \author[1]{Giuseppe Primiero}[
 email=giuseppe.primiero@unimi.it
 ]
-\author[2]{Christian Quaggio}
+\author[2]{Christian Quaggio}[
+email=xxx@xxx
+]
 
 %\author[1,2]{Dmitry S. Kulyabov}[%
 %orcid=0000-0002-0877-7063,
@@ -82,6 +87,7 @@ email=giuseppe.primiero@unimi.it
 %\fnmark[1]
 \address[1]{LUCI Group, University of Milan, via Festa del Perdono 7, 20122 Milan, Italy}
 \address[2]{Alkemy, \dots}
+\address[3]{Verona}
 
 %\author[4]{Manfred Jeusfeld}[%
 %orcid=0000-0002-9421-8566,
@@ -125,14 +131,13 @@ we provide the means to compare the action of the user's algorithm of choice on 
 @UNIMI
 
 
-The project BRIO aims at developing formal and conceptual frameworks for the analysis of AI systems and for the advancement of the technical and philosophical understanding of the notions of Bias, Risk and Opacity in AI, with the ultimate objective of generally contributing to the development of trustworthy AI. 
+The project BRIO aims at developing formal and conceptual frameworks for the analysis of AI systems and for the advancement of the technical and philosophical understanding of the notions of Bias, Risk and Opacity in AI, with the ultimate objective of generally contributing to the development of trustworthy AI.\footnote{\url{sites.unimi.it/brio}} 
 
-The collaboration between BRIO and Alkemy aspires to produce software applications for the analysis of bias and risk with regard to AI technologies which often rely on probabilistic computations and  are often opaque in nature. One of the most challenging aspects of modern AI systems, indeed, is the fact that they do not operate in a deterministic way, namely they do not simply implement a function that associates a unique output to each input, and they are not transparent, in the sense that a general formal description of their behaviour might not be available.
+The aim of the collaboration between BRIO and Alkemy is to produce software applications for the analysis of bias, risk and opacity with regard to AI technologies which often rely on non-deterministic computations and  are often opaque in nature. One of the most challenging aspects of modern AI systems, indeed, is that they do not guarantee specification correctness, and they are not transparent, in the sense that a general formal description of their behaviour might not be available.
 
-We present a piece of software for the detection and analysis of biased behaviours in AI systems. The application is meant as a tool for developers and data scientists that wish to test their algorithms relying on probabilistic and learning mechanisms in order to detect misbehaviours related to biases and collect data about them. The ultimate goal is to provide them with useful insights and data for the improvement of the AI systems with respect to bias.
+We present a first tool developed within the BRIOxAlkemy collaboration for the detection and analysis of biased behaviours in AI systems. The tool is aimed at developers and data scientists that wish to test their algorithms relying on probabilistic and learning mechanisms in order to detect misbehaviours related to biases and collect data about them. The ultimate goal is to provide them with useful insights and data for the improvement of the AI systems with respect to bias.
 
-
-The system we are presenting is based on the theoretical, foundational works presented in \cite{dap21}, \cite{dagp22}, and \cite{gp23}, and in this paper we discuss the formal ideas behind the definition of the software (Section \ref{sec:theory}), the technical details of its implementation  (\Cref{sec:implementation}), the data obtained from a case study that validates the usefulness of the software (\Cref{sec:validation}), and the projected further developments aimed at integrating the presented software in a more general tool for the analysis of AI systems (\Cref{sec:conclusions}).
+The system presented is based on the theoretical, foundational works presented in \cite{dap21}, \cite{dagp22}, and \cite{gp23}, and in this paper we discuss the formal ideas behind the definition of the software (Section \ref{sec:theory}), the technical details of its implementation  (\Cref{sec:implementation}), the data obtained from a case study that validates the usefulness of the software (\Cref{sec:validation}), and the projected further developments aimed at integrating the presented software in a more general tool for the analysis of AI systems (\Cref{sec:conclusions}).
 
 \section{Theory}\label{sec:theory}
 

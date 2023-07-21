@@ -71,6 +71,7 @@
    <dc:type><rdf:Bag><rdf:li>journal</rdf:li></rdf:Bag></dc:type>
    <dc:title><rdf:Alt><rdf:li xml:lang="x-default">BRIOxAlkemy: A Bias detecting tool</rdf:li></rdf:Alt></dc:title>
    <dc:creator><rdf:Seq><rdf:li>Greta Coraglia</rdf:li>
+     <rdf:li>Fabio Aurelio D'Asaro</rdf:li>
      <rdf:li>Francesco A. Genco</rdf:li>
      <rdf:li>Davide Giannuzzi</rdf:li>
      <rdf:li>Davide Posillipo</rdf:li>
@@ -95,9 +96,9 @@
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmp="http://ns.adobe.com/xap/1.0/"> 
    <xmp:CreatorTool>LaTeX with hyperref</xmp:CreatorTool> 
-   <xmp:ModifyDate>2023-07-21T11:41:14+02:00</xmp:ModifyDate> 
-   <xmp:CreateDate>2023-07-21T11:41:14+02:00</xmp:CreateDate> 
-   <xmp:MetadataDate>2023-07-21T11:41:14+02:00</xmp:MetadataDate> 
+   <xmp:ModifyDate>2023-07-21T15:16:23+02:00</xmp:ModifyDate> 
+   <xmp:CreateDate>2023-07-21T15:16:23+02:00</xmp:CreateDate> 
+   <xmp:MetadataDate>2023-07-21T15:16:23+02:00</xmp:MetadataDate> 
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmpRights = "http://ns.adobe.com/xap/1.0/rights/"> 
    <xmpRights:Marked>True</xmpRights:Marked>
@@ -106,7 +107,7 @@
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/"> 
    <xmpMM:DocumentID>uuid:D0FAFD88-6B6D-39DB-0E19-5C5EE4525F4C</xmpMM:DocumentID> 
-   <xmpMM:InstanceID>uuid:430564B7-F861-4198-485D-36D0102EC3C7</xmpMM:InstanceID> 
+   <xmpMM:InstanceID>uuid:85022500-826D-F2F3-8D0A-2156E92CC28C</xmpMM:InstanceID> 
   </rdf:Description> 
  </rdf:RDF> 
 </x:xmpmeta> 
