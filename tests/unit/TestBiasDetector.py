@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
 
-from frontend.utils.Preprocessing import Preprocessing
+from src.utils.Preprocessing import Preprocessing
 from src.bias.BiasDetector import BiasDetector
 from src.bias.TotalVariationDistance import TotalVariationDistance
 from src.bias.KLDivergence import KLDivergence
