@@ -152,9 +152,14 @@ def details_fvf(violation):
 @app.route('/bias/freqvsref', methods=['GET', 'POST'])
 def freqvsref():
 
-    df_pickle = open(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['dataset']), "rb")
-    dict_vars['df'] = pickle.load(df_pickle)
-    df_pickle.close()
+    if ('dataset_custom' and 'notebook') in list(dict_vars.keys()):
+        list_of_files =  glob.glob(os.path.join(app.config['UPLOAD_FOLDER']) + "/*")
+        latest_file = max(list_of_files, key=os.path.getctime)
+        df_pickle = open(latest_file, "rb")
+        dict_vars['df'] = pickle.load(df_pickle)
+    if 'dataset' in list(dict_vars.keys()):
+        df_pickle = open(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['dataset']), "rb")
+        dict_vars['df'] = pickle.load(df_pickle)
     list_var = dict_vars['df'].columns
     if request.method == 'POST':
         if list(request.form.keys()):
@@ -229,8 +234,8 @@ def details_fvr(violation):
     bd=BiasDetector(distance=d)
     
     results_viol1 = bd.get_frequencies_list(focus_df, 'predictions',
-                            dict_vars['df'].dict_vars['predictions'].unique(),
+                            dict_vars['df'][dict_vars['predictions']].unique(),
                             dict_vars['root_var'],  dict_vars['df'][dict_vars['root_var']].unique()
                             )
-    results_viol2 = focus_df.groupby(dict_vars['root_var']).dict_vars['predictions'].value_counts(normalize=True)
+    results_viol2 = focus_df.groupby(dict_vars['root_var'])[dict_vars['predictions']].value_counts(normalize=True)
     return render_template('bias/violation_specific_fvr.html', viol = violation, res2 = results_viol2.to_frame().to_html(classes=['table table-hover mx-auto w-75']))
