@@ -31,7 +31,7 @@ function handle_stdev() {
     "method": "POST",
     "body": data
         }).then((response) => response.json())
-        .then((data) => stdev_id.outerHTML = response.data)
+        .then((data) => stdev_id.outerHTML = data.response)
 };
 
 document.addEventListener("DOMContentLoaded", function() {

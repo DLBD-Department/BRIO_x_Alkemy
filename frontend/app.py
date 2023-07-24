@@ -9,8 +9,8 @@ import sys
 import subprocess
 from statistics import mean, stdev
 
-from utils.funcs import handle_multiupload, write_reference_distributions_html, handle_ref_distributions
-from utils.Preprocessing import Preprocessing
+from src.utils.funcs import handle_multiupload, write_reference_distributions_html, handle_ref_distributions, allowed_file
+from src.utils.Preprocessing import Preprocessing
 
 from sklearn.model_selection import train_test_split
 from src.bias.threshold_calculator import threshold_calculator
@@ -53,13 +53,21 @@ def home_bias():
         if 'dataset' in list(request.files.keys()):
             dataframe_file = request.files['dataset']
             dict_vars['dataset'] = dataframe_file.filename
-            dataframe_file.save(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['dataset']))
-            flash('Dataframe uploaded successfully!', 'success')
+            if allowed_file(dict_vars['dataset']):
+                dataframe_file.save(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['dataset']))
+                flash('Dataframe uploaded successfully!', 'success')
+            else:
+                flash('Unsupported format for dataframe.', 'danger')
+                return redirect('/bias')
         if ('dataset_custom' and 'notebook') in list(request.files.keys()):
             dict_vars['dataset_custom'] = request.files['dataset_custom'].filename
             dict_vars['notebook'] = request.files['notebook'].filename
-            request.files['dataset_custom'].save(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['dataset_custom']))
-            request.files['notebook'].save(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['notebook']))
+            if allowed_file(dict_vars['notebook']) and allowed_file(dict_vars['dataset_custom']):
+                request.files['dataset_custom'].save(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['dataset_custom']))
+                request.files['notebook'].save(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['notebook']))
+            else:
+                flash('Unsupported format for notebook or dataset.', 'danger')
+                return redirect('/bias')
             if request.files['artifacts'].filename != '':
                 handle_multiupload(request, 'artifacts', app.config['UPLOAD_FOLDER'])
             os.system("jupyter nbconvert --to python " + os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['notebook']))
@@ -71,16 +79,26 @@ def home_bias():
 
 @app.route('/bias/freqvsfreq', methods=['GET', 'POST'])
 def freqvsfreq():
-
     if ('dataset_custom' and 'notebook') in list(dict_vars.keys()):
         list_of_files =  glob.glob(os.path.join(app.config['UPLOAD_FOLDER']) + "/*")
         latest_file = max(list_of_files, key=os.path.getctime)
-        df_pickle = open(latest_file, "rb")
-        dict_vars['df'] = pickle.load(df_pickle)
+        extension = latest_file.rsplit('.', 1)[1].lower()
+        match extension:
+            case 'pkl':
+                df_pickle = open(latest_file, "rb")
+                dict_vars['df'] = pickle.load(df_pickle)
+            case 'csv':
+                dict_vars['df'] = pd.read_csv(latest_file)
     if 'dataset' in list(dict_vars.keys()):
-        df_pickle = open(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['dataset']), "rb")
-        dict_vars['df'] = pickle.load(df_pickle)
-
+        df_uploaded = os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['dataset'])
+        extension = df_uploaded.rsplit('.', 1)[1].lower()
+        match extension:
+            case 'pkl':
+                df_pickle = open(df_uploaded, "rb")
+                dict_vars['df'] = pickle.load(df_pickle)
+            case 'csv':
+                dict_vars['df'] = pd.read_csv(df_uploaded)
+    
     list_var = dict_vars['df'].columns
     if request.method == 'POST':
         if list(request.form.keys()):
@@ -90,7 +108,6 @@ def freqvsfreq():
                 html.close()
                 split_html = btn_opt.split('class="')
                 rvar = request.form['rv_selected']
-                print(rvar, flush=True)
                 hide_option = ""
                 if len(dict_vars['df'][rvar].unique()) < 3:
                     hide_option = "d-none "
@@ -151,15 +168,25 @@ def details_fvf(violation):
 
 @app.route('/bias/freqvsref', methods=['GET', 'POST'])
 def freqvsref():
-
     if ('dataset_custom' and 'notebook') in list(dict_vars.keys()):
         list_of_files =  glob.glob(os.path.join(app.config['UPLOAD_FOLDER']) + "/*")
         latest_file = max(list_of_files, key=os.path.getctime)
-        df_pickle = open(latest_file, "rb")
-        dict_vars['df'] = pickle.load(df_pickle)
+        extension = latest_file.rsplit('.', 1)[1].lower()
+        match extension:
+            case 'pkl':
+                df_pickle = open(latest_file, "rb")
+                dict_vars['df'] = pickle.load(df_pickle)
+            case 'csv':
+                dict_vars['df'] = pd.read_csv(latest_file)
     if 'dataset' in list(dict_vars.keys()):
-        df_pickle = open(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['dataset']), "rb")
-        dict_vars['df'] = pickle.load(df_pickle)
+        df_uploaded = os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['dataset'])
+        extension = df_uploaded.rsplit('.', 1)[1].lower()
+        match extension:
+            case 'pkl':
+                df_pickle = open(df_uploaded, "rb")
+                dict_vars['df'] = pickle.load(df_pickle)
+            case 'csv':
+                dict_vars['df'] = pd.read_csv(df_uploaded)
     list_var = dict_vars['df'].columns
     if request.method == 'POST':
         if list(request.form.keys()):

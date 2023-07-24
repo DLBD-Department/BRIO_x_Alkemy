@@ -3,6 +3,11 @@ import pandas as pd
 import numpy as np
 import os
 
+def allowed_file(filename: str) -> str:
+    ALLOWED_EXTENSIONS = {'pkl', 'csv', 'ipynb', 'py'}
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 def handle_multiupload(req: request, label: str, path: str) -> None:
     files_list = req.files.getlist(label)
     for file in files_list:
