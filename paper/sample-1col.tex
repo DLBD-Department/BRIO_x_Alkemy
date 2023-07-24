@@ -167,6 +167,12 @@ As the divergence $D_{\mathrm{KL}}$ is not symmetric, comparison of the behaviou
 
 \[D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)=\frac{D_{\mathrm{KL}}(P\parallel Q)+D_{\mathrm{KL}}(Q\parallel P)}{2},\]
 
+%%NEW VERSION (?):
+%One could either adopt a symmetric divergence, closely related to $D_{\mathrm{KL}}$, which is called Jensen-Shannon divergence ($D_{\mathrm{JS}}$):
+%
+%\[D_{\mathrm{JS}}(P\parallel Q)=\frac{D_{\mathrm{KL}}(P\parallel M)+D_{\mathrm{KL}}(Q\parallel M)}{2},\]where $M$ is defined as $(P+Q)/2$.
+
+
 or choose for the simple but intuitive 
 
 $D_{\mathrm{TV}}$\[D_{\mathrm{TV}}(P\parallel Q)= \sup _{x\in X} \vert P(x) - Q(x)\vert,\]
@@ -178,6 +184,12 @@ In order to normalise the values of the different divergences that we use in the
 \[
 1-\frac{1}{D_{\mathrm{KL}}(P\parallel Q)} \quad\text{and}\quad 1-\frac{1}{D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)}\;.
 \]
+
+%%NEW VERSION (?):
+%In order to normalise the values of the different divergences that we use in the system and be able to select common, reasonable thresholds for all of them, we project the values of $D_{\mathrm{KL}}$ onto the interval $[0,1]$. The divergence $D_{\mathrm{KL}}(P\parallel Q)$ is thus replaced by
+%
+%\[1-\exp (- D_{\mathrm{KL}}(P\parallel Q))\]where the $\exp(x)$ function is defined as $e^x$. 
+
 
 \subsection{How to handle sensitive features corresponding to more than two classes}
 
