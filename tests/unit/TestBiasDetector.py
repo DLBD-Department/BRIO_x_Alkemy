@@ -9,6 +9,7 @@ from src.utils.Preprocessing import Preprocessing
 from src.bias.BiasDetector import BiasDetector
 from src.bias.TotalVariationDistance import TotalVariationDistance
 from src.bias.KLDivergence import KLDivergence
+from src.bias.JSDivergence import JSDivergence
 
 class TestBiasDetector(unittest.TestCase):
 
@@ -84,6 +85,25 @@ class TestBiasDetector(unittest.TestCase):
 
         self.assertEqual(results[0], 0.0031781793012045124)
 
+    
+    def test_compare_root_variable_groups_with_JS(self):
+        '''
+        Test the compare_root_variable_groups method against a 
+        known data set and model.
+        It uses the JS Divergence and max as 
+        aggregating function. 
+        '''
+        d = JSDivergence(aggregating_function=max)
+        bd = BiasDetector(distance=d)
+
+        results = bd.compare_root_variable_groups(
+                    dataframe=self.df_with_predictions,
+                    target_variable='predictions',
+                    root_variable='x2_sex',
+                    threshold=0.1)
+
+        self.assertEqual(results[0], 0.02816177126895962)
+
 
     def test_compare_root_variable_groups_with_TVD_and_ref_distribution(self):
         '''
@@ -123,6 +143,26 @@ class TestBiasDetector(unittest.TestCase):
                     reference_distribution=self.ref)
 
         self.assertEqual(results[0], [0.09045146214557331, 0.05608173922140364])
+
+    
+    def test_compare_root_variable_groups_with_JS_and_ref_distribution(self):
+        '''
+        Test the compare_root_variable_groups method against a 
+        known data set and model.
+        It uses the symmetrical KL divergence and max as aggregating function.
+        It uses a reference distribution for the bias detection.
+        '''
+        d = JSDivergence(aggregating_function=max)
+        bd = BiasDetector(distance=d)
+
+        results = bd.compare_root_variable_groups(
+                    dataframe=self.df_with_predictions,
+                    target_variable='predictions',
+                    root_variable='x2_sex',
+                    threshold=0.1,
+                    reference_distribution=self.ref)
+
+        self.assertEqual(results[0], [0.1401852511575967, 0.11265107744469449])
 
 
     def test_compare_root_variable_conditioned_groups_with_TVD(self):
@@ -171,6 +211,30 @@ class TestBiasDetector(unittest.TestCase):
         violations = {k: v for k, v in results.items() if not v[2]}
 
         self.assertEqual(len(violations), 1)
+
+
+    def test_compare_root_variable_conditioned_groups_with_JS(self):
+        '''
+        Test the compare_root_variable_conditioned_groups method against
+        a known dataset and a model.
+        It uses the symmetrical KL Divergence and max as 
+        aggregating function.
+        '''
+
+        d = JSDivergence(aggregating_function=max)
+        bd = BiasDetector(distance=d)
+
+        results = bd.compare_root_variable_conditioned_groups(
+            self.df_with_predictions,
+            'predictions',
+            'x2_sex',
+            ['x3_education', 'x4_marriage'],
+            0.1,
+            min_obs_per_group=30)
+
+        violations = {k: v for k, v in results.items() if not v[2]}
+
+        self.assertEqual(len(violations), 2)
 
 
     def test_compare_root_variable_conditioned_groups_with_TVD_and_ref_distribution(self):
@@ -223,6 +287,32 @@ class TestBiasDetector(unittest.TestCase):
         violations = {k: v for k, v in results.items() if (not v[2][0] or not v[2][1])}
 
         self.assertEqual(len(violations), 7)
+
+    
+    def test_compare_root_variable_conditioned_groups_with_JS_and_ref_distribution(self):
+        '''
+        Test the compare_root_variable_conditioned_groups method against
+        a known dataset and a model.
+        It uses the symmetrical KL Divergence and max as 
+        aggregating function.
+        It uses a reference distribution for the bias detection. 
+        '''
+
+        d = JSDivergence(aggregating_function=max)
+        bd = BiasDetector(distance=d)
+
+        results = bd.compare_root_variable_conditioned_groups(
+            self.df_with_predictions,
+            'predictions',
+            'x2_sex',
+            ['x3_education', 'x4_marriage'],
+            0.1,
+            min_obs_per_group=30,
+            reference_distribution=self.ref)
+
+        violations = {k: v for k, v in results.items() if (not v[2][0] or not v[2][1])}
+
+        self.assertEqual(len(violations), 15)
 
 
 if __name__ == '__main__':
