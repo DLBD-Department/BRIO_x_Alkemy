@@ -209,38 +209,32 @@ Suppose that we are studying the behaviour of the model with respect to the feat
 \[F=\{over\_50\_yo, between\_40\_and\_50\_yo, below\_40\_yo\}\]
 We can then use the following ways of aggregating the obtained values.
 
-\begin{definition}[Maximal divergence]
+\paragraph{Maximal divergence}
 
 $$\max (\{D(c_i\parallel c_j): c_i,c_j\in C\ \&\ i\neq j\})$$
-\end{definition}
+
 
 
 Maximal divergence corresponds to the worst case scenario with respect to the bias of our AI system. This measure indicates how much the AI system favours the most favoured class with respect to the least favoured class related to our sensitive feature.
 
-\begin{definition}[Minimal divergence]
-
+\paragraph{Minimal divergence}
 $$\min (\{D(c_i\parallel c_j): c_i,c_j\in C\ \&\ i\neq j\})$$
-\end{definition}
+
 
 Minimal divergence, on the other hand, corresponds to the best case scenario.  This measure indicates the minimal bias expressed by our AI system with respect to the sensitive feature. If this measure is $0$, we do not know much, but if it is much above our threshold, then we know that the AI system under analyis expresses strong biases with respect to all classes related to the sensitive feature.
 
 
-\begin{definition}[Average of the divergences]
-
+\paragraph{Average of the divergences}
 $$\sum_{c_i,c_j\in C} D(c_i\parallel c_j)/\binom{\mid C\mid}{2}$$
-\end{definition}
+
 
 i.e. the sum of the divergences between the two elements of each pair $c_i,c_j\in C$ divided by the total number $\binom{\mid C\mid}{2}$ of these pairs. This measure indicates the average bias expressed by the AI system. Unlike the previous measures, this one meaningfully combines information about the behaviour of the system with respect to all classes related to the sensitive feature.  What this measure still does not tell us, though, is the variability of the behaviour of the system in terms of bias. The same average, indeed, could be due to a few very biased behaviours or to many mildly biased behaviours.
 
 
-\begin{definition}[Standard deviation of the divergences]
-
+\paragraph{Standard deviation of the divergences}
 \[\sqrt{ (\sum_{c_i,c_j\in C} (D(c_i\parallel c_j)-\mu)^2 / \binom{\mid C\mid}{2}  )}\]
 
- where  $\mu = \sum_{c_i,c_j\in C} D(c_i\parallel c_j)/\binom{\mid C\mid}{2}$. 
-\end{definition} 
- 
-That is, the square root of the average of the squares of the divergences between each value $D(c_i\parallel c_j)$ and the average value of $D(c_i\parallel c_j)$ for each pair $c_i,c_j$. In other terms,  we calculate the average of the divergences, then the difference of each divergence with respect to their average, then we square this differences and calculate their average. Finally, we compute the square root of this average.
+ where  $\mu = \sum_{c_i,c_j\in C} D(c_i\parallel c_j)/\binom{\mid C\mid}{2}$. That is, the square root of the average of the squares of the divergences between each value $D(c_i\parallel c_j)$ and the average value of $D(c_i\parallel c_j)$ for each pair $c_i,c_j$. In other terms,  we calculate the average of the divergences, then the difference of each divergence with respect to their average, then we square this differences and calculate their average. Finally, we compute the square root of this average.
 This measure indicates the variability of the bias expressed by the AI system we are inspecting. That is, how much difference there is between the cases in which the system is behaving in a very biased way and the cases in which the system is behaving in a mildly biased way. This information complements the information we can gather by computing the previous measure.
 
 \subsection{Parametrisation of the threshold for the divergence}
