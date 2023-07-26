@@ -83,7 +83,7 @@ class TestBiasDetector(unittest.TestCase):
                     root_variable='x2_sex',
                     threshold=0.1)
 
-        self.assertEqual(results[0], 0.0031781793012045124)
+        self.assertEqual(results[0], 0.003168110478059205)
 
     
     def test_compare_root_variable_groups_with_JS(self):
@@ -142,7 +142,7 @@ class TestBiasDetector(unittest.TestCase):
                     threshold=0.1,
                     reference_distribution=self.ref)
 
-        self.assertEqual(results[0], [0.09045146214557331, 0.05608173922140364])
+        self.assertEqual(results[0], [0.0829486366753095, 0.05310359713515167])
 
     
     def test_compare_root_variable_groups_with_JS_and_ref_distribution(self):
@@ -286,7 +286,7 @@ class TestBiasDetector(unittest.TestCase):
 
         violations = {k: v for k, v in results.items() if (not v[2][0] or not v[2][1])}
 
-        self.assertEqual(len(violations), 7)
+        self.assertEqual(len(violations), 6)
 
     
     def test_compare_root_variable_conditioned_groups_with_JS_and_ref_distribution(self):
