@@ -21,6 +21,8 @@
 %% auto break lines
 \lstset{breaklines=true}
 
+\newtheorem{example}{Example}
+\newtheorem{definition}{Definition}
 
 \newcommand{\red}[1]{\color{red}#1}
 %%
@@ -151,7 +153,11 @@ The analyses conducted by our system are of two kids:
 
 Whenever the second behaviour alerts of a possibly biased behaviour, a subsequent check follow on some (or all) of the subclasses of the considered sensitive classes. This second check is meant to tell us if the bias encountered at the level of the classes can be explained away by other features of the individuals in the sensitive classes considered that are not related to the sensitive feature at hand.
 
-Before we delve into the technical details, let us give a little example: given a database of individuals, with their age, gender, and level of education detailed, consider an algorithm which tries to predict whether they are likely to default on credit. We wish to check if age is a sensitive factor in such prediction. We feed the tool our dataset, the output of the run of the predictive algorithm, and mark the feature of age as sensitive. The program allows us to compare either how the behaviour of the algorithm with respect to age differs from an ``optimal'' behaviour (in this case, we might consider optimal the case where each age group equally succeeds), or how different age groups perform with respect to one another.
+Before we delve into the technical details, let us give a little example: 
+
+\begin{example}
+Consider a database containing details of individuals, with their age, gender, and level of education. Consider an algorithm which tries to predict whether each of them is likely to default on credit. We wish to check if age is a sensitive factor in such prediction. We feed the tool our dataset, the output of the run of the predictive algorithm, and mark the feature of age as sensitive. The program allows us to compare either how the behaviour of the algorithm with respect to age differs from an ``optimal'' behaviour (in this case, we might consider optimal the case where each age group equally succeeds), or how different age groups perform with respect to one another.
+\end{example}
  
 \subsection{Divergences}
 
@@ -173,9 +179,9 @@ As the divergence $D_{\mathrm{KL}}$ is not symmetric, comparison of the behaviou
 %\[D_{\mathrm{JS}}(P\parallel Q)=\frac{D_{\mathrm{KL}}(P\parallel M)+D_{\mathrm{KL}}(Q\parallel M)}{2},\]where $M$ is defined as $(P+Q)/2$.
 
 
-or choose for the simple but intuitive 
+or choose for the simple but intuitive $D_{\mathrm{TV}}$
 
-$D_{\mathrm{TV}}$\[D_{\mathrm{TV}}(P\parallel Q)= \sup _{x\in X} \vert P(x) - Q(x)\vert,\]
+\[D_{\mathrm{TV}}(P\parallel Q)= \sup _{x\in X} \vert P(x) - Q(x)\vert,\]
 
 which computes the largest difference between the probability of obtaining an output $o$ given in input individuals of distinct sensitive classes $c_1\in F$ and $c_2\in F$.
 
@@ -191,41 +197,50 @@ In order to normalise the values of the different divergences that we use in the
 %\[1-\exp (- D_{\mathrm{KL}}(P\parallel Q))\]where the $\exp(x)$ function is defined as $e^x$. 
 
 
+\alert{@FG/GC: insert also JS?}
+
+
 \subsection{How to handle sensitive features corresponding to more than two classes}
 
 
 Since the divergences the system uses are binary functions, it is not obvious how to handle the case in which the sensitive feature we are considering partitions the domain in three or more classes. It is, indeed, easy to compute the divergence for pairs of classes, but we also need, in this case, a sensible way of aggregating the obtained results in order to obtain one value describing well how the AI model behaves with respect to the sensitive feature under consideration. It turns out that there are several ways of doing this and each of them tells us something of value if we wish to reach a meaningful conclusion about the AI model.
 
-Suppose that we are studying the behaviour of the model with respect to the feature $F=\{c_1, \ldots , c_n\}$ which induces a partition of our domain of individuals into the classes $c_1, \ldots , c_n$. The first step, required in any case, is the pairwise calculation of the divergences with respect to the different classes induced by $F$. Hence, for each pair $(c_i\parallel c_j)$ such that $c_i, c_j\in F$, we compute $D(c_i\parallel c_j) $ where $D$ is the  preselected divergence and consider the set $\{D(c_i\parallel c_j) : c_i,c_j\in F \& i\neq j\}$. For instance, if we are considering age as our feature  $F$ and we partition our domain into three age groups, we might have
+Suppose that we are studying the behaviour of the model with respect to the feature $F=\{c_1, \ldots , c_n\}$ which induces a partition of our domain of individuals into the classes $c_1, \ldots , c_n$. The first step is the pairwise calculation of the divergences with respect to the different classes induced by $F$. Hence, for each pair $(c_i\parallel c_j)$ such that $c_i, c_j\in F$, we compute $D(c_i\parallel c_j) $ where $D$ is the  preselected divergence and consider the set $\{D(c_i\parallel c_j) : c_i,c_j\in F\ \&\ i\neq j\}$. For instance, if we are considering age as our feature  $F$ and we partition our domain into three age groups, we might have
 \[F=\{over\_50\_yo, between\_40\_and\_50\_yo, below\_40\_yo\}\]
 We can then use the following ways of aggregating the obtained values.
 
-\paragraph{The maximal divergence}
+\begin{definition}[Maximal divergence]
 
-$\max (\{D(c_i\parallel c_j): c_i,c_j\in C \& i\neq j\})$
-
-The maximal divergence corresponds to the worst case scenario with respect to the bias of our AI system. This measure indicates how much the AI system favours the most favoured class with respect to the least favoured class related to our sensitive feature.
-
-\paragraph{The minimal divergence}
-
-$\min (\{D(c_i\parallel c_j): c_i,c_j\in C \& i\neq j\})$
+$$\max (\{D(c_i\parallel c_j): c_i,c_j\in C\ \&\ i\neq j\})$$
+\end{definition}
 
 
-The minimal divergence, on the other hand, corresponds to the best case scenario.  This measure indicates the minimal bias expressed by our AI system with respect to the sensitive feature. If this measure is $0$, we do not know much, but if it is much above our threshold, then we know that the AI system under analyis expresses strong biases with respect to all classes related to the sensitive feature.
+Maximal divergence corresponds to the worst case scenario with respect to the bias of our AI system. This measure indicates how much the AI system favours the most favoured class with respect to the least favoured class related to our sensitive feature.
+
+\begin{definition}[Minimal divergence]
+
+$$\min (\{D(c_i\parallel c_j): c_i,c_j\in C\ \&\ i\neq j\})$$
+\end{definition}
+
+Minimal divergence, on the other hand, corresponds to the best case scenario.  This measure indicates the minimal bias expressed by our AI system with respect to the sensitive feature. If this measure is $0$, we do not know much, but if it is much above our threshold, then we know that the AI system under analyis expresses strong biases with respect to all classes related to the sensitive feature.
 
 
-\paragraph{The average of the divergences}
+\begin{definition}[Average of the divergences]
 
-$\sum_{c_i,c_j\in C} D(c_i\parallel c_j)/\binom{\mid C\mid}{2}$
+$$\sum_{c_i,c_j\in C} D(c_i\parallel c_j)/\binom{\mid C\mid}{2}$$
+\end{definition}
 
-That is, the sum of the divergences between the two elements of each pair $c_i,c_j\in C$ divided by the total number $\binom{\mid C\mid}{2}$ of these pairs.
-This measure indicates the average bias expressed by the AI system. Unlike the previous measures, this one meaningfully combines information about the behaviour of the system with respect to all classes related to the sensitive feature.  What this measure still does not tell us, though, is the variability of the behaviour of the system in terms of bias. The same average, indeed, could be due to a few very biased behaviours or to many mildly biased behaviours.
+i.e. the sum of the divergences between the two elements of each pair $c_i,c_j\in C$ divided by the total number $\binom{\mid C\mid}{2}$ of these pairs. This measure indicates the average bias expressed by the AI system. Unlike the previous measures, this one meaningfully combines information about the behaviour of the system with respect to all classes related to the sensitive feature.  What this measure still does not tell us, though, is the variability of the behaviour of the system in terms of bias. The same average, indeed, could be due to a few very biased behaviours or to many mildly biased behaviours.
 
 
-\paragraph{The standard deviation of the divergences}
+\begin{definition}[Standard deviation of the divergences]
 
 \[\sqrt{ (\sum_{c_i,c_j\in C} (D(c_i\parallel c_j)-\mu)^2 / \binom{\mid C\mid}{2}  )}\]
- where  $\mu = \sum_{c_i,c_j\in C} D(c_i\parallel c_j)/\binom{\mid C\mid}{2}$. That is, the square root of the average of the squares of the divergences between each value $D(c_i\parallel c_j)$ and the average value of $D(c_i\parallel c_j)$ for each pair $c_i,c_j$. In other terms,  we calculate the average of the divergences, then the difference of each divergence with respect to their average, then we square this differences and calculate their average. Finally, we compute the square root of this average.
+
+ where  $\mu = \sum_{c_i,c_j\in C} D(c_i\parallel c_j)/\binom{\mid C\mid}{2}$. 
+\end{definition} 
+ 
+That is, the square root of the average of the squares of the divergences between each value $D(c_i\parallel c_j)$ and the average value of $D(c_i\parallel c_j)$ for each pair $c_i,c_j$. In other terms,  we calculate the average of the divergences, then the difference of each divergence with respect to their average, then we square this differences and calculate their average. Finally, we compute the square root of this average.
 This measure indicates the variability of the bias expressed by the AI system we are inspecting. That is, how much difference there is between the cases in which the system is behaving in a very biased way and the cases in which the system is behaving in a mildly biased way. This information complements the information we can gather by computing the previous measure.
 
 \subsection{Parametrisation of the threshold for the divergence}
