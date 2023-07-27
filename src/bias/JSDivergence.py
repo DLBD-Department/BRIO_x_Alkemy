@@ -1,5 +1,6 @@
 from scipy.spatial.distance import jensenshannon
 from itertools import combinations
+from math import log2
 
 class JSDivergence:
 
@@ -27,7 +28,7 @@ class JSDivergence:
         '''
 
         divergences = [
-                jensenshannon(p=ref, q=obs) for ref, obs in zip(
+                jensenshannon(p=ref, q=obs, base=2) for ref, obs in zip(
                     reference_distribution, observed_distribution
                     )
                 ]
@@ -50,7 +51,7 @@ class JSDivergence:
 
         divergences = []
         for pair in combinations(observed_distribution, 2):
-            divergence = jensenshannon(p=pair[0], q=pair[1])
+            divergence = jensenshannon(p=pair[0], q=pair[1], base=2)
             divergences.append(divergence)
 
         divergence = self.aggregating_function(divergences)
