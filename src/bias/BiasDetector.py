@@ -96,10 +96,10 @@ class BiasDetector:
         computed_threshold = threshold_calculator(self.A1, A2, A3, default_threshold=threshold)
         if reference_distribution is None:
             distance = self.dis.compute_distance_between_frequencies(freqs)
-            return (distance, distance<=computed_threshold)
+            return (distance, distance<=computed_threshold, computed_threshold)
         else:
             distance = self.dis.compute_distance_from_reference(freqs, reference_distribution)
-            return (distance, [d<=computed_threshold for d in distance])
+            return (distance, [d<=computed_threshold for d in distance], computed_threshold)
 
 
     def compare_root_variable_conditioned_groups(self, 

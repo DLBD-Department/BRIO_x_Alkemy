@@ -1,7 +1,8 @@
-from scipy.stats import entropy
+from scipy.spatial.distance import jensenshannon
 from itertools import combinations
+from math import log2
 
-class KLDivergence:
+class JSDivergence:
 
     def __init__(self, 
         aggregating_function=max):
@@ -26,14 +27,11 @@ class KLDivergence:
             The shape of each array is given by the number of labels of target_variable.
         '''
 
-        divergences = []
-        for ref, obs in zip(reference_distribution, observed_distribution):
-            kl = entropy(pk=ref, qk=obs)
-            try:
-                divergence = 1 - 1/kl
-            except ZeroDivisionError:
-                divergence = 1
-            divergences.append(divergence)
+        divergences = [
+                jensenshannon(p=ref, q=obs, base=2) for ref, obs in zip(
+                    reference_distribution, observed_distribution
+                    )
+                ]
 
         return divergences
 
@@ -53,15 +51,8 @@ class KLDivergence:
 
         divergences = []
         for pair in combinations(observed_distribution, 2):
-            kl = ( entropy(pk=pair[0], qk=pair[1]) + entropy(pk=pair[1], qk=pair[0]) )/2
-            print(kl)
-            try:
-                divergence = 1 - (1/kl)
-            except ZeroDivisionError:
-                divergence = 1
+            divergence = jensenshannon(p=pair[0], q=pair[1], base=2)
             divergences.append(divergence)
-        
-        print(divergences)
 
         divergence = self.aggregating_function(divergences)
 
