@@ -9,6 +9,7 @@ class TotalVariationDistance:
         self.aggregating_function = aggregating_function
 
 
+    #TODO this cannot be used, only KL is allowed for freq-vs-ref
     def compute_distance_from_reference(self, 
             observed_distribution,
             reference_distribution):

@@ -51,7 +51,7 @@ class KLDivergence:
 
         return divergences
 
-    
+    #TODO this must be the JS freq-vs-freq
     def compute_distance_between_frequencies(self, 
             observed_distribution):
         '''
