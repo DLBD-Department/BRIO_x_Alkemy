@@ -169,35 +169,35 @@ A first possibility is the Kullback–Leibler divergence $D_{\mathrm{KL}}$ \cite
 
 it intuitively indicates the difference, in probabilistic terms, between the input-output behaviour of the AI system at hand and a reference probability distribution. It sums up all the differences computed for each possible output of the AI system weighted by the actual probability of correctly obtaining that output.
 
-As the divergence $D_{\mathrm{KL}}$ is not symmetric, comparison of the behaviour of the system on two distinct sensitive classes requires another measure. One could either simply adopt a symmetric version of $D_{\mathrm{KL}}$
+As the divergence $D_{\mathrm{KL}}$ is not symmetric, comparison of the behaviour of the system on two distinct sensitive classes requires another measure. 
 
-\[D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)=\frac{D_{\mathrm{KL}}(P\parallel Q)+D_{\mathrm{KL}}(Q\parallel P)}{2},\]
+%One could either simply adopt a symmetric version of $D_{\mathrm{KL}}$
+%
+%\[D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)=\frac{D_{\mathrm{KL}}(P\parallel Q)+D_{\mathrm{KL}}(Q\parallel P)}{2},\]
 
 %%NEW VERSION (?):
-%One could either adopt a symmetric divergence, closely related to $D_{\mathrm{KL}}$, which is called Jensen-Shannon divergence ($D_{\mathrm{JS}}$):
-%
-%\[D_{\mathrm{JS}}(P\parallel Q)=\frac{D_{\mathrm{KL}}(P\parallel M)+D_{\mathrm{KL}}(Q\parallel M)}{2},\]where $M$ is defined as $(P+Q)/2$.
+One could either adopt a symmetric divergence, closely related to $D_{\mathrm{KL}}$, which is called Jensen-Shannon divergence ($D_{\mathrm{JS}}$):
+
+\[D_{\mathrm{JS}}(P\parallel Q)=\frac{D_{\mathrm{KL}}(P\parallel M)+D_{\mathrm{KL}}(Q\parallel M)}{2},\]where $M$ is defined as $(P+Q)/2$.
 
 
 or choose for the simple but intuitive $D_{\mathrm{TV}}$
 
 \[D_{\mathrm{TV}}(P\parallel Q)= \sup _{x\in X} \vert P(x) - Q(x)\vert,\]
 
-which computes the largest difference between the probability of obtaining an output $o$ given in input individuals of distinct sensitive classes $c_1\in F$ and $c_2\in F$.
+which computes the largest difference between the probability of obtaining an output $o$ given in input individuals of distinct sensitive classes $c_1\in F$ and $c_2\in F$. {\color{red} Since the value of $D_{\mathrm{TV}}$ is smaller than the value of $D_{\mathrm{JS}}$, it should only be used for toutine checks.}
 
-In order to normalise the values of the different divergences that we use in the system and be able to select common, reasonable thresholds for all of them, we project the values of $D_{\mathrm{KL}}$ and $D^{\mathrm{Sym}}_{\mathrm{KL}}$ onto the interval $[0,1]$. The divergences $D_{\mathrm{KL}}(P\parallel Q)$ and $D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)$ are replaced, respectively, by
-
-\[
-1-\frac{1}{D_{\mathrm{KL}}(P\parallel Q)} \quad\text{and}\quad 1-\frac{1}{D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)}\;.
-\]
+%In order to normalise the values of the different divergences that we use in the system and be able to select common, reasonable thresholds for all of them, we project the values of $D_{\mathrm{KL}}$ and $D^{\mathrm{Sym}}_{\mathrm{KL}}$ onto the interval $[0,1]$. The divergences $D_{\mathrm{KL}}(P\parallel Q)$ and $D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)$ are replaced, respectively, by
+%
+%\[
+%1-\frac{1}{D_{\mathrm{KL}}(P\parallel Q)} \quad\text{and}\quad 1-\frac{1}{D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)}\;.
+%\]
 
 %%NEW VERSION (?):
-%In order to normalise the values of the different divergences that we use in the system and be able to select common, reasonable thresholds for all of them, we project the values of $D_{\mathrm{KL}}$ onto the interval $[0,1]$. The divergence $D_{\mathrm{KL}}(P\parallel Q)$ is thus replaced by
-%
-%\[1-\exp (- D_{\mathrm{KL}}(P\parallel Q))\]where the $\exp(x)$ function is defined as $e^x$. 
+In order to normalise the values of the different divergences that we use in the system and be able to select common, reasonable thresholds for all of them, we project the values of $D_{\mathrm{KL}}$ onto the interval $[0,1]$. The divergence $D_{\mathrm{KL}}(P\parallel Q)$ is thus replaced by
 
+\[1-\exp (- D_{\mathrm{KL}}(P\parallel Q))\]where the $\exp(x)$ function is defined as $e^x$. 
 
-{\ehi UNIMI: Present JS and Normalised-KL when we settled how. Commented options above.}
 
 
 \subsection{How to handle sensitive features corresponding to more than two classes}
@@ -308,7 +308,7 @@ The tool for the detection of biases in AI systems presented in this paper is me
 %% identification of the section in the article metadata, and the
 %% consistent spelling of the heading.
 \begin{acknowledgments}
-This research has been partially funded by the Project PRIN2020 "BRIO - Bias, Risk and Opacity in AI" (2020SSKZ7R) and by by the Department of Philosophy “Piero Martinetti” of the University of Milan under the Project “Departments of Excellence 2023-2027”, both awarded by the Ministry of University and Research (MUR).
+This research has been partially funded by the Project PRIN2020 ``BRIO - Bias, Risk and Opacity in AI'' (2020SSKZ7R) and by by the Department of Philosophy “Piero Martinetti” of the University of Milan under the Project ``Departments of Excellence 2023-2027'', both awarded by the Ministry of University and Research (MUR).
 \end{acknowledgments}
 
 %%
