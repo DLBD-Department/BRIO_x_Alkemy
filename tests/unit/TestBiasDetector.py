@@ -83,7 +83,7 @@ class TestBiasDetector(unittest.TestCase):
                     root_variable='x2_sex',
                     threshold=0.1)
 
-        self.assertEqual(results[0], 0.003168110478059205)
+        self.assertEqual(results[0], 0.0045642159318142195)
 
     
     def test_compare_root_variable_groups_with_JS(self):
@@ -102,7 +102,7 @@ class TestBiasDetector(unittest.TestCase):
                     root_variable='x2_sex',
                     threshold=0.1)
 
-        self.assertEqual(results[0], 0.03382573454226581)
+        self.assertEqual(results[0], 0.0011441803173238346)
 
 
     def test_compare_root_variable_groups_with_TVD_and_ref_distribution(self):
@@ -142,7 +142,7 @@ class TestBiasDetector(unittest.TestCase):
                     threshold=0.1,
                     reference_distribution=self.ref)
 
-        self.assertEqual(results[0], [0.0829486366753095, 0.05310359713515167])
+        self.assertEqual(results[0], [0.11543085607355452, 0.07485260878313427])
 
     
     def test_compare_root_variable_groups_with_JS_and_ref_distribution(self):
@@ -162,7 +162,7 @@ class TestBiasDetector(unittest.TestCase):
                     threshold=0.1,
                     reference_distribution=self.ref)
 
-        self.assertEqual(results[0], [0.16837964654674598, 0.13530773349276035])
+        self.assertEqual(results[0], [0.028351705371207105, 0.01830818274294786])
 
 
     def test_compare_root_variable_conditioned_groups_with_TVD(self):
@@ -234,7 +234,7 @@ class TestBiasDetector(unittest.TestCase):
 
         violations = {k: v for k, v in results.items() if not v[2]}
 
-        self.assertEqual(len(violations), 2)
+        self.assertEqual(len(violations), 0)
 
 
     def test_compare_root_variable_conditioned_groups_with_TVD_and_ref_distribution(self):
@@ -286,7 +286,7 @@ class TestBiasDetector(unittest.TestCase):
 
         violations = {k: v for k, v in results.items() if (not v[2][0] or not v[2][1])}
 
-        self.assertEqual(len(violations), 6)
+        self.assertEqual(len(violations), 9)
 
     
     def test_compare_root_variable_conditioned_groups_with_JS_and_ref_distribution(self):
@@ -312,7 +312,7 @@ class TestBiasDetector(unittest.TestCase):
 
         violations = {k: v for k, v in results.items() if (not v[2][0] or not v[2][1])}
 
-        self.assertEqual(len(violations), 16)
+        self.assertEqual(len(violations), 2)
 
 
 if __name__ == '__main__':

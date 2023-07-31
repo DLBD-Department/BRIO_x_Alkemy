@@ -45,7 +45,7 @@ class KLDivergence:
 
         divergences = []
         for ref, obs in zip(reference_distribution, observed_distribution):
-            kl = entropy(pk=ref, qk=obs)
+            kl = entropy(pk=ref, qk=obs, base=2)
             divergence = self.normalization_function(kl)
             divergences.append(divergence)
 
@@ -67,7 +67,7 @@ class KLDivergence:
 
         divergences = []
         for pair in combinations(observed_distribution, 2):
-            kl = ( entropy(pk=pair[0], qk=pair[1]) + entropy(pk=pair[1], qk=pair[0]) )/2
+            kl = ( entropy(pk=pair[0], qk=pair[1], base=2) + entropy(pk=pair[1], qk=pair[0], base=2) )/2
             divergence = self.normalization_function(kl)
             divergences.append(divergence)
         
