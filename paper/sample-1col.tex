@@ -18,11 +18,13 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{cleveref}
+\usepackage{amsthm}
 %% auto break lines
 \lstset{breaklines=true}
 
 \newtheorem{example}{Example}
 \newtheorem{definition}{Definition}
+\newtheorem*{theorem*}{Theorem}
 
 \newcommand{\red}[1]{\color{red}#1}
 %%
@@ -160,32 +162,29 @@ Consider a database containing details of individuals, with their age, gender, a
 \end{example}
  
 \subsection{Divergences}
-
-The comparisons above are computed on probability distributions, each taken to express the behaviour of a stochastic system. In order to compute the difference between the behaviour of the AI system under investigation -- denoted by the probability distribution $Q$ -- and an optimal behaviour $P$ when available, different divergences might be considered.
-
-A first possibility is the Kullback–Leibler divergence $D_{\mathrm{KL}}$ \cite{dkl} known from information theory:
-
-\[D_{\mathrm{KL}}(P\parallel Q)= \sum _{x\in X} P(x)\cdot \log \Big( \frac{P(x)}{Q(x)}\Big)\]
-
-it intuitively indicates the difference, in probabilistic terms, between the input-output behaviour of the AI system at hand and a reference probability distribution. It sums up all the differences computed for each possible output of the AI system weighted by the actual probability of correctly obtaining that output.
-
-As the divergence $D_{\mathrm{KL}}$ is not symmetric, comparison of the behaviour of the system on two distinct sensitive classes requires another measure. 
-
-%One could either simply adopt a symmetric version of $D_{\mathrm{KL}}$
-%
-%\[D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)=\frac{D_{\mathrm{KL}}(P\parallel Q)+D_{\mathrm{KL}}(Q\parallel P)}{2},\]
-
-%%NEW VERSION (?):
-One could either adopt a symmetric divergence, closely related to $D_{\mathrm{KL}}$, which is called Jensen-Shannon divergence ($D_{\mathrm{JS}}$):
-
-\[D_{\mathrm{JS}}(P\parallel Q)=\frac{D_{\mathrm{KL}}(P\parallel M)+D_{\mathrm{KL}}(Q\parallel M)}{2},\]where $M$ is defined as $(P+Q)/2$.
+The comparisons above are computed on probability distributions, each taken to express the behaviour of a stochastic system. In order to compute the difference between the behaviour of the AI system under investigation -- denoted by the probability distribution $Q$ -- and a fixed behaviour $P$ (either the optimal behaviour, when available, or the behaviour with respect to a different class) various divergences might be considered. Depending on the analysis one wishes to conduct, one or more divergences are made available in the tool. Notice that all divergences are made to take values in $[0,1]$ in order to be compared with the threshold described in \Cref{threshold}.
 
 
-or choose for the simple but intuitive $D_{\mathrm{TV}}$
+\paragraph{Kullback-Leibner divergence}
+When we wish to compare how the system behaves with respect to an \textit{a priori} optimal behaviour $P$, we use the Kullback–Leibler divergence $D_{\mathrm{KL}}$:
 
-\[D_{\mathrm{TV}}(P\parallel Q)= \sup _{x\in X} \vert P(x) - Q(x)\vert,\]
+\[D_{\mathrm{KL}}(P\parallel Q)= \sum _{x\in X} P(x)\cdot \log_2 \Big( \frac{P(x)}{Q(x)}\Big)\,.\]
 
-which computes the largest difference between the probability of obtaining an output $o$ given in input individuals of distinct sensitive classes $c_1\in F$ and $c_2\in F$. {\color{red} Since the value of $D_{\mathrm{TV}}$ is smaller than the value of $D_{\mathrm{JS}}$, it should only be used for toutine checks.}
+It was first introduced in \cite{dkl} in the context of information theory, and it intuitively indicates the difference, in probabilistic terms, between the input-output behaviour of the AI system at hand and a reference probability distribution. It sums up all the differences computed for each possible output of the AI system weighted by the actual probability of correctly obtaining that output.
+
+Notice that this is not symmetric and takes values in $[0,+\infty]$: the asymmetry accounts for the fact that the behaviour we are monitoring is, in fact, non symmetric -- as $P$ is a theoretical distribution that we know, or consider to be, optimal, while $Q$ is our observed one -- while to make it fit the unit interval we adjust the divergence as follows.
+
+\[D'_{\mathrm{KL}}(P\parallel Q)=1-\exp (- D_{\mathrm{KL}}(P\parallel Q))\]
+
+\paragraph{Jensen-Shannon divergence}
+When we wish to compare classes, instead, a certain symmetry is required. First, we consider the Jensen-Shannon divergence 
+\[D_{\mathrm{JS}}(P\parallel Q)=\frac{D_{\mathrm{KL}}(P\parallel M)+D_{\mathrm{KL}}(Q\parallel M)}{2},\]
+with $M=(P+Q)/2$. This was introduced in \cite{lin_divergence} as a well-behaved symmetrization of Kullback-Leibner. It takes values in $[0,1]$.
+
+\paragraph{Total variation distance}
+Another choice for comparing classes is provided by the total variation distance of $P$ and $Q$, meaning
+\[D_{\mathrm{TV}}(P, Q)= \sup _{x\in X} \vert P(x) - Q(x)\vert,\]
+which computes the largest difference between the probability of obtaining an output $o$ given in input individuals of distinct sensitive classes $c_1\in F$ and $c_2\in F$.\footnote{We write the argument $(P,Q)$ instead of $P\parallel Q$ to remark that this is in fact a distance, and not a divergence.}  It, too, takes values in $[0,1]$. %{\color{red} Since the value of $D_{\mathrm{TV}}$ is smaller than the value of $D_{\mathrm{JS}}$, it should only be used for toutine checks.}
 
 %In order to normalise the values of the different divergences that we use in the system and be able to select common, reasonable thresholds for all of them, we project the values of $D_{\mathrm{KL}}$ and $D^{\mathrm{Sym}}_{\mathrm{KL}}$ onto the interval $[0,1]$. The divergences $D_{\mathrm{KL}}(P\parallel Q)$ and $D^{\mathrm{Sym}}_{\mathrm{KL}}(P\parallel Q)$ are replaced, respectively, by
 %
@@ -194,15 +193,23 @@ which computes the largest difference between the probability of obtaining an ou
 %\]
 
 %%NEW VERSION (?):
-In order to normalise the values of the different divergences that we use in the system and be able to select common, reasonable thresholds for all of them, we project the values of $D_{\mathrm{KL}}$ onto the interval $[0,1]$. The divergence $D_{\mathrm{KL}}(P\parallel Q)$ is thus replaced by
+%In order to normalise the values of the different divergences that we use in the system and be able to select common, reasonable thresholds for all of them, we project the values of $D_{\mathrm{KL}}$ onto the interval $[0,1]$. The divergence $D_{\mathrm{KL}}(P\parallel Q)$ is thus replaced by
+%
+%\[1-\exp (- D_{\mathrm{KL}}(P\parallel Q))\]where the $\exp(x)$ function is defined as $e^x$. 
 
-\[1-\exp (- D_{\mathrm{KL}}(P\parallel Q))\]where the $\exp(x)$ function is defined as $e^x$. 
+\begin{theorem*}[{\cite[Prop. 4.2]{levin2017markov}},{\cite[Thm. 3]{lin_divergence}}]
+Let $P$ and $Q$ probability distributions over $X$. Then we have the following:
+\begin{enumerate}
+\item $D_{\mathrm{TV}}(P,Q)=\frac{1}{2}\sum_{x\in X}\vert P(x)-Q(x)\vert$;
+\vspace{0.2cm}
+\item $D_{\mathrm{JS}}(P\parallel Q)\leq D_\mathrm{TV}(P,Q)$.
+\vspace{0.2cm}
+\end{enumerate}
+\end{theorem*}
 
-
+This suggests that Jensen-Shannon is less sensitive to differences in the comparing sets, and can therefore be used for preliminary analyses.
 
 \subsection{How to handle sensitive features corresponding to more than two classes}
-
-
 Since the divergences the system uses are binary functions, it is not obvious how to handle the case in which the sensitive feature we are considering partitions the domain in three or more classes. It is, indeed, easy to compute the divergence for pairs of classes, but we also need, in this case, a sensible way of aggregating the obtained results in order to obtain one value describing well how the AI model behaves with respect to the sensitive feature under consideration. It turns out that there are several ways of doing this and each of them tells us something of value if we wish to reach a meaningful conclusion about the AI model.
 
 Suppose that we are studying the behaviour of the model with respect to the feature $F=\{c_1, \ldots , c_n\}$ which induces a partition of our domain of individuals into the classes $c_1, \ldots , c_n$. The first step is the pairwise calculation of the divergences with respect to the different classes induced by $F$. Hence, for each pair $(c_i\parallel c_j)$ such that $c_i, c_j\in F$, we compute $D(c_i\parallel c_j) $ where $D$ is the  preselected divergence and consider the set $\{D(c_i\parallel c_j) : c_i,c_j\in F\ \&\ i\neq j\}$. For instance, if we are considering age as our feature  $F$ and we partition our domain into three age groups, we might have
@@ -212,32 +219,23 @@ We can then use the following ways of aggregating the obtained values.
 \paragraph{Maximal divergence}
 
 $$\max (\{D(c_i\parallel c_j): c_i,c_j\in C\ \&\ i\neq j\})$$
-
-
-
 Maximal divergence corresponds to the worst case scenario with respect to the bias of our AI system. This measure indicates how much the AI system favours the most favoured class with respect to the least favoured class related to our sensitive feature.
 
 \paragraph{Minimal divergence}
 $$\min (\{D(c_i\parallel c_j): c_i,c_j\in C\ \&\ i\neq j\})$$
-
-
 Minimal divergence, on the other hand, corresponds to the best case scenario.  This measure indicates the minimal bias expressed by our AI system with respect to the sensitive feature. If this measure is $0$, we do not know much, but if it is much above our threshold, then we know that the AI system under analyis expresses strong biases with respect to all classes related to the sensitive feature.
 
 
 \paragraph{Average of the divergences}
 $$\sum_{c_i,c_j\in C} D(c_i\parallel c_j)/\binom{\mid C\mid}{2}$$
-
-
 i.e. the sum of the divergences between the two elements of each pair $c_i,c_j\in C$ divided by the total number $\binom{\mid C\mid}{2}$ of these pairs. This measure indicates the average bias expressed by the AI system. Unlike the previous measures, this one meaningfully combines information about the behaviour of the system with respect to all classes related to the sensitive feature.  What this measure still does not tell us, though, is the variability of the behaviour of the system in terms of bias. The same average, indeed, could be due to a few very biased behaviours or to many mildly biased behaviours.
 
 
 \paragraph{Standard deviation of the divergences}
-\[\sqrt{ (\sum_{c_i,c_j\in C} (D(c_i\parallel c_j)-\mu)^2 / \binom{\mid C\mid}{2}  )}\]
-
- where  $\mu = \sum_{c_i,c_j\in C} D(c_i\parallel c_j)/\binom{\mid C\mid}{2}$. That is, the square root of the average of the squares of the divergences between each value $D(c_i\parallel c_j)$ and the average value of $D(c_i\parallel c_j)$ for each pair $c_i,c_j$. In other terms,  we calculate the average of the divergences, then the difference of each divergence with respect to their average, then we square this differences and calculate their average. Finally, we compute the square root of this average.
+\[\sqrt{ (\sum_{c_i,c_j\in C} (D(c_i\parallel c_j)-\mu)^2 / \binom{\mid C\mid}{2}  )}\] where  $\mu = \sum_{c_i,c_j\in C} D(c_i\parallel c_j)/\binom{\mid C\mid}{2}$. That is, the square root of the average of the squares of the divergences between each value $D(c_i\parallel c_j)$ and the average value of $D(c_i\parallel c_j)$ for each pair $c_i,c_j$. In other terms,  we calculate the average of the divergences, then the difference of each divergence with respect to their average, then we square this differences and calculate their average. Finally, we compute the square root of this average.
 This measure indicates the variability of the bias expressed by the AI system we are inspecting. That is, how much difference there is between the cases in which the system is behaving in a very biased way and the cases in which the system is behaving in a mildly biased way. This information complements the information we can gather by computing the previous measure.
 
-\subsection{Parametrisation of the threshold for the divergence}
+\subsection{Parametrisation of the threshold for the divergence}\label{threshold}
 
 Whenever the system computes a divergence between the results of the model and a reference distribution or the results of the model for distinct classes, a threshold is employed to check whether the divergence is significant -- in which case it should be treated as a possible violation of our fairness criteria -- or negligible -- in which case should be simply ignored. Obviously, fixing this threshold once and for all would give a rather inflexible system. For instance, setting the threshold to $1/100$ might be reasonable if we are considering the results of the model on a set of $100$ individuals, but it is clearly too strict if our domain only contains $40$ individuals. In the latter case, even a difference only concerning one individual would constitute a mistake much greater than the one admitted by the threshold. This is why we parametrise the threshold on the basis of several factors. 
 
