@@ -79,14 +79,15 @@ function desel_all() {
 
 
 document.addEventListener("DOMContentLoaded", function() {
-    var disabfrompred = document.getElementById("predictions");
-    disabfrompred.addEventListener("change", handle_disab_frompred);
-    var disabfromroot = document.getElementById("root_var");
-    disabfromroot.addEventListener("change", handle_disab_fromroot);
-    var select = document.getElementById("cond_var");
-    select.addEventListener("change", handle_select);
-    var select_all = document.getElementsByClassName("bs-actionsbox")[0].firstElementChild.firstElementChild;
-    select_all.addEventListener("click", sel_all);
-    var deselect_all = document.getElementsByClassName("bs-actionsbox")[0].firstElementChild.children[1];
-    deselect_all.addEventListener("click", desel_all);
+  $('[data-bs-toggle="popover"]').popover();
+  var disabfrompred = document.getElementById("predictions");
+  disabfrompred.addEventListener("change", handle_disab_frompred);
+  var disabfromroot = document.getElementById("root_var");
+  disabfromroot.addEventListener("change", handle_disab_fromroot);
+  var select = document.getElementById("cond_var");
+  select.addEventListener("change", handle_select);
+  var select_all = document.getElementsByClassName("bs-actionsbox")[0].firstElementChild.firstElementChild;
+  select_all.addEventListener("click", sel_all);
+  var deselect_all = document.getElementsByClassName("bs-actionsbox")[0].firstElementChild.children[1];
+  deselect_all.addEventListener("click", desel_all);
 });

@@ -4,30 +4,36 @@
 	<legend>Select a distance:</legend>
         <div class="btn-group">
             <input type="radio" class="btn-check" name="distance" id="distance1" value="TotalVariation" autocomplete="off" checked>
-            <label class="btn btn-success btn-lg" for="distance1">TotalVariation</label>
-            <input type="radio" class="btn-check" name="distance" id="distance2" value="KLDivergence" autocomplete="off">
-            <label class="btn btn-success btn-lg" for="distance2">Symmetrical KL</label>
+            <label class="btn btn-success btn-lg" for="distance1" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="TotalVariation" data-bs-content="This distance is used to measure how much the model is biased. This measure is usually smaller than JS. Thus, by using it, we will have more permissive checks.">TotalVariation</label>
+            <input type="radio" class="btn-check" name="distance" id="distance2" value="JSDivergence" autocomplete="off">
+            <label class="btn btn-success btn-lg" for="distance2" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="JSDivergence" data-bs-content="This distance is used to measure how much the model is biased. This measure is usually greater than TV. Thus, by using it, we will have stricter checks that only very unbiased models will pass.">JSDivergence</label>
         </div>
     </fieldset><br><br>
     <fieldset>
 	<legend>Select an aggregation function:</legend>
         <div class="btn-group" id="agg_funcs">
-            <input type="radio" class="btn-check" name="agg_func" id="agg_func1" value="min" autocomplete="off" checked>
-            <label class="btn btn-success btn-lg" for="agg_func1">Min</label>
-            <input type="radio" class="btn-check" name="agg_func" id="agg_func2" value="max">
-            <label class="btn btn-success btn-lg" for="agg_func2">Max</label>
-            <input type="radio" class="btn-check" name="agg_func" id="agg_func3" value="mean">
-            <label class="btn btn-success btn-lg" for="agg_func3">Mean</label>
-            <input type="radio" class="btn-check" name="agg_func" id="agg_func4" value="stdev">
-            {% include 'bias/stdev.html' %}
+          <input type="radio" class="btn-check" name="agg_func" id="agg_func1" value="min">
+          <label class="btn btn-success btn-lg" for="agg_func1" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="Minimal divergence" data-bs-content="The minimal divergence indicates how much the model is biased when it expresses the minimal bias. A high value (closer to 1 than to 0) is a very bad sign. Only available if the root variable has more than two classes.">Min</label>
+          <input type="radio" class="btn-check" name="agg_func" id="agg_func2" value="max">
+          <label class="btn btn-success btn-lg" for="agg_func2" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="Maximal divergence" data-bs-content="The maximal divergence indicates how much the model is biased when it expresses the maximal bias. A low value (closer to 0 than to 1) is a very good sign. Only available if the root variable has more than two classes.">Max</label>
+          <input type="radio" class="btn-check" name="agg_func" id="agg_func3" value="mean">
+          <label class="btn btn-success btn-lg" for="agg_func3" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="Average divergence" data-bs-content="A low value (closer to 0 than to 1) indicates that the model is generally unbiased, a high value indicates that the model is generally biased. Only available if the root variable has more than two classes.">Mean</label>
+          <!-- <input type="radio" class="btn-check" name="agg_func" id="agg_func4" value="stdev"> -->
+          <!-- {% include 'bias/stdev.html' %} -->
         </div>
     </fieldset><br><br>
     <legend>Select other parameters:</legend><br><br>
-    <label for="slider">Threshold:</label>
+    <a for="slider" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="Threshold" data-bs-content="The threshold value is used to decide when the behaviour of the model should be considered biased.  If the threshold is low (closer to 0 than to 1), then the checks will be strict and only a very unbiased model will pass them.">Threshold:</a>
     <input type="range" name="Slider" min="0" max="1" step="0.05" oninput="this.form.amountInput.value=this.value" />
     <input type="number" name="amountInput" min="0" max="1" step="0.05" oninput="this.form.amountRange.value=this.value" />
     <input type="checkbox" class="form-check-input" name="auto_thr" id="auto_thr" value="active">
-    <label class="form-check-label" for="auto_thr">Set automatic threshold</label><br><br>
+    <label class="form-check-label" for="auto_thr">Set automatic threshold <b>{{ thr }}</b></label>
+    <div class="container d-none" id="a1_params">
+      <input type="radio" class="form-check-input" name="a1_param" id="a1_high" value="high">
+      <label class="form-check-label" for="a1_high">A1=high</label>
+      <input type="radio" class="form-check-input" name="a1_param" id="a1_low" value="low">
+      <label class="form-check-label" for="a1_low">A1=low</label>
+    </div><br><br>
     <label for="predictions">Predictions:</label>
     <select class="selectpicker" data-style="btn-info" name="predictions" id="predictions">
         {% for item in var_list -%}

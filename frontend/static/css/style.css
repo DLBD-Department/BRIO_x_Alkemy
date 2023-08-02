@@ -3,6 +3,11 @@
   grid-template-columns: 1fr 1fr !important;
 }
 
+.my-grid-bias {
+  display: inline-grid !important;
+  grid-template-columns: 3fr 1fr !important;
+}
+
 .btn-xl {
   padding: 50px 100px !important;
   font-size: 40px !important;
@@ -10,4 +15,45 @@
   width: 100% !important;
   justify-content: center !important;
   align-items: center !important;
+}
+.parent-img {
+  position: relative;
+}
+
+.img-container {
+  position: relative;
+  width: 1000px; /* Set the width to the same width as the imgback */
+  height: 200px; /* Set the height to the same height as the imgback */
+  margin: 0 auto; /* Center the container horizontally */
+  overflow: hidden; /* Hide any overflowing content (e.g., imgfront) */
+}
+
+.imgback {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.imgfront {
+  position: absolute;
+  top: 40%; /* Adjust as needed to vertically center the image */
+  left: 50%; /* Adjust as needed to horizontally center the image */
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+/* Additional styling for the text and other elements if needed */
+.display-5 {
+  margin-top: 20px; /* Add some space between the images and the text */
+}
+
+.red-text {
+  color: red;
+}
+
+.green-text {
+  color: green;
 }

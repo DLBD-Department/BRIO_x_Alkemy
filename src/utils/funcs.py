@@ -27,6 +27,19 @@ def handle_ref_distributions(rootvar: str, targetvar: str, df : pd.DataFrame, di
         intermediate_list = []
     return final_list
 
+def order_violations(viol: dict) -> dict:
+    # Function to get the middle value from the tuple
+    def get_middle_value(item):
+        middle_value = item[1]
+        return middle_value
+
+    # Sort entries with valid middle values
+    sorted_entries_with_middle_values = sorted(((key, value) for key, value in viol.items() if get_middle_value(value) is not None),
+                                            key=lambda x: get_middle_value(x[1]), reverse=True)
+
+    # Sort entries with None middle values and append them at the end
+    sorted_dict = dict(sorted_entries_with_middle_values + [(key, value) for key, value in viol.items() if get_middle_value(value) is None])
+    return sorted_dict
 
 def write_reference_distributions_html(rootvar: str, targetvar: str, df: pd.DataFrame) -> str:
     nroot = len(df[rootvar].unique())

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash, url_for
+from flask import Flask, render_template, request, redirect, flash, url_for, session
 import pickle
 import pandas as pd
 import numpy as np
@@ -9,12 +9,13 @@ import sys
 import subprocess
 from statistics import mean, stdev
 
-from src.utils.funcs import handle_multiupload, write_reference_distributions_html, handle_ref_distributions, allowed_file
+from src.utils.funcs import handle_multiupload, write_reference_distributions_html, handle_ref_distributions, allowed_file, order_violations
 from src.utils.Preprocessing import Preprocessing
 
 from sklearn.model_selection import train_test_split
 from src.bias.threshold_calculator import threshold_calculator
 from src.bias.BiasDetector import BiasDetector
+from src.bias.JSDivergence import JSDivergence 
 from src.bias.TotalVariationDistance import TotalVariationDistance
 from src.bias.KLDivergence import KLDivergence
 
@@ -35,6 +36,9 @@ agg_funcs = {
     'stdev': stdev
 }
 
+used_df = ""
+comp_thr = ""
+success_status = "text-warning"
 ips = check_output(['hostname', '-I'])
 localhost_ip = ips.decode().split(" ")[0]
 
@@ -44,6 +48,14 @@ def home():
 
 @app.route('/bias', methods=['GET', 'POST'])
 def home_bias():
+    global used_df
+    global success_status
+    global dict_vars
+    if request.method == 'GET' and request.args.get('reset'):
+        used_df = ""
+        success_status = "text-warning"
+        dict_vars = {}
+        session.clear()
     if request.method == 'POST':
         keys = list(request.files.keys())
         uploads = [request.files[x].filename for x in keys if x != '']
@@ -55,6 +67,8 @@ def home_bias():
             dict_vars['dataset'] = dataframe_file.filename
             if allowed_file(dict_vars['dataset']):
                 dataframe_file.save(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['dataset']))
+                used_df = dict_vars['dataset']
+                success_status = "text-success"
                 flash('Dataframe uploaded successfully!', 'success')
             else:
                 flash('Unsupported format for dataframe.', 'danger')
@@ -62,6 +76,8 @@ def home_bias():
         if ('dataset_custom' and 'notebook') in list(request.files.keys()):
             dict_vars['dataset_custom'] = request.files['dataset_custom'].filename
             dict_vars['notebook'] = request.files['notebook'].filename
+            used_df = "Custom preprocessed " + dict_vars['dataset_custom']
+            success_status = "text-success"
             if allowed_file(dict_vars['notebook']) and allowed_file(dict_vars['dataset_custom']):
                 request.files['dataset_custom'].save(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['dataset_custom']))
                 request.files['notebook'].save(os.path.join(app.config['UPLOAD_FOLDER'], dict_vars['notebook']))
@@ -75,10 +91,11 @@ def home_bias():
             subprocess.run(["python3", os.path.join(app.config['UPLOAD_FOLDER'], note_name + ".py")])
             flash('Custom preprocessing pipeline uploaded and processed successfully!', 'success')
         return redirect('/bias')
-    return render_template('bias/home.html')
+    return render_template('bias/home.html', df_used=used_df, status=success_status)
 
 @app.route('/bias/freqvsfreq', methods=['GET', 'POST'])
 def freqvsfreq():
+    global comp_thr
     if ('dataset_custom' and 'notebook') in list(dict_vars.keys()):
         list_of_files =  glob.glob(os.path.join(app.config['UPLOAD_FOLDER']) + "/*")
         latest_file = max(list_of_files, key=os.path.getctime)
@@ -110,8 +127,10 @@ def freqvsfreq():
                 rvar = request.form['rv_selected']
                 hide_option = ""
                 if len(dict_vars['df'][rvar].unique()) < 3:
-                    hide_option = "d-none "
-                return {'response' : split_html[0] + 'class="' + hide_option + split_html[1] }
+                    # hide_option = "d-none "
+                    return {'response': 'True'}
+                return {'response': 'False'}
+                # return {'response' : split_html[0] + 'class="' + hide_option + split_html[1] }
             dict_vars['root_var']= request.form['root_var']
             dict_vars['distance'] = request.form['distance']
             dict_vars['predictions'] = request.form['predictions']
@@ -120,17 +139,20 @@ def freqvsfreq():
             dict_vars['cond_vars']= request.form.getlist('cond_var')
             if 'auto_thr' in list(request.form.keys()):
                 if request.form['auto_thr'] == 'active':
-                    dict_vars['thr'] = threshold_calculator('high', len(dict_vars['df'][dict_vars['root_var']].unique()), dict_vars['df'][dict_vars['root_var']].count() )
-            print(dict_vars, flush=True)
+                    a1 = ""
+                    if 'a1_param' in list(request.form.keys()):
+                        a1 = request.form['a1_param']
+                    dict_vars['thr'] = threshold_calculator(a1, len(dict_vars['df'][dict_vars['root_var']].unique()), dict_vars['df'][dict_vars['root_var']].count() )
+            comp_thr = " (Computed threshold: " + str(dict_vars['thr']) + ")"
         return redirect('/bias/freqvsfreq')
-    return render_template('bias/freqvsfreq.html', var_list=list_var, local_ip=localhost_ip)
+    return render_template('bias/freqvsfreq.html', var_list=list_var, local_ip=localhost_ip, thr=comp_thr)
 
 @app.route('/bias/freqvsfreq/results')
 def results_fvf():
     
     d=TotalVariationDistance(aggregating_function=agg_funcs[dict_vars['agg_func']])
-    if dict_vars['distance'] == 'KLDivergence':
-        d=KLDivergence(aggregating_function=agg_funcs[dict_vars['agg_func']])
+    if dict_vars['distance'] == 'JSDivergence':
+        d=JSDivergence(aggregating_function=agg_funcs[dict_vars['agg_func']])
     bd=BiasDetector(distance=d)
 
     results1 = bd.compare_root_variable_groups(
@@ -149,14 +171,14 @@ def results_fvf():
 	)
     
     violations = {k: v for k, v in results2.items() if not v[2]}
-    return render_template('bias/results_freqvsfreq.html', results1=results1, results2=results2, violations=violations)
+    return render_template('bias/results_freqvsfreq.html', results1=results1, results2=results2, violations=order_violations(violations))
 
 @app.route('/bias/freqvsfreq/results/<violation>')
 def details_fvf(violation):
     focus_df = dict_vars['df'].query(violation)
     d=TotalVariationDistance(aggregating_function=agg_funcs[dict_vars['agg_func']])
-    if dict_vars['distance'] == 'KLDivergence':
-        d=KLDivergence(aggregating_function=agg_funcs[dict_vars['agg_func']])
+    if dict_vars['distance'] == 'JSDivergence':
+        d=JSDivergence(aggregating_function=agg_funcs[dict_vars['agg_func']])
     bd=BiasDetector(distance=d)
     
     results_viol1 = bd.get_frequencies_list(focus_df, dict_vars['predictions'],
@@ -168,6 +190,7 @@ def details_fvf(violation):
 
 @app.route('/bias/freqvsref', methods=['GET', 'POST'])
 def freqvsref():
+    global comp_thr
     if ('dataset_custom' and 'notebook') in list(dict_vars.keys()):
         list_of_files =  glob.glob(os.path.join(app.config['UPLOAD_FOLDER']) + "/*")
         latest_file = max(list_of_files, key=os.path.getctime)
@@ -210,8 +233,11 @@ def freqvsref():
             dict_vars['thr'] = request.form['Slider']
             if 'auto_thr' in list(request.form.keys()):
                 if request.form['auto_thr'] == 'active':
-                    dict_vars['thr'] = threshold_calculator('high', len(dict_vars['df'][dict_vars['root_var']].unique()), dict_vars['df'][dict_vars['root_var']].count() )
-            dict_vars['root_var']= request.form['root_var']
+                    a1 = ""
+                    if 'a1_param' in list(request.form.keys()):
+                        a1 = request.form['a1_param']
+                    dict_vars['thr'] = threshold_calculator(a1, len(dict_vars['df'][dict_vars['root_var']].unique()), dict_vars['df'][dict_vars['root_var']].count() )
+            comp_thr = " (Computed threshold: " + str(dict_vars['thr']) + ")"
             dict_vars['cond_vars']= request.form.getlist('cond_var')
             nroot = len(dict_vars['df'][dict_vars['root_var']].unique())
             ntarget = len(dict_vars['df'][dict_vars['predictions']].unique())
@@ -220,14 +246,12 @@ def freqvsref():
                     cat = f'prob_{i}_{j}'
                     dict_vars[cat] = float(request.form[cat])
         return redirect('/bias/freqvsref')
-    return render_template('bias/freqvsref.html', var_list=list_var, local_ip=localhost_ip)
+    return render_template('bias/freqvsref.html', var_list=list_var, local_ip=localhost_ip, thr=comp_thr)
 
 @app.route('/bias/freqvsref/results')
 def results_fvr():
     
-    d=TotalVariationDistance(aggregating_function=agg_funcs[dict_vars['agg_func']])
-    if dict_vars['distance'] == 'KLDivergence':
-        d=KLDivergence(aggregating_function=agg_funcs[dict_vars['agg_func']])
+    d=KLDivergence(aggregating_function=agg_funcs[dict_vars['agg_func']])
     bd=BiasDetector(distance=d)
 
     ref_distribution = handle_ref_distributions(dict_vars['root_var'], dict_vars['predictions'], dict_vars['df'], dict_vars)
@@ -255,9 +279,7 @@ def results_fvr():
 @app.route('/bias/freqvsref/results/<violation>')
 def details_fvr(violation):
     focus_df = dict_vars['df'].query(violation)
-    d=TotalVariationDistance(aggregating_function=agg_funcs[dict_vars['agg_func']])
-    if dict_vars['distance'] == 'KLDivergence':
-        d=KLDivergence(aggregating_function=agg_funcs[dict_vars['agg_func']])
+    d=KLDivergence(aggregating_function=agg_funcs[dict_vars['agg_func']])
     bd=BiasDetector(distance=d)
     
     results_viol1 = bd.get_frequencies_list(focus_df, 'predictions',

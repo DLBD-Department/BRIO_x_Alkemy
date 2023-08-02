@@ -27,26 +27,73 @@ function handle_stdev_refs() {
       data.append("rv_selected", selected_option_rv.value);
       data.append("pr_selected", selected_option_pr.value);
       const freqvsref_url = "http://" + "{{ local_ip }}" + ":5000/bias/freqvsref";
-      const stdev_id = document.getElementById("stdev-label");
+//      const stdev_id = document.getElementById("stdev-label");
       const preds_id = document.getElementById("ref_dist");
-      //console.log(stdev_id.outerHTML)
-      //console.log(selected_option_rv.value)
       fetch(freqvsref_url, {
       "method": "POST",
       "body": data
           }).then((response) => response.json())
         .then((data) => {
-          stdev_id.outerHTML = data.response_stdev;
+          console.log(data)
+//          stdev_id.outerHTML = data.response_stdev;
           preds_id.innerHTML = data.response_refs;
         })
   } 
 };
 
+function handle_agg_funcs() {
+  let data = new FormData();
+  var rootvar = document.getElementById("root_var");
+  var selected_option = rootvar.options[rootvar.selectedIndex];
+  data.append("rv_selected", selected_option.value);
+  const freqvsfreq_url = "http://" + "{{ local_ip }}" + ":5000/bias/freqvsfreq";
+  
+  fetch(freqvsfreq_url, {
+    "method": "POST",
+    "body": data
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    // Handle the received data
+    // If the response is "True", show only the "Max" button and select it
+    // If the response is "False", enable all buttons
+    const buttons = document.querySelectorAll('input[name="agg_func"]');
+    if (data.response === "True") {
+      buttons.forEach(button => {
+        button.disabled = true;
+      });
+      document.getElementById("agg_func2").disabled = false;
+      document.getElementById("agg_func2").checked = true;
+    } else {
+      buttons.forEach(button => {
+        button.disabled = false;
+      });
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
+
+function display_thr() {
+  var auto_thr = document.getElementById("auto_thr")
+  var params = document.getElementById("a1_params")
+  console.log(auto_thr.checked)
+  if (auto_thr.checked == true) {
+    params.classList.remove("d-none");
+  } else {
+    params.classList.add("d-none");
+  }
+};
+
 document.addEventListener("DOMContentLoaded", function() {
     var fromroot = document.getElementById("root_var");
     var frompred = document.getElementById("predictions");
+    fromroot.addEventListener("change", handle_agg_funcs);
     fromroot.addEventListener("change", handle_stdev_refs);
     frompred.addEventListener("change", handle_stdev_refs);
+    var auto_thr = document.getElementById("auto_thr");
+    auto_thr.addEventListener("change", display_thr)
 });
 </script>
 {% endblock %}
