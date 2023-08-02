@@ -65,7 +65,9 @@ email=fabio.dasaro@univr.it
 \author[1]{Francesco A. Genco}[%
 email=francesco.genco@unimi.it
 ]
-\author[2]{Davide Giannuzzi}
+\author[2]{Davide Giannuzzi}[
+  email=davide.giannuzzi@alkemy.com
+  ]
 \author[2]{Davide Posillipo}[
 email=davide.posillipo@alkemy.com
 ]
@@ -73,7 +75,7 @@ email=davide.posillipo@alkemy.com
 email=giuseppe.primiero@unimi.it
 ]
 \author[2]{Christian Quaggio}[
-email=xxx@xxx
+email=christian.quaggio@alkemy.com
 ]
 
 %\author[1,2]{Dmitry S. Kulyabov}[%
@@ -90,7 +92,7 @@ email=xxx@xxx
 
 %\fnmark[1]
 \address[1]{LUCI Group, University of Milan, via Festa del Perdono 7, 20122 Milan, Italy}
-\address[2]{Alkemy, \dots}
+\address[2]{Alkemy, Deep Learning \& Big Data Department}
 \address[3]{Verona}
 
 %\author[4]{Manfred Jeusfeld}[%
@@ -262,12 +264,34 @@ where $m$ is the lower limit of our interval and $M$ is its upper limit.
 \section{Implementation}
 \label{sec:implementation}
 
-@Alkemy
+A first MVP for the outlined bias detection tool has been implemented using the programming language Python (3.x) and can be found at the following URL: \url{https://github.com/DLBD-Department/BRIO_x_Alkemy}. Here the most important aspects of the implementation will be described.
+
+\subsection{Backend}
+\label{subsec:backend}
+WORK IN PROGRESS
+
+In terms of software architecture, the tool leverages on Docker in order to reach full portability. Currently it uses a simple python:3.10 image that is enough for the first developments. 
+
+TODO:
+\begin{itemize}
+  \item descrivere classe BiasDetector, FreqVsFreqBiasDetector e FreqVsRefBiasDetector. Inserire snippet o pseudocodice
+  \item descrivere threshold calculator
+\end{itemize}
+
+\subsection{Frontend}
+@Christian
+TODO:
+\begin{itemize}
+  \item menzionare il framework utilizzato per lo sviluppo e perché lo abbiamo scelto
+  \item descrivere UX (flusso operazioni), valutare se ha senso mettere degli screenshots
+\end{itemize}
 
 \section{Validation}
 \label{sec:validation}
 
-@Alkemy
+@Alkemy TODO
+
+Descrivere i risultati degli esperimenti con i 3 modelli e le valutazioni emerse. 
 
 
 \section{Conclusions and Further Work}
