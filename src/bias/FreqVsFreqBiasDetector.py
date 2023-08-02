@@ -3,6 +3,7 @@ from .threshold_calculator import threshold_calculator
 from sklearn.utils.extmath import cartesian
 from itertools import combinations
 from scipy.spatial.distance import jensenshannon
+import numpy as np
 
 class FreqVsFreqBiasDetector(BiasDetector):
 
@@ -28,29 +29,29 @@ class FreqVsFreqBiasDetector(BiasDetector):
             
         It works for any number of labels of the target variable and any number of classes for the root variable. 
         The final distance is given by self.aggregating_function. 
-
-        It breaks if aggregating_function=stdev when the root_variable is binary (we would have a stdev
-        of a single number)
         '''
 
+        distances = []
+
         if self.dis == "TVD":
-            # Computing the TVD for each pair of distributions
-            distance = self.aggregating_function(
-                    # TVD
-                    [max( abs( pair[0]-pair[1] ) ) for pair in combinations(observed_distribution, 2)]
-                )
+            for pair in combinations(observed_distribution, 2):
+                # TVD
+                distance = max( abs( pair[0]-pair[1] ) )
+                distances.append(distance)            
         elif self.dis == "JS":
-            divergences = []
             for pair in combinations(observed_distribution, 2):
                 # Squaring JS given that the scipy implementation has square root
-                divergence = jensenshannon(p=pair[0], q=pair[1], base=2)**2
-                divergences.append(divergence)
-
-            distance = self.aggregating_function(divergences)
+                distance = jensenshannon(p=pair[0], q=pair[1], base=2)**2
+                distances.append(distance)
         else:
             raise Exception("Only TVD or JS are supported as distances for freq_vs_freq analysis")
 
-        return distance
+        overall_distance = self.aggregating_function(distances)
+    
+        if len(distances) > 1:
+            return overall_distance, np.std(distances)
+        else:
+            return overall_distance, None
 
 
     def compare_root_variable_groups(self,
@@ -78,8 +79,8 @@ class FreqVsFreqBiasDetector(BiasDetector):
         
         A3 = sum(sum(abs_freqs))
         computed_threshold = threshold_calculator(self.A1, A2, A3, default_threshold=threshold)
-        distance = self.compute_distance_between_frequencies(freqs)
-        return (distance, distance<=computed_threshold, computed_threshold)
+        distance, stds = self.compute_distance_between_frequencies(freqs)
+        return (distance, distance<=computed_threshold, computed_threshold, stds)
 
 
     def compare_root_variable_conditioned_groups(self, 
@@ -153,9 +154,10 @@ class FreqVsFreqBiasDetector(BiasDetector):
                     conditioned_frequencies[condition] = (num_of_obs, None)
             
         distances = {
+                # group: (number_of_observations, (overall_distance, standard_deviations) )
                 group: (
                         (obs_and_freqs[0], 
-                            self.compute_distance_between_frequencies(obs_and_freqs[1])
+                            self.compute_distance_between_frequencies(obs_and_freqs[1]) # (distance, standard_deviations)
                         ) if obs_and_freqs[1] is not None else (obs_and_freqs[0], None)
                     ) for group, obs_and_freqs in conditioned_frequencies.items()
                 }
@@ -163,9 +165,11 @@ class FreqVsFreqBiasDetector(BiasDetector):
         results = {group: (
                 (
                     obs_and_dist[0], #This will also be the A3 for threshold_calculator, being it the number of obs of the group
-                    obs_and_dist[1], 
-                    obs_and_dist[1]<=threshold_calculator(A1=self.A1, A2=A2, A3=obs_and_dist[0], default_threshold=threshold)
+                    obs_and_dist[1][0], #distance
+                    obs_and_dist[1][0]<=threshold_calculator(A1=self.A1, A2=A2, A3=obs_and_dist[0], default_threshold=threshold),
+                    obs_and_dist[1][1], #standard deviations
+                    threshold_calculator(A1=self.A1, A2=A2, A3=obs_and_dist[0], default_threshold=threshold)
                 ) if obs_and_dist[1] is not None else (obs_and_dist[0], obs_and_dist[1], 'Not enough observations')
             ) for group, obs_and_dist in distances.items()}
-    
+            
         return results
