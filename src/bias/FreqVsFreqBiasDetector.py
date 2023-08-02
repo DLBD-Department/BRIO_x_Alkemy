@@ -167,8 +167,8 @@ class FreqVsFreqBiasDetector(BiasDetector):
                     obs_and_dist[0], #This will also be the A3 for threshold_calculator, being it the number of obs of the group
                     obs_and_dist[1][0], #distance
                     obs_and_dist[1][0]<=threshold_calculator(A1=self.A1, A2=A2, A3=obs_and_dist[0], default_threshold=threshold),
-                    obs_and_dist[1][1], #standard deviations
-                    threshold_calculator(A1=self.A1, A2=A2, A3=obs_and_dist[0], default_threshold=threshold)
+                    threshold_calculator(A1=self.A1, A2=A2, A3=obs_and_dist[0], default_threshold=threshold),
+                    obs_and_dist[1][1] #standard deviation
                 ) if obs_and_dist[1] is not None else (obs_and_dist[0], obs_and_dist[1], 'Not enough observations')
             ) for group, obs_and_dist in distances.items()}
             
