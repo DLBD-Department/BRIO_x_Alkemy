@@ -31,6 +31,8 @@ def order_violations(viol: dict) -> dict:
     # Function to get the middle value from the tuple
     def get_middle_value(item):
         middle_value = item[1]
+        if type(middle_value) == list:
+            return max(middle_value)
         return middle_value
 
     # Sort entries with valid middle values

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash, url_for, session
+from flask import Flask, render_template, request, redirect, flash, url_for, session, Response, jsonify
 import pickle
 import pandas as pd
 import numpy as np
@@ -15,9 +15,8 @@ from src.utils.Preprocessing import Preprocessing
 from sklearn.model_selection import train_test_split
 from src.bias.threshold_calculator import threshold_calculator
 from src.bias.BiasDetector import BiasDetector
-from src.bias.JSDivergence import JSDivergence 
-from src.bias.TotalVariationDistance import TotalVariationDistance
-from src.bias.KLDivergence import KLDivergence
+from src.bias.FreqVsFreqBiasDetector import FreqVsFreqBiasDetector
+from src.bias.FreqVsRefBiasDetector import FreqVsRefBiasDetector 
 
 UPLOAD_FOLDER = os.path.abspath("uploads")
 if not os.path.exists(UPLOAD_FOLDER):
@@ -134,54 +133,62 @@ def freqvsfreq():
             dict_vars['root_var']= request.form['root_var']
             dict_vars['distance'] = request.form['distance']
             dict_vars['predictions'] = request.form['predictions']
-            dict_vars['agg_func'] = request.form['agg_func']
-            dict_vars['thr'] = request.form['Slider']
+            if 'agg_func' in list(request.form.keys()):
+                dict_vars['agg_func'] = request.form['agg_func']
+            if float(request.form['Slider']) > 0:
+                dict_vars['thr'] = float(request.form['Slider'])
+            else:
+                dict_vars['thr'] = None
             dict_vars['cond_vars']= request.form.getlist('cond_var')
+            dict_vars['a1_param'] = "high" 
             if 'auto_thr' in list(request.form.keys()):
                 if request.form['auto_thr'] == 'active':
-                    a1 = ""
                     if 'a1_param' in list(request.form.keys()):
-                        a1 = request.form['a1_param']
-                    dict_vars['thr'] = threshold_calculator(a1, len(dict_vars['df'][dict_vars['root_var']].unique()), dict_vars['df'][dict_vars['root_var']].count() )
-            comp_thr = " (Computed threshold: " + str(dict_vars['thr']) + ")"
+                        dict_vars['a1_param'] = request.form['a1_param']
+                        dict_vars['thr'] = None
         return redirect('/bias/freqvsfreq')
-    return render_template('bias/freqvsfreq.html', var_list=list_var, local_ip=localhost_ip, thr=comp_thr)
+    return render_template('bias/freqvsfreq.html', var_list=list_var, local_ip=localhost_ip) 
 
-@app.route('/bias/freqvsfreq/results')
+@app.route('/bias/freqvsfreq/results', methods=['GET', 'POST'])
 def results_fvf():
-    
-    d=TotalVariationDistance(aggregating_function=agg_funcs[dict_vars['agg_func']])
-    if dict_vars['distance'] == 'JSDivergence':
-        d=JSDivergence(aggregating_function=agg_funcs[dict_vars['agg_func']])
-    bd=BiasDetector(distance=d)
+    bd=FreqVsFreqBiasDetector(distance=dict_vars['distance']
+                              )
 
     results1 = bd.compare_root_variable_groups(
 		dataframe=dict_vars['df'],
 		target_variable=dict_vars['predictions'],
 		root_variable=dict_vars['root_var'],
-		threshold=float(dict_vars['thr'])
+        threshold=dict_vars['thr']
 	)
     results2 = bd.compare_root_variable_conditioned_groups(
 		dataframe=dict_vars['df'],
 		target_variable=dict_vars['predictions'],
 		root_variable=dict_vars['root_var'],
 		conditioning_variables=dict_vars['cond_vars'],
-		threshold=float(dict_vars['thr']),
+        threshold=dict_vars['thr'],
 		min_obs_per_group=30
 	)
-    
     violations = {k: v for k, v in results2.items() if not v[2]}
-    return render_template('bias/results_freqvsfreq.html', results1=results1, results2=results2, violations=order_violations(violations))
+
+    if request.method == "POST":
+        x = request.json.get('export-data', False)
+        csv_data = "condition,num_observations,distance,distance_gt_threshold,threshold,standard_deviation\n"
+        for key in list(results2.keys()):
+            if len(results2[key]) == 3:
+                csv_data += f"{key},{results2[key][0]},{results2[key][1]},{results2[key][2]}\n"
+                continue
+            csv_data += f"{key},{results2[key][0]},{results2[key][1]},{results2[key][2]},{results2[key][3]},{results2[key][4]}\n"
+        # Create a Response with CSV data
+        return jsonify({"csv_data": csv_data})
+
+    return render_template('bias/results_freqvsfreq.html', results1=results1, results2=results2, violations=order_violations(violations), local_ip=localhost_ip)
 
 @app.route('/bias/freqvsfreq/results/<violation>')
 def details_fvf(violation):
     focus_df = dict_vars['df'].query(violation)
-    d=TotalVariationDistance(aggregating_function=agg_funcs[dict_vars['agg_func']])
-    if dict_vars['distance'] == 'JSDivergence':
-        d=JSDivergence(aggregating_function=agg_funcs[dict_vars['agg_func']])
-    bd=BiasDetector(distance=d)
+    bd_general=BiasDetector()
     
-    results_viol1 = bd.get_frequencies_list(focus_df, dict_vars['predictions'],
+    results_viol1 = bd_general.get_frequencies_list(focus_df, dict_vars['predictions'],
                             dict_vars['df'][dict_vars['predictions']].unique(),
                             dict_vars['root_var'],  dict_vars['df'][dict_vars['root_var']].unique()
                             )
@@ -221,23 +228,22 @@ def freqvsref():
                 rvar = request.form['rv_selected']
                 print(rvar, flush=True)
                 hide_option = ""
-                if len(dict_vars['df'][rvar].unique()) < 3:
-                    hide_option = "d-none "
+                # if len(dict_vars['df'][rvar].unique()) < 3:
+                #     hide_option = "d-none "
                 pvar = request.form['pr_selected']
-                return {'response_stdev': split_html[0] + 'class="' + hide_option + split_html[1],
-                        'response_refs' : write_reference_distributions_html(rvar, pvar, dict_vars['df'])}
+                return {'response_refs' : write_reference_distributions_html(rvar, pvar, dict_vars['df'])}
             dict_vars['root_var']= request.form['root_var']
             dict_vars['predictions'] = request.form['predictions']
             dict_vars['distance'] = request.form['distance']
-            dict_vars['agg_func'] = request.form['agg_func']
-            dict_vars['thr'] = request.form['Slider']
+            if float(request.form['Slider']) > 0:
+                dict_vars['thr'] = float(request.form['Slider'])
+            else:
+                dict_vars['thr'] = None
             if 'auto_thr' in list(request.form.keys()):
                 if request.form['auto_thr'] == 'active':
-                    a1 = ""
                     if 'a1_param' in list(request.form.keys()):
-                        a1 = request.form['a1_param']
-                    dict_vars['thr'] = threshold_calculator(a1, len(dict_vars['df'][dict_vars['root_var']].unique()), dict_vars['df'][dict_vars['root_var']].count() )
-            comp_thr = " (Computed threshold: " + str(dict_vars['thr']) + ")"
+                        dict_vars['a1_param'] = request.form['a1_param']
+                        dict_vars['thr'] = None
             dict_vars['cond_vars']= request.form.getlist('cond_var')
             nroot = len(dict_vars['df'][dict_vars['root_var']].unique())
             ntarget = len(dict_vars['df'][dict_vars['predictions']].unique())
@@ -246,43 +252,55 @@ def freqvsref():
                     cat = f'prob_{i}_{j}'
                     dict_vars[cat] = float(request.form[cat])
         return redirect('/bias/freqvsref')
-    return render_template('bias/freqvsref.html', var_list=list_var, local_ip=localhost_ip, thr=comp_thr)
+    return render_template('bias/freqvsref.html', var_list=list_var, local_ip=localhost_ip) 
 
-@app.route('/bias/freqvsref/results')
+@app.route('/bias/freqvsref/results', methods = ['GET', 'POST'])
 def results_fvr():
     
-    d=KLDivergence(aggregating_function=agg_funcs[dict_vars['agg_func']])
-    bd=BiasDetector(distance=d)
+    bd=FreqVsRefBiasDetector(A1=dict_vars['a1_param'])
 
     ref_distribution = handle_ref_distributions(dict_vars['root_var'], dict_vars['predictions'], dict_vars['df'], dict_vars)
 
     results1 = bd.compare_root_variable_groups(
 		dataframe=dict_vars['df'],
-		target_variable='predictions',
+		target_variable=dict_vars['predictions'],
 		root_variable=dict_vars['root_var'],
-		threshold=float(dict_vars['thr']),
-        reference_distribution=ref_distribution
+        reference_distribution=ref_distribution,
+		threshold=dict_vars['thr']
 	)
     results2 = bd.compare_root_variable_conditioned_groups(
 		dataframe=dict_vars['df'],
-		target_variable='predictions',
+		target_variable=dict_vars['predictions'],
 		root_variable=dict_vars['root_var'],
 		conditioning_variables=dict_vars['cond_vars'],
-		threshold=float(dict_vars['thr']),
-		min_obs_per_group=30,
-        reference_distribution=ref_distribution
+        reference_distribution=ref_distribution,
+		threshold=dict_vars['thr'],
+		min_obs_per_group=30
 	)
     
     violations = {k: v for k, v in results2.items() if (not v[2][0] or not v[2][1])}
-    return render_template('bias/results_freqvsref.html', results1=results1, results2=results2, violations=violations)
+    print(results1, flush=True)
+    print(results2, flush=True)
+    print(violations, flush=True)
+    if request.method == "POST":
+        x = request.json.get('export-data', False)
+        csv_data = "condition;num_observations;distance;distance_gt_threshold;threshold\n"
+        for key in list(results2.keys()):
+            if len(results2[key]) == 3:
+                csv_data += f"{key};{results2[key][0]};{results2[key][1]};{results2[key][2]}\n"
+                continue
+            print(results2[key][1], flush=True)
+            csv_data += f"{key};{results2[key][0]};{results2[key][1]};{results2[key][2]};{results2[key][3]}\n"
+        # Create a Response with CSV data
+        return jsonify({"csv_data": csv_data})
+    return render_template('bias/results_freqvsref.html', results1=results1, results2=results2, violations=order_violations(violations), local_ip=localhost_ip)
 
 @app.route('/bias/freqvsref/results/<violation>')
 def details_fvr(violation):
     focus_df = dict_vars['df'].query(violation)
-    d=KLDivergence(aggregating_function=agg_funcs[dict_vars['agg_func']])
-    bd=BiasDetector(distance=d)
+    bd_general=BiasDetector()
     
-    results_viol1 = bd.get_frequencies_list(focus_df, 'predictions',
+    results_viol1 = bd_general.get_frequencies_list(focus_df, 'predictions',
                             dict_vars['df'][dict_vars['predictions']].unique(),
                             dict_vars['root_var'],  dict_vars['df'][dict_vars['root_var']].unique()
                             )

@@ -1,27 +1,110 @@
 {% extends 'base.html' %}
 
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+
 {% block title %}
 Results
 {% endblock %}
 
 {% block content %}
-   <div class="container my-5 mx-5">
-     <div class="row pb-4 mx-3 pe-lg-0 pt-lg-5 rounded-3 border shadow-lg">
-         <div class="col border border-5 mx-4">
-           <h2 class="display-6 fw-bold text-center">Overall Result</h2>
-            {{ results1 }}<br>
-           <h2 class="display-6 fw-bold text-center">Conditioned Results</h2>
-            {% for key, value in results2.items() %}
-                {{ key }} : {{ value }}<br>
-            {% endfor %}
-         </div>
-         <div class="col border border-5 mx-4">
-           <h2 class="display-6 fw-bold text-center">Violations</h2>
-            {% for key, value in violations.items() %}
-            <a href='/bias/freqvsref/results/{{ key }}'>{{ key }}</a> : {{ value }}<br>
-            {% endfor %} 
-         </div>
-       </div>
+<div class="container my-5 mx-5 shadow-lg rounded-3">
+  <div class="row mx-3 pe-lg-0 pt-lg-5">
+    <div class="col border border-5 mx-4">
+      <h2 class="display-6 fw-bold text-center">Overall Result</h2>
+      <p class="text-center" style="font-size: 24px;">
+      (Distance&lsqb;ref&rsqb;, distance&lsqb;ref&rsqb;&lt;&#61;threshold, threshold)
+      </p>
+      <p class="text-center" style="font-size: 24px;">
+      ({{ results1[0] }}, <b><span {% if results1[1] %}class="green-text"{% else %}class="red-text"{% endif %}>{{ results1[1] }}</span></b>, {{ results1[2] }})
+      </p>
     </div>
+  </div>
+  <div class="row pb-4 mx-3 pe-lg-0 pt-lg-5">
+    <div class="col border border-5 mx-1">
+      <h2 class="display-6 red-text fw-bold text-center">Violations</h2>
+      {% for key, value in violations.items() %}
+        <div style="color: rgba(255, {{ 160*((loop.index - 1) / (violations|length - 1)) }}, 0, 1);">
+          <a href='/bias/freqvsfreq/results/{{ key }}'>{{ key }}</a> : {{ value }}<br>
+        </div>
+      {% endfor %} 
+    </div>
+    <div class="col border border-5 mx-1">
+      <h2 class="display-6 fw-bold text-center">Conditioned Results  <button class="btn btn-primary btn-export" id="export-btn">Export CSV</button></h2>
+      <div class="row">
+        <div class="col text-center">
+          <h4 class="fw-bold">Condition applied</h4>
+        </div>
+        <div class="col text-center">
+          <h4 class="fw-bold">Result</h4>
+        </div>
+      </div>
+      {% for key, value in results2.items() %}
+        <div class="row">
+          <div class="col text-center">
+            {{ key }}
+          </div>
+          <div class="col text-center">
+            ({{ value[0] }}, {{ value[1] }}, <span {% if value[2] == True %}class="green-text"{% elif value[2] == False %}class="red-text"{% endif %}>{{ value[2] }}</span>, {{ value[3] }})
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
 {% endblock %}
 
+
+{% block scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/handle_parameters.js') }}"></script>
+<script type="text/javascript">
+function handle_export() {
+  const results_url = "http://" + "{{ local_ip }}" + ":5000/bias/freqvsref/results";
+  fetch(results_url, {
+    "method": "POST",
+    "headers" : {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    "body": JSON.stringify({ "export-data": "True"})
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    // Handle the received data
+    // If the response is "True", show only the "Max" button and select it
+    // If the response is "False", enable all buttons
+    const blob = new Blob([data.csv_data], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'exported_data.csv';
+    link.style.display = 'none';
+    // Trigger the download
+    document.body.appendChild(link);
+    link.click();
+    // Clean up
+    document.body.removeChild(link);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
+
+function display_thr() {
+  var auto_thr = document.getElementById("auto_thr")
+  var params = document.getElementById("a1_params")
+  console.log(auto_thr.checked)
+  if (auto_thr.checked == true) {
+    params.classList.remove("d-none");
+  } else {
+    params.classList.add("d-none");
+  }
+};
+
+document.addEventListener("DOMContentLoaded", function() {
+    var disabfromroot = document.getElementById("export-btn");
+    disabfromroot.addEventListener("click", handle_export);
+});
+</script>
+{% endblock %}
