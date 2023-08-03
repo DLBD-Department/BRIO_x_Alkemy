@@ -280,6 +280,24 @@ TODO:
 
 \subsection{Frontend}
 @Christian
+WORK IN PROGRESS 
+Regarding the frontend implementation, the tool relies on the Flask framework. Flask is a web framework for building web applications in Python. It provides great flexibility and modularity with the \textit{routing} mechanism, allowing the user to select which URL should trigger which function. This makes it straightforward to create distinct endpoints for various parts of the application. Routes that respond to different HTTP methods (GET, POST, etc.) and render dynamic content can thus be easily created.
+The user can investigate and analyse bias behaviour in a given AI system by accessing the \textit{Bias} section of the frontend. They have the possibility to upload either an already preprocessed dataframe, or a raw dataset together with a customised preprocessing pipeline. (as it can be seen in fig.?) 
+Afterwards, the user can compare the behaviour of the AI system with an ideal behaviour (Frequence vs Frequence), or compare sensitive classes within the AI system itself (Frequence vs Reference).
+\subsubsection{Frequence vs Frequence}
+To perform this analysis, a set of parameters have to be chosen. Firstly, the divergence: the choice is between \textbf{Total variation distance} and \textbf{Jensen-Shannon divergence}. Then, the user has to select: 
+\begin{itemize}
+  \item the target feature,
+  \item the sensitive feature,
+  \item the aggregating function (only when the sensitive feature partitions the domain in three or more classes),
+  \item the threshold (can also be automatically computed),
+  \item additional conditioning features, which further split the domain into subclasses
+\end{itemize}
+Lastly, the tool shows the result of the analysis, giving information about the overall result +++++++FINISH THIS PART+++++++ 
+
+\subsubsection{Frequence vs Reference}
+TODO
+
 TODO:
 \begin{itemize}
   \item menzionare il framework utilizzato per lo sviluppo e perché lo abbiamo scelto
