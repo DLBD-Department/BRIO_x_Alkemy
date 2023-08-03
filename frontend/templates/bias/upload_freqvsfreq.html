@@ -4,9 +4,9 @@
 	<legend>Select a distance:</legend>
         <div class="btn-group">
             <input type="radio" class="btn-check" name="distance" id="distance1" value="TVD" autocomplete="off" checked>
-            <label class="btn btn-success btn-lg" for="distance1" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="TotalVariation" data-bs-content="This distance is used to measure how much the model is biased. This measure is usually smaller than JS. Thus, by using it, we will have more permissive checks.">TotalVariation</label>
+            <label class="btn btn-success btn-lg" for="distance1" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="TotalVariation" data-bs-content="This distance is used to measure how much the model is biased. This measure is more sensitive than JS and will provide more fine-grained results.">TotalVariation</label>
             <input type="radio" class="btn-check" name="distance" id="distance2" value="JS" autocomplete="off">
-            <label class="btn btn-success btn-lg" for="distance2" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="JSDivergence" data-bs-content="This distance is used to measure how much the model is biased. This measure is usually greater than TV. Thus, by using it, we will have stricter checks that only very unbiased models will pass.">JSDivergence</label>
+            <label class="btn btn-success btn-lg" for="distance2" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="JSDivergence" data-bs-content="This distance is used to measure how much the model is biased. This measure is less sensitive than TV. Thus, it should only be used for preliminary checks.">JSDivergence</label>
         </div>
     </fieldset><br><br>
     <fieldset>

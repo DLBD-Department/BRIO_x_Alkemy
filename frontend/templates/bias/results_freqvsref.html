@@ -17,13 +17,16 @@ Results
       (Distance&lsqb;ref&rsqb;, distance&lsqb;ref&rsqb;&lt;&#61;threshold, threshold)
       </p>
       <p class="text-center" style="font-size: 24px;">
-      ({{ results1[0] }}, <b><span {% if results1[1] %}class="green-text"{% else %}class="red-text"{% endif %}>{{ results1[1] }}</span></b>, {{ results1[2] }})
+      ({{ results1[0] }}, <b><span {% if results1[1][1] %}class="green-text"{% else %}class="red-text"{% endif %}>{{ results1[1] }}</span></b>, {{ results1[2] }})
       </p>
     </div>
   </div>
   <div class="row pb-4 mx-3 pe-lg-0 pt-lg-5">
     <div class="col border border-5 mx-1">
       <h2 class="display-6 red-text fw-bold text-center">Violations</h2>
+      <p style="font-size: 18px;">
+      Condition: (num observations, distance&lsqb;ref&rsqb;, distance&lsqb;ref&rsqb;&lt;&#61;threshold, threshold)
+      </p>
       {% for key, value in violations.items() %}
         <div style="color: rgba(255, {{ 160*((loop.index - 1) / (violations|length - 1)) }}, 0, 1);">
           <a href='/bias/freqvsfreq/results/{{ key }}'>{{ key }}</a> : {{ value }}<br>
@@ -72,13 +75,11 @@ function handle_export() {
   .then((response) => response.json())
   .then((data) => {
     // Handle the received data
-    // If the response is "True", show only the "Max" button and select it
-    // If the response is "False", enable all buttons
     const blob = new Blob([data.csv_data], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'exported_data.csv';
+    link.download = 'conditioned_results.csv';
     link.style.display = 'none';
     // Trigger the download
     document.body.appendChild(link);

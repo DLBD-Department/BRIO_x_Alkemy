@@ -279,9 +279,6 @@ def results_fvr():
 	)
     
     violations = {k: v for k, v in results2.items() if (not v[2][0] or not v[2][1])}
-    print(results1, flush=True)
-    print(results2, flush=True)
-    print(violations, flush=True)
     if request.method == "POST":
         x = request.json.get('export-data', False)
         csv_data = "condition;num_observations;distance;distance_gt_threshold;threshold\n"
@@ -289,7 +286,6 @@ def results_fvr():
             if len(results2[key]) == 3:
                 csv_data += f"{key};{results2[key][0]};{results2[key][1]};{results2[key][2]}\n"
                 continue
-            print(results2[key][1], flush=True)
             csv_data += f"{key};{results2[key][0]};{results2[key][1]};{results2[key][2]};{results2[key][3]}\n"
         # Create a Response with CSV data
         return jsonify({"csv_data": csv_data})
