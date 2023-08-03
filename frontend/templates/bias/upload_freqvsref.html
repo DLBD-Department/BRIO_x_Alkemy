@@ -7,22 +7,9 @@
             <label class="btn btn-success btn-lg" for="distance1" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="KLDivergence" data-bs-content="This distance is used to measure how much the model is off with respect to the reference distribution.">KLDivergence</label>
         </div>
     </fieldset><br><br>
-    <fieldset>
-	<legend>Select an aggregation function:</legend>
-        <div class="btn-group">
-          <input type="radio" class="btn-check" name="agg_func" id="agg_func1" value="min">
-          <label class="btn btn-success btn-lg" for="agg_func1" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="Minimal divergence" data-bs-content="The minimal divergence indicates how much the model is biased when it expresses the minimal bias. A high value (closer to 1 than to 0) is a very bad sign. Only available if the root variable has more than two classes.">Min</label>
-          <input type="radio" class="btn-check" name="agg_func" id="agg_func2" value="max">
-          <label class="btn btn-success btn-lg" for="agg_func2" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="Maximal divergence" data-bs-content="The maximal divergence indicates how much the model is biased when it expresses the maximal bias. A low value (closer to 0 than to 1) is a very good sign. Only available if the root variable has more than two classes.">Max</label>
-          <input type="radio" class="btn-check" name="agg_func" id="agg_func3" value="mean">
-          <label class="btn btn-success btn-lg" for="agg_func3" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="Average divergence" data-bs-content="A low value (closer to 0 than to 1) indicates that the model is generally unbiased, a high value indicates that the model is generally biased. Only available if the root variable has more than two classes.">Mean</label>
-          <!-- <input type="radio" class="btn-check" name="agg_func" id="agg_func4" value="stdev"> -->
-          <!-- {% include 'bias/stdev.html' %} -->
-        </div>
-    </fieldset><br><br>
     <legend>Select other parameters:</legend><br><br>
     <a for="slider" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="Threshold" data-bs-content="The threshold value is used to decide when the behaviour of the model should be considered biased.  If the threshold is low (closer to 0 than to 1), then the checks will be strict and only a very unbiased model will pass them.">Threshold:</a>
-    <input type="range" name="Slider" min="0" max="1" step="0.05" oninput="this.form.amountInput.value=this.value" />
+    <input type="range" name="Slider" min="0" max="1" value="0" step="0.05" oninput="this.form.amountInput.value=this.value" />
     <input type="number" name="amountInput" min="0" max="1" step="0.05" oninput="this.form.amountRange.value=this.value" />
     <input type="checkbox" class="form-check-input" name="auto_thr" id="auto_thr" value="active">
     <label class="form-check-label" for="auto_thr">Set automatic threshold <b>{{ thr }}</b></label>

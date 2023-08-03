@@ -3,10 +3,10 @@
     <fieldset>
 	<legend>Select a distance:</legend>
         <div class="btn-group">
-            <input type="radio" class="btn-check" name="distance" id="distance1" value="TotalVariation" autocomplete="off" checked>
-            <label class="btn btn-success btn-lg" for="distance1" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="TotalVariation" data-bs-content="This distance is used to measure how much the model is biased. This measure is usually smaller than JS. Thus, by using it, we will have more permissive checks.">TotalVariation</label>
-            <input type="radio" class="btn-check" name="distance" id="distance2" value="JSDivergence" autocomplete="off">
-            <label class="btn btn-success btn-lg" for="distance2" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="JSDivergence" data-bs-content="This distance is used to measure how much the model is biased. This measure is usually greater than TV. Thus, by using it, we will have stricter checks that only very unbiased models will pass.">JSDivergence</label>
+            <input type="radio" class="btn-check" name="distance" id="distance1" value="TVD" autocomplete="off" checked>
+            <label class="btn btn-success btn-lg" for="distance1" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="TotalVariation" data-bs-content="This distance is used to measure how much the model is biased. This measure is more sensitive than JS and will provide more fine-grained results.">TotalVariation</label>
+            <input type="radio" class="btn-check" name="distance" id="distance2" value="JS" autocomplete="off">
+            <label class="btn btn-success btn-lg" for="distance2" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="JSDivergence" data-bs-content="This distance is used to measure how much the model is biased. This measure is less sensitive than TV. Thus, it should only be used for preliminary checks.">JSDivergence</label>
         </div>
     </fieldset><br><br>
     <fieldset>
@@ -24,10 +24,10 @@
     </fieldset><br><br>
     <legend>Select other parameters:</legend><br><br>
     <a for="slider" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="Threshold" data-bs-content="The threshold value is used to decide when the behaviour of the model should be considered biased.  If the threshold is low (closer to 0 than to 1), then the checks will be strict and only a very unbiased model will pass them.">Threshold:</a>
-    <input type="range" name="Slider" min="0" max="1" step="0.05" oninput="this.form.amountInput.value=this.value" />
+    <input type="range" name="Slider" min="0" max="1" value="0" step="0.05" oninput="this.form.amountInput.value=this.value" />
     <input type="number" name="amountInput" min="0" max="1" step="0.05" oninput="this.form.amountRange.value=this.value" />
     <input type="checkbox" class="form-check-input" name="auto_thr" id="auto_thr" value="active">
-    <label class="form-check-label" for="auto_thr">Set automatic threshold <b>{{ thr }}</b></label>
+    <label class="form-check-label" for="auto_thr">Set automatic threshold</label>
     <div class="container d-none" id="a1_params">
       <input type="radio" class="form-check-input" name="a1_param" id="a1_high" value="high">
       <label class="form-check-label" for="a1_high">A1=high</label>
