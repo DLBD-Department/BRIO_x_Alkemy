@@ -20,16 +20,17 @@
 \usepackage{cleveref}
 \usepackage{amsthm}
 %% auto break lines
-\lstset{breaklines=true}
+\lstset{language=Python, breaklines=true}
 
 \newtheorem{example}{Example}
 \newtheorem{definition}{Definition}
 \newtheorem*{theorem*}{Theorem}
 
 \newcommand{\red}[1]{\color{red}#1}
-%%
+
 %% end of the preamble, start of the body of the document source.
 \begin{document}
+
 
 %%
 %% Rights management information.
@@ -150,9 +151,9 @@ Our tool takes as input an AI model's output and a set of user's selected parame
 The analyses conducted by our system are of two kids: 
 
 \begin{enumerate}
-	\item comparison between the behaviour of the AI system and a target desirable behaviour, and
+	\item comparison between the behaviour of the AI system and a target desirable behaviour (expressed as "freqs-vs-ref" in the implementation), and
 	
-	\item comparison between the behaviour of the AI system with respect to a sensitive class $c_1\in F$ and the behaviour of the AI system with respect to another sensitive class $c_2\in F$ related to the same sensitive feature $F$.
+	\item comparison between the behaviour of the AI system with respect to a sensitive class $c_1\in F$ and the behaviour of the AI system with respect to another sensitive class $c_2\in F$ related to the same sensitive feature $F$ (expressed as "freqs-vs-freq" in the implementation).
 \end{enumerate}
 
 Whenever the second behaviour alerts of a possibly biased behaviour, a subsequent check follow on some (or all) of the subclasses of the considered sensitive classes. This second check is meant to tell us if the bias encountered at the level of the classes can be explained away by other features of the individuals in the sensitive classes considered that are not related to the sensitive feature at hand.
@@ -211,7 +212,7 @@ Let $P$ and $Q$ probability distributions over $X$. Then we have the following:
 
 This suggests that Jensen-Shannon is less sensitive to differences in the comparing sets, and can therefore be used for preliminary analyses.
 
-\subsection{How to handle sensitive features corresponding to more than two classes}
+\subsection{How to handle sensitive features corresponding to more than two classes}\label{subsec:aggregation}
 Since the divergences the system uses are binary functions, it is not obvious how to handle the case in which the sensitive feature we are considering partitions the domain in three or more classes. It is, indeed, easy to compute the divergence for pairs of classes, but we also need, in this case, a sensible way of aggregating the obtained results in order to obtain one value describing well how the AI model behaves with respect to the sensitive feature under consideration. It turns out that there are several ways of doing this and each of them tells us something of value if we wish to reach a meaningful conclusion about the AI model.
 
 Suppose that we are studying the behaviour of the model with respect to the feature $F=\{c_1, \ldots , c_n\}$ which induces a partition of our domain of individuals into the classes $c_1, \ldots , c_n$. The first step is the pairwise calculation of the divergences with respect to the different classes induced by $F$. Hence, for each pair $(c_i\parallel c_j)$ such that $c_i, c_j\in F$, we compute $D(c_i\parallel c_j) $ where $D$ is the  preselected divergence and consider the set $\{D(c_i\parallel c_j) : c_i,c_j\in F\ \&\ i\neq j\}$. For instance, if we are considering age as our feature  $F$ and we partition our domain into three age groups, we might have
@@ -264,23 +265,42 @@ where $m$ is the lower limit of our interval and $M$ is its upper limit.
 \section{Implementation}
 \label{sec:implementation}
 
-A first MVP for the outlined bias detection tool has been implemented using the programming language Python (3.x) and can be found at the following URL: \url{https://github.com/DLBD-Department/BRIO_x_Alkemy}. Here the most important aspects of the implementation will be described.
+A first Minimum Viable Product (MVP) for the outlined bias detection tool has been implemented using the programming language Python (3.x) and can be found at the following URL: \url{https://github.com/DLBD-Department/BRIO_x_Alkemy}. Here the most important aspects of the implementation will be described.
 
 \subsection{Backend}
 \label{subsec:backend}
-WORK IN PROGRESS
 
 In terms of software architecture, the tool leverages on Docker in order to reach full portability. Currently it uses a simple python:3.10 image that is enough for the first developments. 
 
-TODO:
-\begin{itemize}
-  \item descrivere classe BiasDetector, FreqVsFreqBiasDetector e FreqVsRefBiasDetector. Inserire snippet o pseudocodice
-  \item descrivere threshold calculator
-\end{itemize}
+The tool is developed following the Object Oriented Programming (OOP) paradigm in order to make it easy to extend for the upcoming functionalities both for bias and opacity detection. In this section a few details about the implemented classes are provided. 
+
+\paragraph{\lstinline[columns=fixed]{BiasDetector} class}
+This class contains the methods shared by both bias detection tasks described in \ref{sec:theory}, namely freqs-vs-ref and freqs-vs-freqs. In particular, this class contains the method \lstinline[columns=fixed]{get_frequencies_list} which is used compute the distribution of the dataframe units w.r.t. to the target feature \lstinline[columns=fixed]{target_variable} in the code, the output of a predictive machine learning model, conditioned to the categories of the sensitive features (\lstinline[columns=fixed]{root_variable} in the code). 
+
+\paragraph{\lstinline[columns=fixed]{FreqVsRefBiasDetector} class}
+This class inherits from \lstinline[columns=fixed]{BiasDetector} and implements the freqs-vs-ref analysis described in \ref{sec:theory}. The constructor of the class provides the option for the normalization of the KL divergence.  
+
+The KL divergence calculation is implemented in the method \lstinline[columns=fixed]{compute_distance_from_reference}. Currently only the discrete version of KL is implemented. 
+
+The method \lstinline[columns=fixed]{compare_root_variable_groups} computes the distance, in terms of normalized KL divergence, of the observed distribution of \lstinline[columns=fixed]{target_variable} conditioned to \lstinline[columns=fixed]{root_variable} w.r.t. a reference distribution that is passed as parameter.
+
+The method \lstinline[columns=fixed]{compare_root_variable_conditioned_groups} performs the same calculation described above but for each sub-group implied by the cartesian product of the categories of \lstinline[columns=fixed]{conditioning_variables}, that is a list of available features present in dataframe and selected by the user. The computation is performed only if the sub-groups are composed of at least \lstinline[columns=fixed]{min_obs_per_group} observations, with a default of 30. 
+
+\paragraph{\lstinline[columns=fixed]{FreqVsFreqBiasDetector} class}
+This class inherits from \lstinline[columns=fixed]{BiasDetector} and implements the freqs-vs-freqs analysis described in \ref{sec:theory}. The constructor of the class provides the options for setting up the aggregation function for the multi-class case (see \ref{subsec:aggregation}), for the selection of the A1 parameter value for the parametric threshold (see \ref{threshold}) and for the distance definition to be used for the calculations. Currently only JS and TVD are supported. 
+
+The method \lstinline[columns=fixed]{compute_distance_between_frequencies} computes the JS divergence or the TV distance for the \lstinline[columns=fixed]{observed_distribution}, an array with the distribution of the \lstinline[columns=fixed]{target_variable} conditioned to \lstinline[columns=fixed]{root_variable}. The final value is provided using the selected aggregation function, relevant in case of multi-classes root variables. 
+
+The method \lstinline[columns=fixed]{compare_root_variable_groups} computes the mutual distance, in terms of JS or TVD, of the categories of the observed distribution of \lstinline[columns=fixed]{target_variable} conditioned to \lstinline[columns=fixed]{root_variable}.
+
+The method \lstinline[columns=fixed]{compare_root_variable_conditioned_groups} performs the same calculation described above but for each sub-group implied by the cartesian product of the categories of \lstinline[columns=fixed]{conditioning_variables}, that is a list of available features present in dataframe and selected by the user. The computation is performed only if the sub-groups are composed of at least \lstinline[columns=fixed]{min_obs_per_group} observations, with a default of 30.
+
+\paragraph{Threshold calculator}
+When the threshold is not provided by the user, the tool computes it using the \lstinline[columns=fixed]{treshold_calculator} function. This function implements the algorithm described in \ref{threshold}.
 
 \subsection{Frontend}
-@Christian
-WORK IN PROGRESS 
+WORK IN PROGRESS
+
 Regarding the frontend implementation, the tool relies on the Flask framework. Flask is a web framework for building web applications in Python. It provides great flexibility and modularity with the \textit{routing} mechanism, allowing the user to select which URL should trigger which function. This makes it straightforward to create distinct endpoints for various parts of the application. Routes that respond to different HTTP methods (GET, POST, etc.) and render dynamic content can thus be easily created.
 The user can investigate and analyse bias behaviour in a given AI system by accessing the \textit{Bias} section of the frontend. They have the possibility to upload either an already preprocessed dataframe, or a raw dataset together with a customised preprocessing pipeline. (as it can be seen in fig.?) 
 Afterwards, the user can compare the behaviour of the AI system with an ideal behaviour (Frequence vs Frequence), or compare sensitive classes within the AI system itself (Frequence vs Reference).

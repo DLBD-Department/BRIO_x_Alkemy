@@ -31,6 +31,8 @@ def order_violations(viol: dict) -> dict:
     # Function to get the middle value from the tuple
     def get_middle_value(item):
         middle_value = item[1]
+        if type(middle_value) == list:
+            return max(middle_value)
         return middle_value
 
     # Sort entries with valid middle values
@@ -61,7 +63,7 @@ def write_reference_distributions_html(rootvar: str, targetvar: str, df: pd.Data
                 break
             tot_refs -= 1
             tot_html += '<div class="col-3">'
-            tot_html += f'<input type="number" class="form-control" placeholder="rv{c}_tg{d}_ref" name="prob_{c}_{d}" id="prob_{c}_{d}" min="0" max="1" step=".01">'
+            tot_html += f'<input type="number" class="form-control" placeholder="{rootvar}_{c}_{targetvar}_{d}_ref" name="prob_{c}_{d}" id="prob_{c}_{d}" min="0" max="1" step=".01">'
             d += 1
             if d == ntarget:
                 d = 0
