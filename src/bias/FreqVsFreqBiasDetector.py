@@ -49,6 +49,8 @@ class FreqVsFreqBiasDetector(BiasDetector):
         overall_distance = self.aggregating_function(distances)
     
         if len(distances) > 1:
+            ## Computing the standard deviation of the distances in case of 
+            # multi-class root_variable
             return overall_distance, np.std(distances)
         else:
             return overall_distance, None
@@ -63,7 +65,18 @@ class FreqVsFreqBiasDetector(BiasDetector):
         This function compares for the two groups given by
         the two categories of root_variable and check if 
         the observed frequencies of a given target_variable
-        are distant below the given threshold
+        are distant below the given threshold.
+
+        Args:
+            dataframe: Pandas DataFrame with features and 
+                predicted labels
+            target_variable: variable with the predicted labels
+            root_variable: variable that we use to compare the predicted
+                labels in two different groups of observation
+            threshold: value from 0 to 1 used to check the computed distance with. If None, the tool will compute a parametric threshold. 
+
+        Returns:
+            A tuple (distance, distance>=computed_threshold, computed_threshold, standard_deviation).
         '''
 
         root_variable_labels = dataframe[root_variable].unique()
@@ -106,11 +119,11 @@ class FreqVsFreqBiasDetector(BiasDetector):
                 Starting from the first variable, a tree of conditions is created;
                 for each of the resulting group, we check if the predicted labels frequencies are significantly 
                 different in the two groups of root_variable.
-            threshold: value from 0 to 1 used to check the computed distance with.
+            threshold: value from 0 to 1 used to check the computed distance with. If None, the tool will compute a parametric threshold. 
             min_obs_per_group: the minimum number of observations needed for the distance computation
 
         Returns:
-            A dictionary {group_condition: (numb_obs_of_group, distance, distance>=threshold)}
+            A dictionary {group_condition: (numb_obs_of_group, distance, distance>=computed_threshold, computed_threshold, standard_deviation)}
         '''
 
         # this is computed once and passed each time for each group

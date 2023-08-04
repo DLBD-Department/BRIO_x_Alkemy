@@ -30,7 +30,6 @@ class BiasDetector:
         The shape of each array is given by the number of labels of target_variable.
         '''
 
-        #TODO cosa succede se non tutte le labels di root_variable sono presenti nel dataframe?
         freq_list = []
         abs_freq_list = []
         for label in root_variable_labels:

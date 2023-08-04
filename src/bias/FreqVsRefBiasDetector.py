@@ -59,8 +59,6 @@ class FreqVsRefBiasDetector(BiasDetector):
             reference_distribution,
             threshold=None):
         '''
-        TODO Comment this section better
-
         This function computes the distance from a reference distribution, for
         each class of root_variable wrt the distribution implied by target_variable. 
         '''
@@ -91,10 +89,8 @@ class FreqVsRefBiasDetector(BiasDetector):
             min_obs_per_group=30,
             threshold=None):
         '''
-        TODO Comment this section better
-
         This function computes the distance from a reference distribution, for
-        each class of root_variable wrt the distribution implied by target_variable, for each 
+        each class of root_variable w.r.t. the distribution implied by target_variable, for each 
         subgroup given by the conditioning variables groups. 
 
         Args:
@@ -108,13 +104,19 @@ class FreqVsRefBiasDetector(BiasDetector):
                 Starting from the first variable, a tree of conditions is created;
                 for each of the resulting group, we check if the predicted labels frequencies are significantly 
                 different in the two groups of root_variable.
-            threshold: value from 0 to 1 used to check the computed distance with.
+            threshold: value from 0 to 1 used to check the computed distance with. If None, the tool will compute a parametric threshold.
             min_obs_per_group: the minimum number of observations needed for the distance computation
             reference_distribution: numpy array of probabilities w.r.t. target_variable (e.g. predictions) for the 
                 two groups given by root_variable.
 
         Returns:
-            A dictionary {group_condition: (numb_obs_of_group, [distance_a, distance_b], [distance_a>=threshold, distance_b>=threshold])},
+            A dictionary {group_condition: (
+                                            numb_obs_of_group, 
+                                            [distance_a, distance_b], 
+                                            [distance_a>=computed_threshold, distance_b>=computed_threshold]
+                                            computed_threshold
+                                            )
+                            },
             where distance_a and distance_b are the distances computed for the two categories of root_variable. 
         '''
 
