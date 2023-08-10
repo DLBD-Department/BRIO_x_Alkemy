@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+
 {% block title %}
 FreqvsRef
 {% endblock %}
@@ -17,7 +21,7 @@ Using the max as aggregating function, you are checking the "worst case scenario
 {% block scripts %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/handle_parameters.js') }}"></script>
 <script type="text/javascript">
-function handle_stdev_refs() {
+function handle_refs() {
     let data = new FormData();
     var rootvar = document.getElementById("root_var");
     var selected_option_rv = rootvar.options[rootvar.selectedIndex];
@@ -27,15 +31,12 @@ function handle_stdev_refs() {
       data.append("rv_selected", selected_option_rv.value);
       data.append("pr_selected", selected_option_pr.value);
       const freqvsref_url = "http://" + "{{ local_ip }}" + ":5000/bias/freqvsref";
-//      const stdev_id = document.getElementById("stdev-label");
       const preds_id = document.getElementById("ref_dist");
       fetch(freqvsref_url, {
       "method": "POST",
       "body": data
           }).then((response) => response.json())
         .then((data) => {
-          console.log(data)
-//          stdev_id.outerHTML = data.response_stdev;
           preds_id.innerHTML = data.response_refs;
         })
   } 
@@ -90,8 +91,8 @@ document.addEventListener("DOMContentLoaded", function() {
     var fromroot = document.getElementById("root_var");
     var frompred = document.getElementById("predictions");
     fromroot.addEventListener("change", handle_agg_funcs);
-    fromroot.addEventListener("change", handle_stdev_refs);
-    frompred.addEventListener("change", handle_stdev_refs);
+    fromroot.addEventListener("change", handle_refs);
+    frompred.addEventListener("change", handle_refs);
     var auto_thr = document.getElementById("auto_thr");
     auto_thr.addEventListener("change", display_thr)
 });
@@ -100,11 +101,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 {% block footer %}
     <div class="modal-footer">
-        <a href="/bias/freqvsref/results"><button type="button" class="btn btn-lg btn-secondary" data-dismiss="modal">Run</button>
+        <a href="/bias/freqvsref/results"><button type="button" class="btn btn-secondary btn-semixl" data-dismiss="modal">Run</button>
     </div>
 {% endblock %}
-
-
-
 
 

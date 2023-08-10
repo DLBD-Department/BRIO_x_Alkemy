@@ -28,9 +28,11 @@ Results
       Condition: (num observations, distance&lsqb;ref&rsqb;, distance&lsqb;ref&rsqb;&lt;&#61;threshold, threshold)
       </p>
       {% for key, value in violations.items() %}
-        <div style="color: rgba(255, {{ 160*((loop.index - 1) / (violations|length - 1)) }}, 0, 1);">
-          <a href='/bias/freqvsfreq/results/{{ key }}'>{{ key }}</a> : {{ value }}<br>
-        </div>
+        {% if violations|length != 1 %}
+          <div style="color: rgba(255, {{ 160*((loop.index - 1) / (violations|length - 1)) }}, 0, 1);">
+            <a href='/bias/freqvsfreq/results/{{ key }}'>{{ key }}</a> : {{ value }}<br>
+          </div>
+        {% endif %}
       {% endfor %} 
     </div>
     <div class="col border border-5 mx-1">

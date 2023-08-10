@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+
 {% block title %}
 FreqvsFreq
 {% endblock %}
@@ -18,22 +22,6 @@ FreqvsFreq
 {% block scripts %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/handle_parameters.js') }}"></script>
 <script type="text/javascript">
-function handle_stdev() {
-    let data = new FormData();
-    var rootvar = document.getElementById("root_var");
-    var selected_option = rootvar.options[rootvar.selectedIndex];
-    data.append("rv_selected", selected_option.value);
-    const freqvsfreq_url = "http://" + "{{ local_ip }}" + ":5000/bias/freqvsfreq";
-    const stdev_id = document.getElementById("stdev-label");
-    console.log(stdev_id.outerHTML)
-    console.log(selected_option.value)
-    fetch(freqvsfreq_url, {
-    "method": "POST",
-    "body": data
-        }).then((response) => response.json())
-        .then((data) => stdev_id.outerHTML = data.response)
-};
-
 function handle_agg_funcs() {
   let data = new FormData();
   var rootvar = document.getElementById("root_var");
@@ -79,8 +67,6 @@ function display_thr() {
 };
 
 document.addEventListener("DOMContentLoaded", function() {
-//    var disabfromroot = document.getElementById("root_var");
-//    disabfromroot.addEventListener("change", handle_stdev);
     var disabfromroot = document.getElementById("root_var");
     disabfromroot.addEventListener("change", handle_agg_funcs);
     var auto_thr = document.getElementById("auto_thr");
@@ -91,6 +77,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 {% block footer %}
     <div class="modal-footer">
-        <a href="/bias/freqvsfreq/results"><button type="button" class="btn btn-lg btn-secondary" data-dismiss="modal">Run</button>
+        <a href="/bias/freqvsfreq/results"><button type="button" class="btn btn-secondary btn-semixl" data-dismiss="modal">Run</button>
     </div>
 {% endblock %}

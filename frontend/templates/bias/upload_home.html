@@ -1,6 +1,6 @@
 {% block content %}
 <h2>Upload files</h2><br>
-<form method="POST" action="{{ url_for('home_bias') }}" enctype="multipart/form-data">
+<form method="POST" action="{{ url_for('bias.home_bias') }}" enctype="multipart/form-data">
     <div class="form-group row mb-2 w-50 mx-auto">
 	    <label for="dataset" class="col-sm-2 col-form-label col-form-label-lg font-weight-bold">Dataframe:</label>
 	    <div class="col-sm-10">
@@ -25,7 +25,7 @@
         <p>
         You can upload here a raw dataset, a preprocessing pipeline in the form of a jupyter notebook (packages you use must already be installed), and some artifacts. Please note that if you use this customization tool, <u>the original dataframe will be overridden</u>. Notebooks input can be accessed at <b>os.path.abspath("uploads/input_file")</b>. Output dataframe should be a <u>pickle</u> file located at <b>os.path.abspath("uploads/output_file")</b>.
         </p>
-        <form method="POST" action="{{ url_for('home_bias') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ url_for('bias.home_bias') }}" enctype="multipart/form-data">
           <div class="form-group row mb-2 mx-auto">
 	    <label for="dataset_custom" class="col-sm-2 col-form-label col-form-label-sm font-weight-bold">Dataset:</label>
             <div class="col-sm-10">

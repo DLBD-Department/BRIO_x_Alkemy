@@ -16,6 +16,15 @@
   justify-content: center !important;
   align-items: center !important;
 }
+
+.btn-semixl {
+  padding: 25px 50px !important;
+  font-size: 40px !important;
+  border-radius: 10px !important;
+  width: 100% !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
 .parent-img {
   position: relative;
 }
