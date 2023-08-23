@@ -19,6 +19,9 @@
 \usepackage{xcolor}
 \usepackage{cleveref}
 \usepackage{amsthm}
+
+\usepackage[export]{adjustbox}
+
 %% auto break lines
 \lstset{language=Python, breaklines=true}
 
@@ -327,9 +330,46 @@ TODO:
 \section{Validation}
 \label{sec:validation}
 
-@Alkemy TODO
+A set of experiments were performed to understand the behavior of the proposed approach on real data, in particular for the freqs-vs-freqs analysis. To simulate a realistic bias detection scenario, payment data from an important bank (a cash and credit card issuer) in Taiwan were used [INSERIRE REF]. The targets were credit card holders of the bank. 
 
-Descrivere i risultati degli esperimenti con i 3 modelli e le valutazioni emerse. 
+As first step, three machine learning models were trained to predict the default probability, using all the available features. The three models are:
+\begin{itemize}
+  \item "strong" model: a Random Forest with 200 trees and max depth equals to 12;
+  \item "weak" model: a Random Forest with 10 trees and max depth equals to 37;
+  \item "lame" model: a Classification Tree with max depth equals to 2.
+\end{itemize}
+
+Training and performance details of the three models are available on the GitHub repository [INSERIRE REF]. The three models have different performance in terms of accuracy and errors distribution: the idea is to verify if and how our bias detection approach can deal with different models performances. 
+
+\subsubsection{Experiment 1: freqs-vs-freqs, TVD, A1=low, root-variable=x2-sex}
+
+\begin{figure}[h!]
+  \includegraphics[width=.7\linewidth, left]{exp1.png}
+  \caption{Experiment 1 results.}
+  \label{fig:exp1}
+\end{figure}
+Figure \ref{fig:exp1} shows the results of the first experiment. Using TVD and the parametric threshold, no bias is detected for the three models predictions, but it is noticeable the different distance magnitude obtained for the "lame" model, that is considerable smaller than the ones of the other two models. A simpler, more erroneous model is unable to produce a strongly skewed predictions distribution and so it tends to produce "less bias". The "strong" model obtains the biggest distance, suggesting that the more powerful a model is, the more likely is that it can exploit predictive signals, producing more skewed predictions distributions. 
+
+\subsubsection{Experiment 2: freqs-vs-freqs, TVD, A1=low, root-variable=x3-education}
+
+\begin{figure}[h!]
+  \includegraphics[width=.7\linewidth, left]{exp2.png}
+  \caption{Experiment 2 results.}
+  \label{fig:exp2}
+\end{figure}
+Figure \ref{fig:exp2} shows the results of the second experiment. With this experiment we tried to understand the bias detector behavior when dealing with multi-class sensitive features, in this case Education. A potential bias is detected for each model, but it is questionable if using Education as sensitive feature makes sense in this setting and with these data. It is more interesting observing that the distances are almost the same for the three models, fact that suggests the each model is exploiting in some way the predictive signal offered by Education. The standard deviations of the class-vs-class distances (the last values of the output tuples) are also of the same magnitude order.
+
+\subsubsection{Experiment 3: freqs-vs-freqs, JS, A1=low, root-variable=x2-sex}
+
+\begin{figure}[h!]
+  \includegraphics[width=.7\linewidth, left]{exp3.png}
+  \caption{Experiment 3 results.}
+  \label{fig:exp3}
+\end{figure}
+Figure \ref{fig:exp3} shows the results of the third experiment. Now we are interested in trying out the other distance, the JS divergence, that is provided by the tool for the freqs-vs-freqs analysis. As expected, the distances are of smaller order of magnitude. Apart from this numerical outcome, the pattern is the same observed for Experiment 1. 
+
+COMPLETARE CON GLI ALTRI 4 ESPERIMENTI
+
 
 
 \section{Conclusions and Further Work}
