@@ -124,10 +124,7 @@ we provide the means to compare the action of the user's algorithm of choice on 
 %% Keywords. The author(s) should pick words that accurately describe
 %% the work being presented. Separate the keywords with commas.
 \begin{keywords}
-  LaTeX class \sep
-  paper template \sep
-  paper formatting \sep
-  CEUR-WS
+Bias, Machine Learning
 \end{keywords}
 
 %%
@@ -268,38 +265,37 @@ where $m$ is the lower limit of our interval and $M$ is its upper limit.
 \section{Implementation}
 \label{sec:implementation}
 
-A first Minimum Viable Product (MVP) for the outlined bias detection tool has been implemented using the programming language Python (3.x) and can be found at the following URL: \url{https://github.com/DLBD-Department/BRIO_x_Alkemy}. Here the most important aspects of the implementation will be described.
+A first Minimum Viable Product (MVP) for the outlined bias detection tool has been implemented using the programming language Python (3.x) and can be found at the following URL: \url{https://github.com/DLBD-Department/BRIO_x_Alkemy}. We present in this Section the most relevant aspects of the implementation.
 
 \subsection{Backend}
 \label{subsec:backend}
 
-In terms of software architecture, the tool leverages on Docker in order to reach full portability. Currently it uses a simple python:3.10 image that is enough for the first developments. 
+In terms of software architecture, the tool leverages on Docker in order to reach full portability. Currently it uses a simple python:3.10 image sufficient for early developments. The tool is developed following the Object Oriented Programming (OOP) paradigm in order to make allow easy extension to the upcoming functionalities both for bias and opacity detection. In this section a few details about the implemented classes are provided. 
 
-The tool is developed following the Object Oriented Programming (OOP) paradigm in order to make it easy to extend for the upcoming functionalities both for bias and opacity detection. In this section a few details about the implemented classes are provided. 
+\paragraph{\texttt{BiasDetector} class}
 
-\paragraph{\lstinline[columns=fixed]{BiasDetector} class}
-This class contains the methods shared by both bias detection tasks described in \ref{sec:theory}, namely freqs-vs-ref and freqs-vs-freqs. In particular, this class contains the method \lstinline[columns=fixed]{get_frequencies_list} which is used compute the distribution of the dataframe units w.r.t. to the target feature \lstinline[columns=fixed]{target_variable} in the code, the output of a predictive machine learning model, conditioned to the categories of the sensitive features (\lstinline[columns=fixed]{root_variable} in the code). 
+This class contains the methods shared by both bias detection tasks described in Section \ref{sec:theory}, namely \texttt{freqs-vs-ref} and \texttt{freqs-vs-freqs}. In particular, this class contains the method \texttt{get\_frequencies\_list} which is used compute the distribution of the dataframe units with respect to the target feature (\texttt{target\_variable} in the code), the output of a predictive machine learning model, conditioned to the categories of the sensitive features (\texttt{root\_variable} in the code). 
 
-\paragraph{\lstinline[columns=fixed]{FreqVsRefBiasDetector} class}
-This class inherits from \lstinline[columns=fixed]{BiasDetector} and implements the freqs-vs-ref analysis described in \ref{sec:theory}. The constructor of the class provides the option for the normalization of the KL divergence.  
+\paragraph{\texttt{Freqs-vs-RefBiasDetector} class}
+This class inherits from \texttt{BiasDetector} and implements the freqs-vs-ref analysis described in Section \ref{sec:theory}. The constructor of the class provides the option for the normalization of the KL divergence. The KL divergence calculation is implemented in the method \texttt{compute\_distance\_from\_reference}. Currently only the discrete version of KL is implemented. 
 
-The KL divergence calculation is implemented in the method \lstinline[columns=fixed]{compute_distance_from_reference}. Currently only the discrete version of KL is implemented. 
+The method \texttt{compare\_root\_variable\_groups} computes the distance, in terms of normalized KL divergence, of the observed distribution of \texttt{target\_variable} conditioned to \texttt{root\_variable} with respect to a reference distribution that is passed as parameter.
 
-The method \lstinline[columns=fixed]{compare_root_variable_groups} computes the distance, in terms of normalized KL divergence, of the observed distribution of \lstinline[columns=fixed]{target_variable} conditioned to \lstinline[columns=fixed]{root_variable} w.r.t. a reference distribution that is passed as parameter.
+The method \texttt{compare\_root\_variable\_conditioned\_groups} performs the same calculation described above but for each sub-group implied by the Cartesian product of the categories of \texttt{conditioning\_variables}, a list of available features present in dataframe and selected by the user. The computation is performed only if the sub-groups are composed of at least \texttt{min\_obs\_per\_group} observations, with a default of 30. 
 
-The method \lstinline[columns=fixed]{compare_root_variable_conditioned_groups} performs the same calculation described above but for each sub-group implied by the cartesian product of the categories of \lstinline[columns=fixed]{conditioning_variables}, that is a list of available features present in dataframe and selected by the user. The computation is performed only if the sub-groups are composed of at least \lstinline[columns=fixed]{min_obs_per_group} observations, with a default of 30. 
+\paragraph{\texttt{FreqVsFreqBiasDetector} class}
+This class inherits from \texttt{BiasDetector} and implements the freqs-vs-freqs analysis described in Section \ref{sec:theory}. The constructor of the class provides the options for setting up the aggregation function for the multi-class case (see Section \ref{subsec:aggregation}), for the selection of the A1 parameter value for the parametric threshold (see Section \ref{threshold}) and for the distance definition to be used for the calculations. Currently only JS and TVD are supported. 
 
-\paragraph{\lstinline[columns=fixed]{FreqVsFreqBiasDetector} class}
-This class inherits from \lstinline[columns=fixed]{BiasDetector} and implements the freqs-vs-freqs analysis described in \ref{sec:theory}. The constructor of the class provides the options for setting up the aggregation function for the multi-class case (see \ref{subsec:aggregation}), for the selection of the A1 parameter value for the parametric threshold (see \ref{threshold}) and for the distance definition to be used for the calculations. Currently only JS and TVD are supported. 
+The method \texttt{compute\_distance\_between\_frequencies} computes the JS divergence or the TV distance as selected for the \texttt{observed\_distribution}, an array with the distribution of the \texttt{target\_variable} conditioned to \texttt{root\_variable}. The final value is provided using the selected aggregation function, relevant in case of multi-classes root variables. 
 
-The method \lstinline[columns=fixed]{compute_distance_between_frequencies} computes the JS divergence or the TV distance for the \lstinline[columns=fixed]{observed_distribution}, an array with the distribution of the \lstinline[columns=fixed]{target_variable} conditioned to \lstinline[columns=fixed]{root_variable}. The final value is provided using the selected aggregation function, relevant in case of multi-classes root variables. 
+The method \texttt{compare\_root\_variable\_groups} computes the mutual distance, in terms of JS or TVD, of the categories of the observed distribution of \texttt{target\_variable} conditioned to \texttt{root\_variable}.
 
-The method \lstinline[columns=fixed]{compare_root_variable_groups} computes the mutual distance, in terms of JS or TVD, of the categories of the observed distribution of \lstinline[columns=fixed]{target_variable} conditioned to \lstinline[columns=fixed]{root_variable}.
+The method \texttt{compare\_root\_variable\_conditioned\_groups} performs the same calculation described above but for each sub-group implied by the Cartesian product of the categories of \texttt{conditioning\_variables}, with the same constraints as for the \texttt{Freqs-Vs-RefBiasDetector} class.
 
-The method \lstinline[columns=fixed]{compare_root_variable_conditioned_groups} performs the same calculation described above but for each sub-group implied by the cartesian product of the categories of \lstinline[columns=fixed]{conditioning_variables}, that is a list of available features present in dataframe and selected by the user. The computation is performed only if the sub-groups are composed of at least \lstinline[columns=fixed]{min_obs_per_group} observations, with a default of 30.
+%that is a list of available features present in dataframe and selected by the user. The computation is performed only if the sub-groups are composed of at least \lstinline[columns=fixed]{min_obs_per_group} observations, with a default of 30.
 
 \paragraph{Threshold calculator}
-When the threshold is not provided by the user, the tool computes it using the \lstinline[columns=fixed]{treshold_calculator} function. This function implements the algorithm described in \ref{threshold}.
+When the threshold is not provided by the user, the tool computes it using the \texttt{treshold\_calculator} function, which implements the algorithm described in Section \ref{threshold}.
 
 \subsection{Frontend}
 WORK IN PROGRESS
