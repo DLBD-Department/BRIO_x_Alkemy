@@ -148,7 +148,7 @@ The system presented is based on the theoretical, foundational works presented i
 
 Our tool takes as input an AI model's output and a set of user's selected parameter settings: the former is encoded as a set of datapoints with their associated features, the latter include the designation of a sensitive feature. The output is an evaluation of the possibility that the AI model under consideration is biased with respect to the features designated as sensitive by the user. The system closely guides the user in the process of setting the parameters and provides it with detailed explanations, remaining customisable with respect to the mathematical details of the analysis. The choices left to the user are those that actually make a conceptual difference in the outcome of the analysis and this difference is explained to the user during the setting of these parameters.
 
-The analyses conducted by our system are of two kids: 
+The analyses conducted by our system are of two kinds: 
 
 \begin{enumerate}
 	\item comparison between the behaviour of the AI system and a target desirable behaviour (expressed as "freqs-vs-ref" in the implementation), and
@@ -298,31 +298,41 @@ The method \texttt{compare\_root\_variable\_conditioned\_groups} performs the sa
 When the threshold is not provided by the user, the tool computes it using the \texttt{treshold\_calculator} function, which implements the algorithm described in Section \ref{threshold}.
 
 \subsection{Frontend}
-WORK IN PROGRESS
+Regarding the frontend implementation, the tool relies on the Flask framework. Flask is a web framework for building web applications in Python. It provides great flexibility and modularity with the \textit{routing} mechanism, allowing the user to select which URL should trigger which python function. This makes it straightforward to create distinct endpoints for various parts of the application. Routes that respond to different HTTP methods (GET, POST, etc.) and render dynamic content can thus be easily created.
 
-Regarding the frontend implementation, the tool relies on the Flask framework. Flask is a web framework for building web applications in Python. It provides great flexibility and modularity with the \textit{routing} mechanism, allowing the user to select which URL should trigger which function. This makes it straightforward to create distinct endpoints for various parts of the application. Routes that respond to different HTTP methods (GET, POST, etc.) and render dynamic content can thus be easily created.
-The user can investigate and analyse bias behaviour in a given AI system by accessing the \textit{Bias} section of the frontend. They have the possibility to upload either an already preprocessed dataframe, or a raw dataset together with a customised preprocessing pipeline. (as it can be seen in fig.?) 
-Afterwards, the user can compare the behaviour of the AI system with an ideal behaviour (Frequence vs Frequence), or compare sensitive classes within the AI system itself (Frequence vs Reference).
-\subsubsection{Frequence vs Frequence}
-To perform this analysis, a set of parameters have to be chosen. Firstly, the divergence: the choice is between \textbf{Total variation distance} and \textbf{Jensen-Shannon divergence}. Then, the user has to select: 
+The user can investigate and analyse bias behaviour in a given AI system by accessing the \textit{Bias} section of the frontend. They have the possibility to upload either an already preprocessed dataframe, or a raw dataset together with a customised preprocessing pipeline, as it is shown in Figure \ref{fig:bias_upload}
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=0.8\textwidth]{frontend_bias_upload.png}
+  \end{center}
+  \caption{Upload options for the bias detection tool}
+  \label{fig:bias_upload}
+\end{figure}
+
+
+Afterwards, the user can compare the behaviour of the AI system with an ideal behaviour (Frequence vs Frequence), or compare sensitive classes within the AI system itself (Frequence vs Reference), also shown in Figure \ref{fig:bias_upload}.
+\subsubsection{FreqVsFreq and FreqVsRef}
+To perform these analyses, a set of parameters have to be chosen. Firstly, the \textbf{distance}: the choice is between \textit{Total variation distance} and \textit{Jensen-Shannon divergence} for \textbf{FreqVsFreq}, and \textit{Kullback-Leibner divergence} is used for \textbf{FreqVsRef}. Then, the user has to select: 
 \begin{itemize}
   \item the target feature,
   \item the sensitive feature,
-  \item the aggregating function (only when the sensitive feature partitions the domain in three or more classes),
-  \item the threshold (can also be automatically computed),
-  \item additional conditioning features, which further split the domain into subclasses
-\end{itemize}
-Lastly, the tool shows the result of the analysis, giving information about the overall result +++++++FINISH THIS PART+++++++ 
-
-\subsubsection{Frequence vs Reference}
-TODO
-
-TODO:
-\begin{itemize}
-  \item menzionare il framework utilizzato per lo sviluppo e perché lo abbiamo scelto
-  \item descrivere UX (flusso operazioni), valutare se ha senso mettere degli screenshots
+  \item \textit{FreqVsFreq exclusive}: the aggregating function (only when the sensitive feature partitions the domain in three or more classes),
+  \item the threshold (this can also be automatically computed, see \ref{threshold}),
+  \item additional conditioning features, which further split the domain into subclasses,
+  \item \textit{FreqVsRef exclusive}: the reference distributions, which will depend on the target and the sensitive features. 
 \end{itemize}
 
+\subsubsection{Results}
+Eventually, the tool shows the analysis result, providing insights about an overall, general result: that is, whether the AI system is biased with respect to the sensitive feature. This is implemented in a boolean variable, which is \textbf{\textcolor{red}{False}} when bias is present, as it is shown in Figure \ref{fig:results}, and \textbf{\textcolor{green}{True}} otherwise.
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=0.8\textwidth]{frontend_results_page.png}
+  \end{center}
+  \caption{Results page displaying comprehensive results from all subclasses (top), subclass-specific violations (bottom left), subclass-specific results (bottom right)}
+  \label{fig:results}
+\end{figure}
+If bias behavior is detected, additional information at the subclass level (if applicable) are also presented, ranked from most severe to less significant.
+Furthermore, results for each subclass are also displayed, with the possibility to export the data in a csv file for additional studies. 
 \section{Validation}
 \label{sec:validation}
 
