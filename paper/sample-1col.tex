@@ -330,7 +330,7 @@ TODO:
 \section{Validation}
 \label{sec:validation}
 
-A set of experiments were performed to understand the behavior of the proposed approach on real data, in particular for the freqs-vs-freqs analysis. To simulate a realistic bias detection scenario, payment data from an important bank (a cash and credit card issuer) in Taiwan were used [INSERIRE REF]. The targets were credit card holders of the bank. 
+A set of experiments were performed to understand the behavior of the proposed approach on real data, in particular for the freqs-vs-freqs analysis. To simulate a realistic bias detection scenario, payment data from an important bank (a cash and credit card issuer) in Taiwan (published along the article \cite{YEH20092473}) were used. The targets were credit card holders of the bank. 
 
 As first step, three machine learning models were trained to predict the default probability, using all the available features. The three models are:
 \begin{itemize}
@@ -339,7 +339,7 @@ As first step, three machine learning models were trained to predict the default
   \item "lame" model: a Classification Tree with max depth equals to 2.
 \end{itemize}
 
-Training and performance details of the three models are available on the GitHub repository [INSERIRE REF]. The three models have different performance in terms of accuracy and errors distribution: the idea is to verify if and how our bias detection approach can deal with different models performances. 
+Training and performance details of the three models are available on the GitHub repository \url{https://github.com/DLBD-Department/BRIO_x_Alkemy/notebooks}. The three models have different performance in terms of accuracy and errors distribution: the idea is to verify if and how our bias detection approach can deal with different models performances. 
 
 \subsubsection{Experiment 1: freqs-vs-freqs, TVD, A1=low, root-variable=x2-sex}
 
@@ -366,11 +366,33 @@ Figure \ref{fig:exp2} shows the results of the second experiment. With this expe
   \caption{Experiment 3 results.}
   \label{fig:exp3}
 \end{figure}
-Figure \ref{fig:exp3} shows the results of the third experiment. Now we are interested in trying out the other distance, the JS divergence, that is provided by the tool for the freqs-vs-freqs analysis. As expected, the distances are of smaller order of magnitude. Apart from this numerical outcome, the pattern is the same observed for Experiment 1. 
+Figure \ref{fig:exp3} shows the results of the third experiment. Now we are interested in trying out the other distance, the JS divergence, that is provided by the tool for the freqs-vs-freqs analysis. As expected, the distances are of a smaller order of magnitude. Apart from this numerical outcome, the pattern is the same observed for Experiment 1. 
 
-COMPLETARE CON GLI ALTRI 4 ESPERIMENTI
+\subsubsection{Experiment 4: freqs-vs-freqs, JS, A1=low, root-variable=v3-education}
 
+\begin{figure}[h!]
+  \includegraphics[width=.7\linewidth, left]{exp4.png}
+  \caption{Experiment 4 results.}
+  \label{fig:exp4}
+\end{figure}
+Figure \ref{fig:exp4} shows the results of the fourth experiment. As with Experiment 2, we observe almost identical distance values for the three models, but of a smaller order of magnitude given that we are using JS instead of TVD. 
 
+\subsubsection{Experiment 5: freqs-vs-freqs, JS, A1=low, root-variable=x6-pay-0 (discrete)}
+
+\begin{figure}[h!]
+  \includegraphics[width=.7\linewidth, left]{exp5.png}
+  \caption{Experiment 5 results.}
+  \label{fig:exp5}
+\end{figure}
+Figure \ref{fig:exp5} shows the results of the fifth experiment. Keeping JS as distance of choice, we wanted to verify what happens if the sensitive feature is also the single most important feature for the classifiers. In this case, we identified x6-pay-0 that is a categorical feature which is providing the strongest predictive signal. Clearly, being strongly effective in discriminating between true 0 and 1 labels, it produces way bigger distances than the one observed in the previous experiments. As commented for Education, we imagine that it wouldn't make sense to consider such a feature a sensitive one. Finally, large standard deviation values are observed, suggesting that some feature categories are more effective and important for the classifiers than others. 
+
+\subsubsection{Experiment 6: freqs-vs-freqs, JS, A1=low, root-variable=x2-sex, conditioning-variable=x6-pay-0 (discrete)}
+For brevity we don't include the numerical outcome of this and the next experiment. The reader can refer to the notebook provided with the online repository (INCLUDE REFERENCE). We are now interested in testing the bias detector using a "conditioning variable", that is using a further dataset feature to compute the distances w.r.t. the sensitive feature for each subset of observations realized by the different conditioning variable categories. In this experiment we do this using the JS Divergence. 
+
+It seems clear that the computed distances can vary a lot for different conditioning variable groups. This behavior is stronger when the model is particularly accurate in its predictions, see e.g. "strong" model results. On the other hand, the "lame" model produces distances equal to zero for each subgroup, given that it's not able to use the conditioning variable to discriminate between observations. 
+
+\subsubsection{Experiment 7: freqs-vs-freqs, TVD, A1=low, root-variable=x2-sex, conditioning-variable=x6-pay-0 (discrete)}
+In this final experiment we repeat the same setting of Experiment 6 but using TVD instead of JS. The observed pattern is identical, with the already commented distances magnitude difference due to the different distance used here. 
 
 \section{Conclusions and Further Work}
 \label{sec:conclusions}
