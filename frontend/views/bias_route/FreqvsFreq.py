@@ -77,7 +77,7 @@ def freqvsfreq():
 
 @bp.route('/results', methods=['GET', 'POST'])
 def results_fvf():
-    bd=FreqVsFreqBiasDetector(distance=dict_vars['distance']
+    bd=FreqVsFreqBiasDetector(distance=dict_vars['distance'], A1=dict_vars['a1_param']
                               )
 
     results1 = bd.compare_root_variable_groups(
