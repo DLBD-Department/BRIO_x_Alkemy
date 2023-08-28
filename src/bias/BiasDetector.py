@@ -54,4 +54,35 @@ class BiasDetector:
         return freq_list, abs_freq_list
     
 
-    
+    def get_frequencies_list_from_probs(self,
+            dataframe,
+            target_variable,
+            root_variable,
+            root_variable_labels,
+            n_bins):
+        '''
+        This function builds a list of numpy arrays, 
+        each of them containing the distribution target_variable | root_variable. 
+        e.g. [ array(female_bin_0, female_bin_1... female_bin_n), array(male_bin_0, male_bin_1... male_bin_n) ] 
+
+        The lenght of the list is given by the number of categories of the root variable.
+        The shape of each array is given by the number of bins in which the probability target variable is split.
+        '''
+        #if len(target_variable_labels)!=2:
+        #    raise Exception("Distance using predicted event probabilities can only be computed for a binary target")
+        
+        freq_list = []
+        abs_freq_list = []
+        for label in root_variable_labels:
+            dataframe_subset = dataframe.loc[
+                dataframe[root_variable]==label
+            ]
+
+            abs_freq, _ = np.histogram(dataframe_subset[target_variable], bins=n_bins, range=(0,1), density=False) #force range to [0,1] since we deal with probabilities
+            freq = abs_freq/abs_freq.sum()
+
+            freq_list.append(freq)
+
+            abs_freq_list.append(abs_freq)
+
+        return freq_list, abs_freq_list    

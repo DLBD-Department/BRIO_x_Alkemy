@@ -7,15 +7,17 @@ import numpy as np
 
 class FreqVsFreqBiasDetector(BiasDetector):
 
-    def __init__(self, distance: str, aggregating_function=max, A1="high"):
+    def __init__(self, distance: str, aggregating_function=max, A1="high", target_variable_type='class'):
         '''
             distance: which distance will be used to compute the bias detection
             aggregating_function: function needed to aggregate distances for multi-class comparisons
             A1: sensitivity parameter used to computer the parametric threshold
+            target_variable_type: type of the tgt variable. 'class' or 'probability'
         '''
         self.dis = distance
         self.aggregating_function = aggregating_function
         self.A1 = A1
+        self.target_variable_type = target_variable_type
 
 
     def compute_distance_between_frequencies(self, 
@@ -25,7 +27,8 @@ class FreqVsFreqBiasDetector(BiasDetector):
             each of them containing the distribution target_variable | root_variable. 
             e.g. [ array(female_0, female_1), array(male_0, male_1) ]  
             The lenght of the list is given by the number of categories of the root variable.
-            The shape of each array is given by the number of labels of target_variable.
+            The shape of each array is given by the number of labels of target_variable (if self.target_variable_type=='class') 
+            or the number of bins (if self.target_variable_type=='probability').
             
         It works for any number of labels of the target variable and any number of classes for the root variable. 
         The final distance is given by self.aggregating_function. 
@@ -60,7 +63,8 @@ class FreqVsFreqBiasDetector(BiasDetector):
             dataframe,
             target_variable,
             root_variable,
-            threshold=None):
+            threshold=None,
+            n_bins=10):
         '''
         This function compares for the two groups given by
         the two categories of root_variable and check if 
@@ -69,27 +73,39 @@ class FreqVsFreqBiasDetector(BiasDetector):
 
         Args:
             dataframe: Pandas DataFrame with features and 
-                predicted labels
-            target_variable: variable with the predicted labels
+                predictions
+            target_variable: variable with the predictions (either prediction lables or probabilities, see self.target_variable_type)
             root_variable: variable that we use to compare the predicted
                 labels in two different groups of observation
             threshold: value from 0 to 1 used to check the computed distance with. If None, the tool will compute a parametric threshold. 
+            n_bins: number of bins used to split the predicted probability (only applies when self.target_variable_type='probability')
 
         Returns:
-            A tuple (distance, distance>=computed_threshold, computed_threshold, standard_deviation).
+            A tuple (distance, distance<=computed_threshold, computed_threshold, standard_deviation).
         '''
 
         root_variable_labels = dataframe[root_variable].unique()
         A2 = len(root_variable_labels)
-        target_variable_labels = dataframe[target_variable].unique()
 
-        freqs, abs_freqs = self.get_frequencies_list(
-                            dataframe,
-                            target_variable,
-                            target_variable_labels,
-                            root_variable,
-                            root_variable_labels) 
-        
+        if self.target_variable_type == 'class':
+            target_variable_labels = dataframe[target_variable].unique()
+            freqs, abs_freqs = self.get_frequencies_list(
+                                dataframe,
+                                target_variable,
+                                target_variable_labels,
+                                root_variable,
+                                root_variable_labels) 
+        elif self.target_variable_type == 'probability':
+            target_variable_labels = None
+            freqs, abs_freqs = self.get_frequencies_list_from_probs(
+                                dataframe,
+                                target_variable,
+                                root_variable,
+                                root_variable_labels,
+                                n_bins) 
+        else:
+            raise Exception("target_variable_type can only be 'class' or 'probability'")
+                    
         A3 = sum(sum(abs_freqs))
         computed_threshold = threshold_calculator(self.A1, A2, A3, default_threshold=threshold)
         distance, stds = self.compute_distance_between_frequencies(freqs)
@@ -102,7 +118,8 @@ class FreqVsFreqBiasDetector(BiasDetector):
             root_variable,
             conditioning_variables,
             threshold=None,
-            min_obs_per_group=30):
+            min_obs_per_group=30,
+            n_bins=10):
         '''
         This functions compares the distance between the two categories of root_variable as observed in the two
         partitions of dataframe, partitions provided by the target_variable, conditioning it
@@ -121,6 +138,7 @@ class FreqVsFreqBiasDetector(BiasDetector):
                 different in the two groups of root_variable.
             threshold: value from 0 to 1 used to check the computed distance with. If None, the tool will compute a parametric threshold. 
             min_obs_per_group: the minimum number of observations needed for the distance computation
+            n_bins: number of bins used to split the predicted probability (only applies when self.target_variable_type='probability')
 
         Returns:
             A dictionary {group_condition: (numb_obs_of_group, distance, distance>=computed_threshold, computed_threshold, standard_deviation)}
@@ -130,8 +148,14 @@ class FreqVsFreqBiasDetector(BiasDetector):
         # in order to avoid disappearing labels due to small groups
         # with only one observed category.
         root_variable_labels = dataframe[root_variable].unique()
-        target_variable_labels = dataframe[target_variable].unique()
 
+        if self.target_variable_type == 'class':
+            target_variable_labels = dataframe[target_variable].unique()
+        elif self.target_variable_type == 'probability':
+            target_variable_labels = None
+        else:
+            raise Exception("target_variable_type can only be 'class' or 'probability'")
+        
         # Second parameter for threshold calculator
         A2 = len(root_variable_labels)
 
@@ -154,15 +178,27 @@ class FreqVsFreqBiasDetector(BiasDetector):
                 num_of_obs = dataframe_subset.shape[0]
 
                 if num_of_obs >= min_obs_per_group:
-                    conditioned_frequencies[condition] = (
-                            num_of_obs, 
-                            self.get_frequencies_list(
-                                dataframe_subset,
-                                target_variable,
-                                target_variable_labels,
-                                root_variable,
-                                root_variable_labels)[0] #taking the relative freqs, the absolute freqs are not needed here
-                            )
+                    if self.target_variable_type == 'class':
+                        conditioned_frequencies[condition] = (
+                                num_of_obs, 
+                                self.get_frequencies_list(
+                                    dataframe_subset,
+                                    target_variable,
+                                    target_variable_labels,
+                                    root_variable,
+                                    root_variable_labels)[0] #taking the relative freqs, the absolute freqs are not needed here
+                                )
+                    elif self.target_variable_type == 'probability':
+                        conditioned_frequencies[condition] = (
+                                num_of_obs, 
+                                self.get_frequencies_list_from_probs(
+                                    dataframe_subset,
+                                    target_variable,
+                                    root_variable,
+                                    root_variable_labels,
+                                    n_bins)[0] #taking the relative freqs, the absolute freqs are not needed here
+                                )
+
                 else:
                     conditioned_frequencies[condition] = (num_of_obs, None)
             
