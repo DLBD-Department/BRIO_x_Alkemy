@@ -326,7 +326,4 @@ class TestBiasDetector(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-    #a=TestBiasDetector()
-    #a.setUp()
-    #a.test_compare_root_variable_groups_with_KL_and_ref_distribution()
 
