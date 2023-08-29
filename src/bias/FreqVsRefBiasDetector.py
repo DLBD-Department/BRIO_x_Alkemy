@@ -113,11 +113,11 @@ class FreqVsRefBiasDetector(BiasDetector):
             where n is the number of classes of root_variable
         '''
 
-        root_variable_labels = dataframe[root_variable].unique()
+        root_variable_labels = sorted(dataframe[root_variable].unique())
         A2 = len(root_variable_labels)
 
         if self.target_variable_type == 'class':
-            target_variable_labels = dataframe[target_variable].unique()
+            target_variable_labels = sorted(dataframe[target_variable].unique())
             freqs, abs_freqs = self.get_frequencies_list(
                                 dataframe,
                                 target_variable,
@@ -185,10 +185,10 @@ class FreqVsRefBiasDetector(BiasDetector):
         # this is computed once and passed each time for each group
         # in order to avoid disappearing labels due to small groups
         # with only one observed category.
-        root_variable_labels = dataframe[root_variable].unique()
+        root_variable_labels = sorted(dataframe[root_variable].unique())
 
         if self.target_variable_type == 'class':
-            target_variable_labels = dataframe[target_variable].unique()
+            target_variable_labels = sorted(dataframe[target_variable].unique())
         elif self.target_variable_type == 'probability':
             target_variable_labels = None
         else:
