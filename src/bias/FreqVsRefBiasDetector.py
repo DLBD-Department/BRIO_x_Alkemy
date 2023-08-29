@@ -8,11 +8,17 @@ import numpy as np
 #todo if kl <0 make it None and add a message analogous to 'not enough observations', es 'too many empty bins'
 class FreqVsRefBiasDetector(BiasDetector):
 
-    def __init__(self, normalization="D1", A1="high", target_variable_type='class'):
+    def __init__(self, normalization="D1", adjust_div=None, A1="high", target_variable_type='class'):
         '''
             distance: which distance will be used to compute the bias detection
             A1: sensitivity parameter used to computer the parametric threshold
             target_variable_type: type of the tgt variable. 'class' or 'probability'
+            adjust_kl: when a bin of the observed distribution is 0 the relative combination to KL is inf (ref*log(ref/0)), thus 
+                the resulting kl is inf (1 when normalized).
+                adjust_div=None: this default behaviour is kept.
+                adjust_div='zero': inf contributions are forced to zero (not suggested when you have many empty bins)
+                adjust_div='laplace': TBD (add 1 obs in the empy bin)
+
         '''
         self.A1 = A1
 
@@ -26,6 +32,7 @@ class FreqVsRefBiasDetector(BiasDetector):
         else:
             raise Exception("Only D0, D1 and D2 are supported as normalization methods.")
         
+        self.adjust_div = adjust_div
         self.target_variable_type = target_variable_type
 
 
@@ -56,17 +63,21 @@ class FreqVsRefBiasDetector(BiasDetector):
 
         divergences = []
         for ref, obs in zip(reference_distribution, observed_distribution):
-            #kl = entropy(pk=ref, qk=obs, base=2)
-            kl_elementwise = rel_entr(ref, obs)
-            #convert from base e to base 2
-            kl_elementwise /= np.log(2)
-            #exlude bins where kl is not defined (y=0 --> kl=np.inf)
-            num_empy_bins = len(kl_elementwise[kl_elementwise==np.inf])
-            if num_empy_bins>0:
-                print('Warning:', num_empy_bins, 'out of', len(kl_elementwise), 'bins of the observed distribution are empty. \
-Their relative contribution to KL was forced to 0')
-                kl_elementwise[kl_elementwise==np.inf]=0
-            kl = kl_elementwise.sum()
+            if self.adjust_div == None:
+                kl = entropy(pk=ref, qk=obs, base=2)
+            elif self.adjust_div == 'zero':
+                kl_elementwise = rel_entr(ref, obs)
+                #convert from base e to base 2
+                kl_elementwise /= np.log(2)
+                #exlude bins where kl is not defined (obs[i]=0 --> kl[i]=np.inf)
+                num_empy_bins = len(kl_elementwise[kl_elementwise==np.inf])
+                if num_empy_bins>0:
+                    print('Warning:', num_empy_bins, 'out of', len(kl_elementwise), 'bins of the observed distribution are empty. \
+    Their relative contribution to KL was forced to 0')
+                    kl_elementwise[kl_elementwise==np.inf]=0
+                kl = kl_elementwise.sum()
+            else:
+                raise Exception("Only 'no' and 'zero' are supported as divergence adjustment methods.")
             divergence = self.normalization_function(kl)
             divergences.append(divergence)
 
