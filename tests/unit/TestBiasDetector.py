@@ -227,7 +227,7 @@ class TestBiasDetector(unittest.TestCase):
         It uses a reference distribution for the bias detection. 
         '''
 
-        bd = FreqVsRefBiasDetector(normalization="D1", adjust_div=None, A1="high")
+        bd = FreqVsRefBiasDetector(normalization="D1", adjust_div='no', A1="high")
 
         results = bd.compare_root_variable_conditioned_groups(
             self.df_with_predictions,
@@ -251,7 +251,7 @@ class TestBiasDetector(unittest.TestCase):
         It uses a reference distribution for the bias detection. 
         '''
 
-        for adjust_div,result in zip([None, 'zero'], [16,12]):
+        for adjust_div,result in zip(['no', 'zero'], [16,12]):
             bd = FreqVsRefBiasDetector(normalization="D1", adjust_div=adjust_div, A1="high", target_variable_type='probability')
 
             results = bd.compare_root_variable_conditioned_groups(
@@ -300,7 +300,7 @@ class TestBiasDetector(unittest.TestCase):
         equal those computed using the predicted classes (for a binary classification problem)
         '''
                 
-        for adjust_div in [None, 'zero']:
+        for adjust_div in ['no', 'zero']:
             bd_class_freq = FreqVsRefBiasDetector(adjust_div=adjust_div, target_variable_type='class')
             results_class = bd_class_freq.compare_root_variable_groups(
                 dataframe=self.df_with_predictions,

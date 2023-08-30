@@ -8,14 +8,14 @@ import numpy as np
 #todo if kl <0 make it None and add a message analogous to 'not enough observations', es 'too many empty bins'
 class FreqVsRefBiasDetector(BiasDetector):
 
-    def __init__(self, normalization="D1", adjust_div=None, A1="high", target_variable_type='class'):
+    def __init__(self, normalization="D1", adjust_div="no", A1="high", target_variable_type='class'):
         '''
             distance: which distance will be used to compute the bias detection
             A1: sensitivity parameter used to computer the parametric threshold
             target_variable_type: type of the tgt variable. 'class' or 'probability'
             adjust_kl: when a bin of the observed distribution is 0 the relative combination to KL is inf (ref*log(ref/0)), thus 
                 the resulting kl is inf (1 when normalized).
-                adjust_div=None: this default behaviour is kept.
+                adjust_div='no': this default behaviour is kept.
                 adjust_div='zero': inf contributions are forced to zero (not suggested when you have many empty bins)
                 adjust_div='laplace': TBD (add 1 obs in the empy bin)
 
@@ -63,7 +63,7 @@ class FreqVsRefBiasDetector(BiasDetector):
 
         divergences = []
         for ref, obs in zip(reference_distribution, observed_distribution):
-            if self.adjust_div == None:
+            if self.adjust_div == 'no':
                 kl = entropy(pk=ref, qk=obs, base=2)
             elif self.adjust_div == 'zero':
                 kl_elementwise = rel_entr(ref, obs)
