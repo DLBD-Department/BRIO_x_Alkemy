@@ -30,7 +30,7 @@ Results
       {% for key, value in violations.items() %}
         {% if violations|length != 1 %}
           <div style="color: rgba(255, {{ 160*((loop.index - 1) / (violations|length - 1)) }}, 0, 1);">
-            <a href='/bias/freqvsfreq/results/{{ key }}'>{{ key }}</a> : {{ value }}<br>
+            <a href='/bias/freqvsref/results/{{ key }}'>{{ key }}</a> : {{ value }}<br>
           </div>
         {% endif %}
       {% endfor %} 

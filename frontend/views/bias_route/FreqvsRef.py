@@ -16,15 +16,16 @@ from sklearn.model_selection import train_test_split
 from src.bias.threshold_calculator import threshold_calculator
 from src.bias.BiasDetector import BiasDetector
 from src.bias.FreqVsFreqBiasDetector import FreqVsFreqBiasDetector
-from src.bias.FreqVsRefBiasDetector import FreqVsRefBiasDetector 
+from src.bias.FreqVsRefBiasDetector import FreqVsRefBiasDetector
 
 
-bp = Blueprint('FreqvsRef', __name__, template_folder="../../templates/bias", url_prefix="/freqvsref")
+bp = Blueprint('FreqvsRef', __name__,
+               template_folder="../../templates/bias", url_prefix="/freqvsref")
 
 dict_vars = {}
 agg_funcs = {
-	'min' : min,
-	'max' : max,
+    'min': min,
+    'max': max,
     'mean': mean,
     'stdev': stdev
 }
@@ -34,10 +35,12 @@ comp_thr = ""
 ips = check_output(['hostname', '-I'])
 localhost_ip = ips.decode().split(" ")[0]
 
+
 @bp.route('/', methods=['GET', 'POST'])
 def freqvsref():
     global comp_thr
-    list_of_files =  glob.glob(os.path.join(current_app.config['UPLOAD_FOLDER']) + "/*")
+    list_of_files = glob.glob(os.path.join(
+        current_app.config['UPLOAD_FOLDER']) + "/*")
     latest_file = max(list_of_files, key=os.path.getctime)
     extension = latest_file.rsplit('.', 1)[1].lower()
     match extension:
@@ -52,8 +55,8 @@ def freqvsref():
             if ('pr_selected' and 'rv_selected') in list(request.form.keys()):
                 rvar = request.form['rv_selected']
                 pvar = request.form['pr_selected']
-                return {'response_refs' : write_reference_distributions_html(rvar, pvar, dict_vars['df'])}
-            dict_vars['root_var']= request.form['root_var']
+                return {'response_refs': write_reference_distributions_html(rvar, pvar, dict_vars['df'])}
+            dict_vars['root_var'] = request.form['root_var']
             dict_vars['predictions'] = request.form['predictions']
             dict_vars['distance'] = request.form['distance']
             if float(request.form['Slider']) > 0:
@@ -65,7 +68,7 @@ def freqvsref():
                     if 'a1_param' in list(request.form.keys()):
                         dict_vars['a1_param'] = request.form['a1_param']
                         dict_vars['thr'] = None
-            dict_vars['cond_vars']= request.form.getlist('cond_var')
+            dict_vars['cond_vars'] = request.form.getlist('cond_var')
             nroot = len(dict_vars['df'][dict_vars['root_var']].unique())
             ntarget = len(dict_vars['df'][dict_vars['predictions']].unique())
             for i in range(nroot):
@@ -74,33 +77,36 @@ def freqvsref():
                     dict_vars[cat] = float(request.form[cat])
             flash('Parameters selected successfully!', 'success')
         return redirect('/bias/freqvsref')
-    return render_template('freqvsref.html', var_list=list_var, local_ip=localhost_ip) 
+    return render_template('freqvsref.html', var_list=list_var, local_ip=localhost_ip)
 
-@bp.route('/results', methods = ['GET', 'POST'])
+
+@bp.route('/results', methods=['GET', 'POST'])
 def results_fvr():
-    
-    bd=FreqVsRefBiasDetector(A1=dict_vars['a1_param'])
 
-    ref_distribution = handle_ref_distributions(dict_vars['root_var'], dict_vars['predictions'], dict_vars['df'], dict_vars)
+    bd = FreqVsRefBiasDetector(A1=dict_vars['a1_param'])
+
+    ref_distribution = handle_ref_distributions(
+        dict_vars['root_var'], dict_vars['predictions'], dict_vars['df'], dict_vars)
 
     results1 = bd.compare_root_variable_groups(
-		dataframe=dict_vars['df'],
-		target_variable=dict_vars['predictions'],
-		root_variable=dict_vars['root_var'],
+        dataframe=dict_vars['df'],
+        target_variable=dict_vars['predictions'],
+        root_variable=dict_vars['root_var'],
         reference_distribution=ref_distribution,
-		threshold=dict_vars['thr']
-	)
+        threshold=dict_vars['thr']
+    )
     results2 = bd.compare_root_variable_conditioned_groups(
-		dataframe=dict_vars['df'],
-		target_variable=dict_vars['predictions'],
-		root_variable=dict_vars['root_var'],
-		conditioning_variables=dict_vars['cond_vars'],
+        dataframe=dict_vars['df'],
+        target_variable=dict_vars['predictions'],
+        root_variable=dict_vars['root_var'],
+        conditioning_variables=dict_vars['cond_vars'],
         reference_distribution=ref_distribution,
-		threshold=dict_vars['thr'],
-		min_obs_per_group=30
-	)
-    
-    violations = {k: v for k, v in results2.items() if (not v[2][0] or not v[2][1])}
+        threshold=dict_vars['thr'],
+        min_obs_per_group=30
+    )
+
+    violations = {k: v for k, v in results2.items() if (
+        not v[2][0] or not v[2][1])}
     if request.method == "POST":
         x = request.json.get('export-data', False)
         csv_data = "condition;num_observations;distance;distance_gt_threshold;threshold\n"
@@ -113,14 +119,11 @@ def results_fvr():
         return jsonify({"csv_data": csv_data})
     return render_template('results_freqvsref.html', results1=results1, results2=results2, violations=order_violations(violations), local_ip=localhost_ip)
 
+
 @bp.route('/results/<violation>')
 def details_fvr(violation):
     focus_df = dict_vars['df'].query(violation)
-    bd_general=BiasDetector()
-    
-    results_viol1 = bd_general.get_frequencies_list(focus_df, 'predictions',
-                            dict_vars['df'][dict_vars['predictions']].unique(),
-                            dict_vars['root_var'],  dict_vars['df'][dict_vars['root_var']].unique()
-                            )
-    results_viol2 = focus_df.groupby(dict_vars['root_var'])[dict_vars['predictions']].value_counts(normalize=True)
-    return render_template('violation_specific_fvr.html', viol = violation, res2 = results_viol2.to_frame().to_html(classes=['table table-hover mx-auto w-75']))
+
+    results_viol2 = focus_df.groupby(dict_vars['root_var'])[
+        dict_vars['predictions']].value_counts(normalize=True)
+    return render_template('violation_specific_fvr.html', viol=violation, res2=results_viol2.to_frame().to_html(classes=['table table-hover mx-auto w-75']))

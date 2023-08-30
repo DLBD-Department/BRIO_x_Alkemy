@@ -148,7 +148,7 @@ The system presented is based on the theoretical, foundational works presented i
 
 Our tool takes as input an AI model's output and a set of user's selected parameter settings: the former is encoded as a set of datapoints with their associated features, the latter include the designation of a sensitive feature. The output is an evaluation of the possibility that the AI model under consideration is biased with respect to the features designated as sensitive by the user. The system closely guides the user in the process of setting the parameters and provides it with detailed explanations, remaining customisable with respect to the mathematical details of the analysis. The choices left to the user are those that actually make a conceptual difference in the outcome of the analysis and this difference is explained to the user during the setting of these parameters.
 
-The analyses conducted by our system are of two kids: 
+The analyses conducted by our system are of two kinds: 
 
 \begin{enumerate}
 	\item comparison between the behaviour of the AI system and a target desirable behaviour (expressed as "freqs-vs-ref" in the implementation), and
@@ -298,76 +298,93 @@ The method \texttt{compare\_root\_variable\_conditioned\_groups} performs the sa
 When the threshold is not provided by the user, the tool computes it using the \texttt{treshold\_calculator} function, which implements the algorithm described in Section \ref{threshold}.
 
 \subsection{Frontend}
-WORK IN PROGRESS
 
-Regarding the frontend implementation, the tool relies on the Flask framework. Flask is a web framework for building web applications in Python. It provides great flexibility and modularity with the \textit{routing} mechanism, allowing the user to select which URL should trigger which function. This makes it straightforward to create distinct endpoints for various parts of the application. Routes that respond to different HTTP methods (GET, POST, etc.) and render dynamic content can thus be easily created.
-The user can investigate and analyse bias behaviour in a given AI system by accessing the \textit{Bias} section of the frontend. They have the possibility to upload either an already preprocessed dataframe, or a raw dataset together with a customised preprocessing pipeline. (as it can be seen in fig.?) 
-Afterwards, the user can compare the behaviour of the AI system with an ideal behaviour (Frequence vs Frequence), or compare sensitive classes within the AI system itself (Frequence vs Reference).
-\subsubsection{Frequence vs Frequence}
-To perform this analysis, a set of parameters have to be chosen. Firstly, the divergence: the choice is between \textbf{Total variation distance} and \textbf{Jensen-Shannon divergence}. Then, the user has to select: 
+For the frontend implementation, the tool relies on Flask, a  framework for building web applications in Python. It provides great flexibility and modularity with the \textit{routing} mechanism, allowing the user to select which URL should trigger which python function. This makes it straightforward to create distinct endpoints for various parts of the application. Routes that respond to different HTTP methods (GET, POST, etc.) and render dynamic content can thus be easily created.
+
+The user can investigate and analyse bias behaviour in a given AI system by accessing the \textit{Bias} section of the frontend. They have the possibility to upload either an already preprocessed dataframe, or a raw dataset together with a customised preprocessing pipeline, see Figure \ref{fig:bias_upload}.
+
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=0.8\textwidth]{frontend_bias_upload.png}
+  \end{center}
+  \caption{Upload options for the bias detection tool}
+  \label{fig:bias_upload}
+\end{figure}
+
+
+Afterwards, the user can compare the behaviour of the AI system with an ideal behaviour (Frequence vs Frequence), or compare sensitive classes within the AI system itself (Frequence vs Reference), also shown in Figure \ref{fig:bias_upload}.
+
+\subsubsection{FreqVsFreq and FreqVsRef}
+To perform these analyses, a set of parameters have to be chosen. Firstly, the \textbf{distance}: the choice is between \textit{Total Variation Distance} and \textit{Jensen-Shannon Divergence} for \textbf{FreqVsFreq}, and \textit{Kullback-Leibner Divergence} is used for \textbf{FreqVsRef}. Then, the user has to select: 
+
 \begin{itemize}
-  \item the target feature,
-  \item the sensitive feature,
-  \item the aggregating function (only when the sensitive feature partitions the domain in three or more classes),
-  \item the threshold (can also be automatically computed),
-  \item additional conditioning features, which further split the domain into subclasses
+  \item the target feature;
+  \item the sensitive feature;
+  \item \textit{FreqVsFreq exclusive}: the aggregating function (only when the sensitive feature partitions the domain in three or more classes);
+  \item the threshold (this can also be automatically computed, see Section \ref{threshold});
+  \item additional conditioning features, which further split the domain into subclasses;
+  \item \textit{FreqVsRef exclusive}: the reference distributions, which will depend on the target and the sensitive features. 
 \end{itemize}
-Lastly, the tool shows the result of the analysis, giving information about the overall result +++++++FINISH THIS PART+++++++ 
 
-\subsubsection{Frequence vs Reference}
-TODO
+\subsubsection{Results}
+Eventually, the tool shows the analysis results, providing insights about whether the AI system under investigations presents behaviour that might be interpreted as bias with respect to the sensitive feature. This is implemented in a boolean variable, which is \textbf{\textcolor{red}{False}} when bias is present and \textbf{\textcolor{green}{True}} otherwise, as it is shown in Figure \ref{fig:results}.
 
-TODO:
-\begin{itemize}
-  \item menzionare il framework utilizzato per lo sviluppo e perché lo abbiamo scelto
-  \item descrivere UX (flusso operazioni), valutare se ha senso mettere degli screenshots
-\end{itemize}
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=0.8\textwidth]{frontend_results_page.png}
+  \end{center}
+  \caption{Results page displaying comprehensive results from all subclasses (top), subclass-specific violations (bottom left), subclass-specific results (bottom right)}
+  \label{fig:results}
+\end{figure}
+
+If bias behavior is detected, additional information at the subclass level (if applicable) are also presented, ranked from most severe to less significant. Furthermore, results for each subclass are also displayed, with the possibility to export the data in a csv file for additional studies. 
 
 \section{Validation}
 \label{sec:validation}
 
-A set of experiments were performed to understand the behavior of the proposed approach on real data, in particular for the freqs-vs-freqs analysis. To simulate a realistic bias detection scenario, payment data from an important bank (a cash and credit card issuer) in Taiwan (published along the article \cite{YEH20092473}) were used. The targets were credit card holders of the bank. 
+A set of experiments were performed to understand the behavior of the proposed approach on real data, in particular for the freqs-vs-freqs analysis. To simulate a realistic bias detection scenario, payment data from a cash and credit card issuer in Taiwan published in \cite{YEH20092473} were used. The targets were credit card holders of the bank. 
 
-As first step, three machine learning models were trained to predict the default probability, using all the available features. The three models are:
+As first step, three machine learning models were trained to predict the default probability, using all the available features:
+
 \begin{itemize}
   \item "strong" model: a Random Forest with 200 trees and max depth equals to 12;
   \item "weak" model: a Random Forest with 10 trees and max depth equals to 37;
   \item "lame" model: a Classification Tree with max depth equals to 2.
 \end{itemize}
 
-Training and performance details of the three models are available on the GitHub repository \url{https://github.com/DLBD-Department/BRIO_x_Alkemy/notebooks}. The three models have different performance in terms of accuracy and errors distribution: the idea is to verify if and how our bias detection approach can deal with different models performances. 
+Training and performance details of the three models are available on the GitHub repository \url{https://github.com/DLBD-Department/BRIO_x_Alkemy/notebooks}. The three models show different performance in terms of accuracy and errors distribution: the aim is to verify if and how our bias detection tool deals with such different models performances. 
 
 \subsubsection{Experiment 1: freqs-vs-freqs, TVD, A1=low, root-variable=x2-sex}
 
 \begin{figure}[h!]
-  \includegraphics[width=.7\linewidth, left]{exp1.png}
+  \includegraphics[width=.8\linewidth, left]{exp1.png}
   \caption{Experiment 1 results.}
   \label{fig:exp1}
 \end{figure}
-Figure \ref{fig:exp1} shows the results of the first experiment. Using TVD and the parametric threshold, no bias is detected for the three models predictions, but it is noticeable the different distance magnitude obtained for the "lame" model, that is considerable smaller than the ones of the other two models. A simpler, more erroneous model is unable to produce a strongly skewed predictions distribution and so it tends to produce "less bias". The "strong" model obtains the biggest distance, suggesting that the more powerful a model is, the more likely is that it can exploit predictive signals, producing more skewed predictions distributions. 
+Figure \ref{fig:exp1} shows the results of the first experiment. Using TVD and the parametric threshold, no bias is detected for the three models predictions (see output \texttt{True} on all three models), but the different distance magnitude obtained for the "lame" model is noticeable ($0,0278$, rounding off at the fourth decimal digit), and considerably smaller than those of the other two models (respectively $0,0138$ for the strong model and $0,0158$ for the weak model). A simpler, more erroneous model is unable to produce a strongly skewed predictions distribution and so it tends to produce "less bias". The "strong" model obtains the largest distance, suggesting that the more powerful a model is, the more likely it is to exploit predictive signals, producing more skewed predictions distributions. 
 
 \subsubsection{Experiment 2: freqs-vs-freqs, TVD, A1=low, root-variable=x3-education}
 
 \begin{figure}[h!]
-  \includegraphics[width=.7\linewidth, left]{exp2.png}
+  \includegraphics[width=.8\linewidth, left]{exp2.png}
   \caption{Experiment 2 results.}
   \label{fig:exp2}
 \end{figure}
-Figure \ref{fig:exp2} shows the results of the second experiment. With this experiment we tried to understand the bias detector behavior when dealing with multi-class sensitive features, in this case Education. A potential bias is detected for each model, but it is questionable if using Education as sensitive feature makes sense in this setting and with these data. It is more interesting observing that the distances are almost the same for the three models, fact that suggests the each model is exploiting in some way the predictive signal offered by Education. The standard deviations of the class-vs-class distances (the last values of the output tuples) are also of the same magnitude order.
+Figure \ref{fig:exp2} shows the results of the second experiment. With this experiment we tried to understand the behavior of the bias detector when dealing with multi-class sensitive features, in this case \texttt{Education}. A potential bias is detected for each model (see output \texttt{False} on all three models), but it is questionable whether using \texttt{Education} as a sensitive feature makes sense in this setting, and with these data. It is more interesting observing that the distances are almost the same for the three models, suggesting that each model is exploiting in some way the predictive signal offered by the feature \texttt{Education}. The standard deviations of the class-vs-class distances (the last values of the output tuples) are also of the same magnitude order.
 
 \subsubsection{Experiment 3: freqs-vs-freqs, JS, A1=low, root-variable=x2-sex}
 
 \begin{figure}[h!]
-  \includegraphics[width=.7\linewidth, left]{exp3.png}
+  \includegraphics[width=.8\linewidth, left]{exp3.png}
   \caption{Experiment 3 results.}
   \label{fig:exp3}
 \end{figure}
-Figure \ref{fig:exp3} shows the results of the third experiment. Now we are interested in trying out the other distance, the JS divergence, that is provided by the tool for the freqs-vs-freqs analysis. As expected, the distances are of a smaller order of magnitude. Apart from this numerical outcome, the pattern is the same observed for Experiment 1. 
+Figure \ref{fig:exp3} shows the results of the third experiment. Now we are interested in trying out the other distance, the JS divergence, provided by the tool for the freqs-vs-freqs analysis. As expected, the distances are of a smaller order of magnitude. Apart from this numerical outcome, the pattern is the same observed for Experiment 1. 
 
 \subsubsection{Experiment 4: freqs-vs-freqs, JS, A1=low, root-variable=v3-education}
 
 \begin{figure}[h!]
-  \includegraphics[width=.7\linewidth, left]{exp4.png}
+  \includegraphics[width=.8\linewidth, left]{exp4.png}
   \caption{Experiment 4 results.}
   \label{fig:exp4}
 \end{figure}
@@ -376,16 +393,16 @@ Figure \ref{fig:exp4} shows the results of the fourth experiment. As with Experi
 \subsubsection{Experiment 5: freqs-vs-freqs, JS, A1=low, root-variable=x6-pay-0 (discrete)}
 
 \begin{figure}[h!]
-  \includegraphics[width=.7\linewidth, left]{exp5.png}
+  \includegraphics[width=.8\linewidth, left]{exp5.png}
   \caption{Experiment 5 results.}
   \label{fig:exp5}
 \end{figure}
-Figure \ref{fig:exp5} shows the results of the fifth experiment. Keeping JS as distance of choice, we wanted to verify what happens if the sensitive feature is also the single most important feature for the classifiers. In this case, we identified x6-pay-0 that is a categorical feature which is providing the strongest predictive signal. Clearly, being strongly effective in discriminating between true 0 and 1 labels, it produces way bigger distances than the one observed in the previous experiments. As commented for Education, we imagine that it wouldn't make sense to consider such a feature a sensitive one. Finally, large standard deviation values are observed, suggesting that some feature categories are more effective and important for the classifiers than others. 
+Figure \ref{fig:exp5} shows the results of the fifth experiment. Keeping JS as distance of choice, we wanted to verify what happens if the sensitive feature is also the single most important feature for the classifiers. In this case, we identified \texttt{x6-pay-0}, namely a categorical feature providing the strongest predictive signal. Clearly, being strongly effective in discriminating between true $0$ and $1$ labels, it produces way bigger distances than those observed in the previous experiments. As commented for \texttt{Education}, we imagine that it would not make sense to consider such a feature a sensitive one. Finally, large standard deviation values are observed, suggesting that some feature categories are more effective and important for the classifiers than others. 
 
 \subsubsection{Experiment 6: freqs-vs-freqs, JS, A1=low, root-variable=x2-sex, conditioning-variable=x6-pay-0 (discrete)}
-For brevity we don't include the numerical outcome of this and the next experiment. The reader can refer to the notebook provided with the online repository (INCLUDE REFERENCE). We are now interested in testing the bias detector using a "conditioning variable", that is using a further dataset feature to compute the distances w.r.t. the sensitive feature for each subset of observations realized by the different conditioning variable categories. In this experiment we do this using the JS Divergence. 
+For brevity we don't include the numerical outcome of this and the next experiment. The reader can refer to the notebook provided with the online repository (\url{https://github.com/DLBD-Department/BRIO_x_Alkemy/notebooks}). We are now interested in testing the bias detector using a "conditioning variable", i.e. using a further dataset feature to compute the distances with respect to the sensitive feature for each subset of observations realized by the different conditioning variable categories. As conditioning variable we use \texttt{x6-pay-0}, the same feature we used in Experiment 5 as sensitive feature. It seems reasonable to ask whether, given the groups implied by a strong predictor, different bias profiles emerge. The aim is to find potential biases that are balanced out when the check is performed on the overall population, but which emerge when focusing on specific subgroups of individuals. In this experiment we use the JS Divergence. 
 
-It seems clear that the computed distances can vary a lot for different conditioning variable groups. This behavior is stronger when the model is particularly accurate in its predictions, see e.g. "strong" model results. On the other hand, the "lame" model produces distances equal to zero for each subgroup, given that it's not able to use the conditioning variable to discriminate between observations. 
+It seems clear that the computed distances can vary a lot for the different conditioning variable groups, justifying our interest in this kind of check. This behavior is stronger when the model is particularly accurate in its predictions, e.g. for the "strong" model results. On the other hand, the "lame" model produces distances equal to zero for each subgroup, given that it's not able to use \texttt{x6-pay-0} to discriminate between observations. 
 
 \subsubsection{Experiment 7: freqs-vs-freqs, TVD, A1=low, root-variable=x2-sex, conditioning-variable=x6-pay-0 (discrete)}
 In this final experiment we repeat the same setting of Experiment 6 but using TVD instead of JS. The observed pattern is identical, with the already commented distances magnitude difference due to the different distance used here. 
