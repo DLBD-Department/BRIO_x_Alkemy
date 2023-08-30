@@ -16,8 +16,9 @@ class FreqVsRefBiasDetector(BiasDetector):
             adjust_kl: when a bin of the observed distribution is 0 the relative combination to KL is inf (ref*log(ref/0)), thus 
                 the resulting kl is inf (1 when normalized).
                 adjust_div='no': this default behaviour is kept.
-                adjust_div='zero': inf contributions are forced to zero (not suggested when you have many empty bins)
-                adjust_div='laplace': TBD (add 1 obs in the empy bin)
+                adjust_div='zero': if present, inf contributions are forced to zero (not suggested when you have many empty bins)
+                adjust_div='laplace': implement add-1 Laplace smoothing (add 1 to each bin and recompute frequencies)
+                    only if 0 bins are present in the observed distribution
 
         '''
         self.A1 = A1
@@ -38,7 +39,8 @@ class FreqVsRefBiasDetector(BiasDetector):
 
     def compute_distance_from_reference(self, 
             observed_distribution,
-            reference_distribution):
+            reference_distribution,
+            n_obs):
         '''
         This function computes a normalized version of the KL divergence between reference distribution
         and observed distribution. 
@@ -56,15 +58,28 @@ class FreqVsRefBiasDetector(BiasDetector):
                 The lenght of the list is given by the number of categories of the root variable.
                 The shape of each array is given by the number of labels of target_variable (if self.target_variable_type=='class') 
                 or the number of bins (if self.target_variable_type=='probability').
+            n_obs: list of ints,
+                total number of observations of the subgroups from which the distributions of observed_distribution was calculated
+                e.g. [num_obs_female, num_obs_male]
 
         Returns:
             divergences: list of n divergences, where n is the number of classes of the root variable
         '''
 
         divergences = []
-        for ref, obs in zip(reference_distribution, observed_distribution):
+        for ref, obs, n in zip(reference_distribution, observed_distribution, n_obs):
             if self.adjust_div == 'no':
                 kl = entropy(pk=ref, qk=obs, base=2)
+            elif self.adjust_div == 'laplace':
+                if len(obs[obs==0])==0:
+                    kl = entropy(pk=ref, qk=obs, base=2)
+                else:
+                    # add 1 observation to each bin and recompute relative freqs on the modified array. 
+                    # Since the starting point is the array of relative freqs and not that of absolut freqs,
+                    # a bit of algebra is needed to get the desired result
+                    n_corr = n + len(obs)
+                    obs = np.where(obs==0, 1/n_corr, (obs*n+1)/n_corr)
+                    kl = entropy(pk=ref, qk=obs, base=2)
             elif self.adjust_div == 'zero':
                 kl_elementwise = rel_entr(ref, obs)
                 #convert from base e to base 2
@@ -77,7 +92,7 @@ class FreqVsRefBiasDetector(BiasDetector):
                     kl_elementwise[kl_elementwise==np.inf]=0
                 kl = kl_elementwise.sum()
             else:
-                raise Exception("Only 'no' and 'zero' are supported as divergence adjustment methods.")
+                raise Exception("Only 'no','zero' and 'laplace' are supported as divergence adjustment methods.")
             divergence = self.normalization_function(kl)
             divergences.append(divergence)
 
@@ -100,7 +115,7 @@ class FreqVsRefBiasDetector(BiasDetector):
             dataframe: Pandas DataFrame with features and 
                 predictions
             target_variable: variable with the predictions (either prediction lables or probabilities, see self.target_variable_type)
-            root_variable: ...
+            root_variable: variable used to split the data in n groups. For each group, the target distribution is computed
             threshold: value from 0 to 1 used to check the computed distance with. If None, the tool will compute a parametric threshold. 
             n_bins: number of bins used to split the predicted probability (only applies when self.target_variable_type='probability')
 
@@ -137,7 +152,7 @@ class FreqVsRefBiasDetector(BiasDetector):
         
         A3 = sum(sum(abs_freqs))
         computed_threshold = threshold_calculator(self.A1, A2, A3, default_threshold=threshold)
-        distance = self.compute_distance_from_reference(freqs, reference_distribution)
+        distance = self.compute_distance_from_reference(freqs, reference_distribution, [sum(x) for x in abs_freqs])
         return (distance, [d<=computed_threshold for d in distance], computed_threshold)
 
 
@@ -159,7 +174,7 @@ class FreqVsRefBiasDetector(BiasDetector):
             dataframe: Pandas DataFrame with features and 
                 predicted labels
             target_variable: variable with the predicted labels
-            root_variable: ...
+            root_variable: variable used to split the data in n groups. For each group, the target distribution is computed
             conditioning_variables: list of strings names of the variables that we use 
                 to create groups within the population. 
                 Starting from the first variable, a tree of conditions is created;
@@ -217,24 +232,28 @@ class FreqVsRefBiasDetector(BiasDetector):
 
                 if num_of_obs >= min_obs_per_group:
                     if self.target_variable_type == 'class':
+                        freqs, abs_freqs = self.get_frequencies_list(
+                                            dataframe_subset,
+                                            target_variable,
+                                            target_variable_labels,
+                                            root_variable,
+                                            root_variable_labels)
                         conditioned_frequencies[condition] = (
                                 num_of_obs, 
-                                self.get_frequencies_list(
-                                    dataframe_subset,
-                                    target_variable,
-                                    target_variable_labels,
-                                    root_variable,
-                                    root_variable_labels)[0] #taking the relative freqs, the absolute freqs are not needed here
+                                freqs,
+                                [sum(x) for x in abs_freqs]
                                 )
                     elif self.target_variable_type == 'probability':
+                        freqs, abs_freqs = self.get_frequencies_list_from_probs(
+                                            dataframe_subset,
+                                            target_variable,
+                                            root_variable,
+                                            root_variable_labels,
+                                            n_bins)
                         conditioned_frequencies[condition] = (
                                 num_of_obs, 
-                                self.get_frequencies_list_from_probs(
-                                    dataframe_subset,
-                                    target_variable,
-                                    root_variable,
-                                    root_variable_labels,
-                                    n_bins)[0] #taking the relative freqs, the absolute freqs are not needed here
+                                freqs,
+                                [sum(x) for x in abs_freqs]
                                 )
 
                 else:
@@ -244,7 +263,9 @@ class FreqVsRefBiasDetector(BiasDetector):
                 group: (
                     (
                         obs_and_freqs[0], 
-                        self.compute_distance_from_reference(obs_and_freqs[1], reference_distribution)
+                        self.compute_distance_from_reference(observed_distribution=obs_and_freqs[1], 
+                                                             reference_distribution=reference_distribution, 
+                                                             n_obs=obs_and_freqs[2])
                     ) if obs_and_freqs[1] is not None else (obs_and_freqs[0], None)
                 ) for group, obs_and_freqs in conditioned_frequencies.items()
             }

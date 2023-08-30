@@ -94,7 +94,7 @@ class TestBiasDetector(unittest.TestCase):
         Test the compare_root_variable_groups method against a 
         known data set and model when the target variable is a probability
         '''
-        for dist, result in zip(["TVD","JS"], [0.05588711, 0.005517027]):
+        for dist, res in zip(["TVD","JS"], [0.05588711, 0.005517027]):
             bd = FreqVsFreqBiasDetector(distance=dist, aggregating_function=max, A1="high", target_variable_type='probability')
 
             results = bd.compare_root_variable_groups(
@@ -104,7 +104,7 @@ class TestBiasDetector(unittest.TestCase):
                         threshold=0.1,
                         n_bins=10)
             with self.subTest():
-                self.assertAlmostEqual(results[0], result, delta=1e-8)
+                self.assertAlmostEqual(results[0], res, delta=1e-8)
 
 
     def test_compare_root_variable_groups_with_KL_and_ref_distribution(self):
@@ -251,7 +251,7 @@ class TestBiasDetector(unittest.TestCase):
         It uses a reference distribution for the bias detection. 
         '''
 
-        for adjust_div,result in zip(['no', 'zero'], [16,12]):
+        for adjust_div,res in zip(['no', 'zero'], [16,12,16]):
             bd = FreqVsRefBiasDetector(normalization="D1", adjust_div=adjust_div, A1="high", target_variable_type='probability')
 
             results = bd.compare_root_variable_conditioned_groups(
@@ -266,7 +266,7 @@ class TestBiasDetector(unittest.TestCase):
 
             violations = {k: v for k, v in results.items() if (not v[2][0] or not v[2][1])}
             with self.subTest():
-                self.assertEqual(len(violations), result)
+                self.assertEqual(len(violations), res)
 
 
     def test_compare_freqvsfreq_distances_from_proba_and_distances_from_classes(self):
@@ -300,7 +300,7 @@ class TestBiasDetector(unittest.TestCase):
         equal those computed using the predicted classes (for a binary classification problem)
         '''
                 
-        for adjust_div in ['no', 'zero']:
+        for adjust_div in ['no', 'zero', 'laplace']:
             bd_class_freq = FreqVsRefBiasDetector(adjust_div=adjust_div, target_variable_type='class')
             results_class = bd_class_freq.compare_root_variable_groups(
                 dataframe=self.df_with_predictions,
@@ -322,6 +322,23 @@ class TestBiasDetector(unittest.TestCase):
             with self.subTest():
                 self.assertEqual(results_class, results_prob)
 
+    def test_compute_distance_from_reference_kl_div_(self):
+        '''
+        test that kl div and relative corrections gives the expected results on known distributions
+        '''
+        ref = [np.array([0.5,0.3,0.2])]*2
+        obs = [np.array([0.5,0.5,0]), np.array([0.5,0.4,0.1])]
+        n_obs = [400, 500]
+        for adjust_div, res in zip(['no','zero','laplace'], [1,-0.283844843, 0.511794884]):
+            bd = FreqVsRefBiasDetector(normalization="D1", adjust_div=adjust_div)
+            result = bd.compute_distance_from_reference(
+                reference_distribution=ref,
+                observed_distribution=obs,
+                n_obs=n_obs)
+            with self.subTest():
+                self.assertAlmostEqual(result[1], 0.070190181, delta=1e-8) # if no bins are empty, corrections shouldn't have effect: always same result
+            with self.subTest():
+                self.assertAlmostEqual(result[0], res, delta=1e-8)
 
 
 if __name__ == '__main__':
