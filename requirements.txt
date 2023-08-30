@@ -6,3 +6,4 @@ scikit_learn==1.2.1
 scikit_plot==0.3.7
 xgboost==1.7.1
 Flask==2.2.3
+Flask-Cors==4.0.0
