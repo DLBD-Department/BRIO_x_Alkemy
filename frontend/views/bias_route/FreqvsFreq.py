@@ -1,22 +1,13 @@
-from flask import Flask, render_template, request, redirect, flash, url_for, session, Response, jsonify, Blueprint, current_app
+from flask import Flask, render_template, request, redirect, flash, jsonify, Blueprint, current_app
 import pickle
 import pandas as pd
-import numpy as np
 import glob
 import os
 from subprocess import check_output
-import sys
-import subprocess
 from statistics import mean, stdev
 
-from src.utils.funcs import handle_multiupload, write_reference_distributions_html, handle_ref_distributions, allowed_file, order_violations
-from src.utils.Preprocessing import Preprocessing
-
-from sklearn.model_selection import train_test_split
-from src.bias.threshold_calculator import threshold_calculator
-from src.bias.BiasDetector import BiasDetector
+from src.utils.funcs import order_violations
 from src.bias.FreqVsFreqBiasDetector import FreqVsFreqBiasDetector
-from src.bias.FreqVsRefBiasDetector import FreqVsRefBiasDetector
 
 
 bp = Blueprint('FreqvsFreq', __name__,
@@ -58,6 +49,9 @@ def freqvsfreq():
                 if len(dict_vars['df'][rvar].unique()) < 3:
                     return {'response': 'True'}
                 return {'response': 'False'}
+            dict_vars['target_type'] = request.form['target_type']
+            if 'nbins' in list(request.form.keys()):
+                dict_vars['nbins'] = int(request.form['nbins'])
             dict_vars['root_var'] = request.form['root_var']
             dict_vars['distance'] = request.form['distance']
             dict_vars['predictions'] = request.form['predictions']
@@ -82,28 +76,48 @@ def freqvsfreq():
 @bp.route('/results', methods=['GET', 'POST'])
 def results_fvf():
 
-    bd = FreqVsFreqBiasDetector(distance=dict_vars['distance'], A1=dict_vars['a1_param']
-                                )
-
-
-    results1 = bd.compare_root_variable_groups(
-        dataframe=dict_vars['df'],
-        target_variable=dict_vars['predictions'],
-        root_variable=dict_vars['root_var'],
-        threshold=dict_vars['thr']
+    bd = FreqVsFreqBiasDetector(
+        distance=dict_vars['distance'],
+        A1=dict_vars['a1_param'],
+        target_variable_type=dict_vars['target_type']
     )
-    results2 = bd.compare_root_variable_conditioned_groups(
-        dataframe=dict_vars['df'],
-        target_variable=dict_vars['predictions'],
-        root_variable=dict_vars['root_var'],
-        conditioning_variables=dict_vars['cond_vars'],
-        threshold=dict_vars['thr'],
-        min_obs_per_group=30
-    )
+
+    if dict_vars['target_type'] == 'probability':
+        results1 = bd.compare_root_variable_groups(
+            dataframe=dict_vars['df'],
+            target_variable=dict_vars['predictions'],
+            root_variable=dict_vars['root_var'],
+            threshold=dict_vars['thr'],
+            n_bins=dict_vars['nbins']
+        )
+        results2 = bd.compare_root_variable_conditioned_groups(
+            dataframe=dict_vars['df'],
+            target_variable=dict_vars['predictions'],
+            root_variable=dict_vars['root_var'],
+            conditioning_variables=dict_vars['cond_vars'],
+            threshold=dict_vars['thr'],
+            min_obs_per_group=30,
+            n_bins=dict_vars['nbins']
+        )
+    else:
+        results1 = bd.compare_root_variable_groups(
+            dataframe=dict_vars['df'],
+            target_variable=dict_vars['predictions'],
+            root_variable=dict_vars['root_var'],
+            threshold=dict_vars['thr']
+        )
+        results2 = bd.compare_root_variable_conditioned_groups(
+            dataframe=dict_vars['df'],
+            target_variable=dict_vars['predictions'],
+            root_variable=dict_vars['root_var'],
+            conditioning_variables=dict_vars['cond_vars'],
+            threshold=dict_vars['thr'],
+            min_obs_per_group=30
+        )
+
     violations = {k: v for k, v in results2.items() if not v[2]}
 
     if request.method == "POST":
-        x = request.json.get('export-data', False)
         csv_data = "condition,num_observations,distance,distance_gt_threshold,threshold,standard_deviation\n"
         for key in list(results2.keys()):
             if len(results2[key]) == 3:

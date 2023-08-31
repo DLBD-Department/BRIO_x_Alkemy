@@ -1,21 +1,12 @@
-from flask import Flask, render_template, request, redirect, flash, url_for, session, Response, jsonify, Blueprint, current_app
+from flask import Flask, render_template, request, redirect, flash, jsonify, Blueprint, current_app
 import pickle
 import pandas as pd
-import numpy as np
 import glob
 import os
 from subprocess import check_output
-import sys
-import subprocess
 from statistics import mean, stdev
 
-from src.utils.funcs import handle_multiupload, write_reference_distributions_html, handle_ref_distributions, allowed_file, order_violations
-from src.utils.Preprocessing import Preprocessing
-
-from sklearn.model_selection import train_test_split
-from src.bias.threshold_calculator import threshold_calculator
-from src.bias.BiasDetector import BiasDetector
-from src.bias.FreqVsFreqBiasDetector import FreqVsFreqBiasDetector
+from src.utils.funcs import write_reference_distributions_html, handle_ref_distributions, order_violations
 from src.bias.FreqVsRefBiasDetector import FreqVsRefBiasDetector
 
 
