@@ -151,9 +151,9 @@ Our tool takes as input an AI model's output and a set of user's selected parame
 The analyses conducted by our system are of two kinds: 
 
 \begin{enumerate}
-	\item comparison between the behaviour of the AI system and a target desirable behaviour (expressed as "freqs-vs-ref" in the implementation), and
+	\item comparison between the behaviour of the AI system and a target desirable behaviour (expressed as "freq-vs-ref" in the implementation), and
 	
-	\item comparison between the behaviour of the AI system with respect to a sensitive class $c_1\in F$ and the behaviour of the AI system with respect to another sensitive class $c_2\in F$ related to the same sensitive feature $F$ (expressed as "freqs-vs-freq" in the implementation).
+	\item comparison between the behaviour of the AI system with respect to a sensitive class $c_1\in F$ and the behaviour of the AI system with respect to another sensitive class $c_2\in F$ related to the same sensitive feature $F$ (expressed as "freq-vs-freq" in the implementation).
 \end{enumerate}
 
 Whenever the second behaviour alerts of a possibly biased behaviour, a subsequent check follow on some (or all) of the subclasses of the considered sensitive classes. This second check is meant to tell us if the bias encountered at the level of the classes can be explained away by other features of the individuals in the sensitive classes considered that are not related to the sensitive feature at hand.
@@ -165,7 +165,7 @@ Consider a database containing details of individuals, with their age, gender, a
 \end{example}
  
 \subsection{Divergences}
-The comparisons above are computed on probability distributions, each taken to express the behaviour of a stochastic system. In order to compute the difference between the behaviour of the AI system under investigation -- denoted by the probability distribution $Q$ -- and a fixed behaviour $P$ (either the optimal behaviour, when available, or the behaviour with respect to a different class) various divergences might be considered. Depending on the analysis one wishes to conduct, one or more divergences are made available in the tool. Notice that all divergences are made to take values in $[0,1]$ in order to be compared with the threshold described in \Cref{threshold}.
+The comparisons above are computed on probability distributions, each taken to express the behaviour of a stochastic system. In order to compute the difference between the behaviour of the AI system under investigation -- denoted by the probability distribution $Q$ -- and a fixed behaviour $P$ (either the optimal behaviour, when available, or the behaviour with respect to a different class) various means of comparison might be considered. Depending on the analysis one wishes to conduct, one or more divergences or distances are made available in the tool. Notice that all divergences and distances are made to take values in $[0,1]$ in order to be compared with the threshold described in \Cref{threshold}.
 
 
 \paragraph{Kullback-Leibner divergence}
@@ -199,6 +199,8 @@ which computes the largest difference between the probability of obtaining an ou
 %In order to normalise the values of the different divergences that we use in the system and be able to select common, reasonable thresholds for all of them, we project the values of $D_{\mathrm{KL}}$ onto the interval $[0,1]$. The divergence $D_{\mathrm{KL}}(P\parallel Q)$ is thus replaced by
 %
 %\[1-\exp (- D_{\mathrm{KL}}(P\parallel Q))\]where the $\exp(x)$ function is defined as $e^x$. 
+
+The theory provides a perhaps clearer description of total variation, and relates it with Jensen-Shannon as follows.
 
 \begin{theorem*}[{\cite[Prop. 4.2]{levin2017markov}},{\cite[Thm. 3]{lin_divergence}}]
 Let $P$ and $Q$ probability distributions over $X$. Then we have the following:
