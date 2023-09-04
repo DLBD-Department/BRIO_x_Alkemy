@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Blueprint
+from flask import Flask, render_template
 from flask_cors import CORS
 import os
 from frontend.views import bias, opacity
@@ -19,3 +19,7 @@ app.register_blueprint(opacity.bp)
 @app.route('/', methods=['GET'])
 def home():
     return render_template('homepage.html')
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
