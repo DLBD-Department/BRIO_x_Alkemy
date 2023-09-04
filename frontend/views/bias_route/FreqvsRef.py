@@ -1,14 +1,16 @@
-from flask import Flask, render_template, request, redirect, flash, jsonify, Blueprint, current_app
-import pickle
-import pandas as pd
 import glob
 import os
-from subprocess import check_output
+import pickle
 from statistics import mean, stdev
+from subprocess import check_output
 
-from src.utils.funcs import write_reference_distributions_html, handle_ref_distributions, order_violations
+import pandas as pd
+from flask import (Blueprint, Flask, current_app, flash, jsonify, redirect,
+                   render_template, request)
+
 from src.bias.FreqVsRefBiasDetector import FreqVsRefBiasDetector
-
+from src.utils.funcs import (handle_ref_distributions, order_violations,
+                             write_reference_distributions_html)
 
 bp = Blueprint('FreqvsRef', __name__,
                template_folder="../../templates/bias", url_prefix="/freqvsref")
@@ -25,6 +27,8 @@ used_df = ""
 comp_thr = ""
 ips = check_output(['hostname', '-I'])
 localhost_ip = ips.decode().split(" ")[0]
+if os.system("test -f /.dockerenv") == 0:
+    localhost_ip = os.environ['HOST_IP']
 
 
 @bp.route('/', methods=['GET', 'POST'])

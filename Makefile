@@ -2,6 +2,7 @@ IMAGE_NAME="brio_frontend"
 VERSION=1.0
 CONTAINER_NAME="brio"
 
+
 .PHONY: help build test shell stop
 
 help:
@@ -20,6 +21,7 @@ build:
 frontend: build
 	@docker run -dp 5000:5000 \
 		--name ${CONTAINER_NAME} \
+		--env HOST_IP=$(shell hostname -I | cut -d " " -f1) \
 		${IMAGE_NAME}
 
 shell: 
