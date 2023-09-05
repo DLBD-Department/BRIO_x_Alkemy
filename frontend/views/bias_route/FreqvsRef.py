@@ -1,21 +1,12 @@
-from flask import Flask, render_template, request, redirect, flash, url_for, session, Response, jsonify, Blueprint, current_app
+from flask import Flask, render_template, request, redirect, flash, url_for, jsonify, Blueprint, current_app
 import pickle
 import pandas as pd
-import numpy as np
 import glob
 import os
 from subprocess import check_output
-import sys
-import subprocess
 from statistics import mean, stdev
 
-from src.utils.funcs import handle_multiupload, write_reference_distributions_html, handle_ref_distributions, allowed_file, order_violations
-from src.utils.Preprocessing import Preprocessing
-
-from sklearn.model_selection import train_test_split
-from src.bias.threshold_calculator import threshold_calculator
-from src.bias.BiasDetector import BiasDetector
-from src.bias.FreqVsFreqBiasDetector import FreqVsFreqBiasDetector
+from src.utils.funcs import write_reference_distributions_html, handle_ref_distributions, order_violations
 from src.bias.FreqVsRefBiasDetector import FreqVsRefBiasDetector
 
 
@@ -34,6 +25,8 @@ used_df = ""
 comp_thr = ""
 ips = check_output(['hostname', '-I'])
 localhost_ip = ips.decode().split(" ")[0]
+if os.system("test -f /.dockerenv") == 0:
+    localhost_ip = os.environ['HOST_IP']
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -108,7 +101,6 @@ def results_fvr():
     violations = {k: v for k, v in results2.items() if (
         not v[2][0] or not v[2][1])}
     if request.method == "POST":
-        x = request.json.get('export-data', False)
         csv_data = "condition;num_observations;distance;distance_gt_threshold;threshold\n"
         for key in list(results2.keys()):
             if len(results2[key]) == 3:
