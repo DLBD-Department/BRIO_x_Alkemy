@@ -1,0 +1,47 @@
+{% block content %}
+<form action="{{ url_for('bias.FreqvsRef.freqvsref') }}" method="POST" enctype="multipart/form-data">
+    <fieldset>
+	<legend>Distance:</legend>
+        <div class="btn-group">
+            <input type="radio" class="btn-check" name="distance" id="distance1" value="KLDivergence" checked>
+            <label class="btn btn-success btn-lg" for="distance1" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="KLDivergence" data-bs-content="This distance is used to measure how much the model is off with respect to the reference distribution.">KLDivergence</label>
+        </div>
+    </fieldset><br><br>
+    <legend>Select other parameters:</legend><br><br>
+    <a for="slider" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="Threshold" data-bs-content="The threshold value is used to decide when the behaviour of the model should be considered biased.  If the threshold is low (closer to 0 than to 1), then the checks will be strict and only a very unbiased model will pass them.">Threshold:</a>
+    <input type="range" name="Slider" min="0" max="1" value="0" step="0.05" oninput="this.form.amountInput.value=this.value" />
+    <input type="number" name="amountInput" min="0" max="1" step="0.05" oninput="this.form.amountRange.value=this.value" />
+    <input type="checkbox" class="form-check-input" name="auto_thr" id="auto_thr" value="active">
+    <label class="form-check-label" for="auto_thr">Set automatic threshold <b>{{ thr }}</b></label>
+    <div class="container d-none" id="a1_params">
+      <input type="radio" class="form-check-input" name="a1_param" id="a1_high" value="high">
+      <label class="form-check-label" for="a1_high">A1=high</label>
+      <input type="radio" class="form-check-input" name="a1_param" id="a1_low" value="low">
+      <label class="form-check-label" for="a1_low">A1=low</label>
+    </div><br><br>
+    <label for="predictions">Predictions:</label>
+	<select class="selectpicker" data-style="btn-info" name="predictions" id="predictions">
+        {% for item in var_list -%}
+		<option value="{{item}}">{{ item }}</option>
+        {%- endfor %}
+    </select><br><br>
+    <label for="root_var">Root Variable:</label>
+    <select class="selectpicker" data-style="btn-info" name="root_var" id="root_var">
+        {% for item in var_list -%}
+            <option value="{{item}}">{{ item }}</option>
+        {%- endfor %}
+    </select><br><br>
+    <label for="cond_var">Conditioning variables:</label>
+    <select class="selectpicker" data-style="btn-info" name="cond_var" id="cond_var" multiple data-actions-box="true">
+        {% for item in var_list -%}
+            <option value="{{item}}" >{{ item }}</option>
+        {%- endfor %}
+    </select>
+    <textarea class="form-control w-50 mx-auto mt-2" rows="3" name="mytext" id="mytext"></textarea><br>
+    <label for="ref_dist" id="ref_dist_label">Reference distributions:</label><br>
+    <div class="container" id="ref_dist">
+    {% include 'bias/ref_dist.html' %}
+    </div>
+    <input class="btn btn-primary btn-lg mb-3 mt-3" type="submit" value="Upload">
+</form>
+{% endblock %}

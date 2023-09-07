@@ -1,88 +1,68 @@
-h1 {
-    text-align: center;
-    font-size: 2.5em;
+.my-grid {
+  display: inline-grid !important;
+  grid-template-columns: 1fr 1fr !important;
 }
 
-fieldset {
-    width: 450px;
+.my-grid-bias {
+  display: inline-grid !important;
+  grid-template-columns: 3fr 1fr !important;
 }
 
-h2 {
-    text-align: center;
-    font-size: 2em;
+.btn-xl {
+  padding: 50px 100px !important;
+  font-size: 40px !important;
+  border-radius: 30px !important;
+  width: 100% !important;
+  justify-content: center !important;
+  align-items: center !important;
 }
 
-#footer-btns button {
-    font-size: 24px;
-    padding: 12px 24px;
+.btn-semixl {
+  padding: 25px 50px !important;
+  font-size: 40px !important;
+  border-radius: 10px !important;
+  width: 100% !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+.parent-img {
+  position: relative;
 }
 
-label {
-    font-size: 22px;
-    font-weight: bold;
-    padding: 10px;
+.img-container {
+  position: relative;
+  width: 1000px; /* Set the width to the same width as the imgback */
+  height: 200px; /* Set the height to the same height as the imgback */
+  margin: 0 auto; /* Center the container horizontally */
+  overflow: hidden; /* Hide any overflowing content (e.g., imgfront) */
 }
 
-input[type="submit"] {
-    font-size: 20px;
-    padding: 10px;
+.imgback {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
 }
 
-form input[type="file"],
-form input[type="submit"] {
-    font-size: 18px;
-    padding: 10px 20px;
+.imgfront {
+  position: absolute;
+  top: 40%; /* Adjust as needed to vertically center the image */
+  left: 50%; /* Adjust as needed to horizontally center the image */
+  transform: translate(-50%, -50%);
+  z-index: 2;
 }
 
-input[type="file"]::before {
-    font-size: 20px;
+/* Additional styling for the text and other elements if needed */
+.display-5 {
+  margin-top: 20px; /* Add some space between the images and the text */
 }
 
-textarea {
-  height: 40px;
-  margin-top: 10px;
-  padding: 8px 16px;
-  font-size: 16px;
-  font-family: Arvo, serif;
-  border: 2px solid #3ca0e7;
-  border-radius: 4px;
-  background-color: #fff;
-  color: #000;
-  box-sizing: border-box;
-  background-repeat: no-repeat;
-  background-position: right .7em top 50%, 0 0;
-  background-size: 10px auto, 100%;
+.red-text {
+  color: red;
 }
 
-select {
-  height: 40px;
-  margin: 0;
-  padding: 8px 16px;
-  font-size: 16px;
-  font-family: Arvo, serif;
-  border: 2px solid #3ca0e7;
-  border-radius: 4px;
-  background-color: #fff;
-  color: #000;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-repeat: no-repeat;
-  background-position: right .7em top 50%, 0 0;
-  background-size: 10px auto, 100%;
-}
-
-select:focus {
-  outline: none;
-  box-shadow: 0 0 2px 2px #3ca0e7;
-}
-
-select:hover {
-  cursor: pointer;
-}
-
-select option {
-  font-size: 16px;
-  font-family: Arvo, serif;
-  color: #000;
+.green-text {
+  color: green;
 }

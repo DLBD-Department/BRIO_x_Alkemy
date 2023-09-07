@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+
+{% block title %}
+Results
+{% endblock %}
+
+{% block content %}
+<div class="container my-5 mx-5 shadow-lg rounded-3">
+  <div class="row mx-3 pe-lg-0 pt-lg-5">
+    <div class="col border border-5 mx-4">
+      <h2 class="display-6 fw-bold text-center">Overall Result</h2>
+      <p class="text-center" style="font-size: 24px;">
+      (Distance, distance&lt;&#61;threshold, threshold, standard deviation)
+      </p>
+      <p class="text-center" style="font-size: 24px;">
+      ({{ results1[0] }}, <b><span {% if results1[1] %}class="green-text"{% else %}class="red-text"{% endif %}>{{ results1[1] }}</span></b> , {{ results1[2] }}, {{ results1[3] }})
+      </p>
+    </div>
+  </div>
+  <div class="row pb-4 mx-3 pe-lg-0 pt-lg-5">
+    <div class="col border border-5 mx-1">
+      <h2 class="display-6 red-text fw-bold text-center">Violations</h2>
+      <p style="font-size: 18px;">
+      Condition: (num observations, distance, distance&lt;&#61;threshold, threshold, standard deviation)
+      </p>
+      {% for key, value in violations.items() %}
+        {% if violations|length != 1 %}
+          <div style="color: rgba(255, {{ 160*((loop.index - 1) / (violations|length - 1)) }}, 0, 1);">
+            <a href='/bias/freqvsfreq/results/{{ key }}'>{{ key }}</a> : {{ value }}<br>
+          </div>
+        {% endif %}
+      {% endfor %} 
+    </div>
+    <div class="col border border-5 mx-1">
+      <h2 class="display-6 fw-bold text-center">Conditioned Results  <button class="btn btn-primary btn-export" id="export-btn">Export CSV</button></h2>
+      <div class="row">
+        <div class="col text-center">
+          <h4 class="fw-bold">Condition applied</h4>
+        </div>
+        <div class="col text-center">
+          <h4 class="fw-bold">Result</h4>
+        </div>
+      </div>
+      {% for key, value in results2.items() %}
+        <div class="row">
+          <div class="col text-center">
+            {{ key }}
+          </div>
+          <div class="col text-center">
+            ({{ value[0] }}, {{ value[1] }}, <span {% if value[2] == True %}class="green-text"{% elif value[2] == False %}class="red-text"{% endif %}>{{ value[2] }}</span>, {{ value[3] }})
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+function handle_export() {
+  const results_url = "http://" + "{{ local_ip }}" + ":5000/bias/freqvsfreq/results";
+  fetch(results_url, {
+    "method": "POST",
+    "headers" : {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    "body": JSON.stringify({ "export-data": "True"})
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    // Handle the received data
+    const blob = new Blob([data.csv_data], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'conditioned_results.csv';
+    link.style.display = 'none';
+    // Trigger the download
+    document.body.appendChild(link);
+    link.click();
+    // Clean up
+    document.body.removeChild(link);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  })
+};
+
+document.addEventListener("DOMContentLoaded", function() {
+    var disabfromroot = document.getElementById("export-btn");
+    disabfromroot.addEventListener("click", handle_export);
+});
+</script>
+{% endblock %}

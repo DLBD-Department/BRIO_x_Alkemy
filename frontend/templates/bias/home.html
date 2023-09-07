@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+
+{% block title %}
+Homepage
+{% endblock %}
+
+
+{% block content %}
+<div class="px-4 py-5 my-2 text-center parent-img">
+  <div class="img-container">
+    <img class="imgback" src="{{ url_for('static', filename='BRIO_banner.png') }}" width="1000" height="200">
+    <img class="imgfront" src="{{ url_for('static', filename='alkemy.png') }}" alt="" width="72" height="72">
+  </div>
+  <h1 class="display-5 fw-bold text-body-emphasis">BRIO X Alkemy <br> A bias and risk detection tool for ML models</h1>
+  <div class="col-lg-6 mx-auto">
+    <p class="lead mb-4">Developed within the scope of the industrial partnership between BRIO and Alkemy.</p>
+  </div>
+  {% include 'bias/upload_home.html' %}
+  <div class="card mx-auto mt-2" style="width: 14rem;">
+    <div class="card-body {{ status }}">
+      <h5 class="card-title">Currently uploaded dataframe:</h5>
+      <p class="card-text">{{ df_used }}</p>
+      <a href="/bias?reset=True" class="card-link">Reset</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<div class="d-grid gap-2 d-sm-flex justify-content-sm-center my-3">
+	<a href="/bias/freqvsfreq" style="display: inline-block; margin-right: 20px; bottom: 200px; right: 200px;"><button class="btn btn-primary btn-lg px-4 gap-3" type="button">Freq vs freq analysis</button></a>
+    <a href="/bias/freqvsref" style="display: inline-block; right: 200px; bottom: 200px;"><button class="btn btn-primary btn-lg px-4 gap-3" type="button">Freq vs ref analysis</button></a>
+</div>
+{% endblock %}
+

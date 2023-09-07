@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+
+{% block title %}
+FreqvsFreq
+{% endblock %}
+
+{% block content %}
+<div class="px-4 py-5 my-2 text-center">
+	<h1 class="display-5 fw-bold text-body-emphasis">Freq vs Freq Analysis</h1>
+	<div class="col-lg-6 mx-auto">
+	<p class="lead mb-4">Check how much the predictions for the target variable differ with respect to the categories of a "root variable", overall and conditioned to the categories of other selected predictors. <br>
+    Using the max as aggregating function, you are checking the "worst case scenario".
+    Using the min as aggregating function, you are checking the "best case scenario".</p>
+</div>
+{% include 'bias/upload_freqvsfreq.html' %}
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/handle_parameters.js') }}"></script>
+<script type="text/javascript">
+function handle_agg_funcs() {
+  let data = new FormData();
+  var rootvar = document.getElementById("root_var");
+  var selected_option = rootvar.options[rootvar.selectedIndex];
+  data.append("rv_selected", selected_option.value);
+  const freqvsfreq_url = "http://" + "{{ local_ip }}" + ":5000/bias/freqvsfreq";
+  
+  fetch(freqvsfreq_url, {
+    "method": "POST",
+    "body": data
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    // Handle the received data
+    // If the response is "True", show only the "Max" button and select it
+    // If the response is "False", enable all buttons
+    const buttons = document.querySelectorAll('input[name="agg_func"]');
+    if (data.response === "True") {
+      buttons.forEach(button => {
+        button.disabled = true;
+      });
+      document.getElementById("agg_func2").checked = true;
+    } else {
+      buttons.forEach(button => {
+        button.disabled = false;
+      });
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
+
+function display_thr() {
+  var auto_thr = document.getElementById("auto_thr")
+  var params = document.getElementById("a1_params")
+  console.log(auto_thr.checked)
+  if (auto_thr.checked == true) {
+    params.classList.remove("d-none");
+  } else {
+    params.classList.add("d-none");
+  }
+};
+
+document.addEventListener("DOMContentLoaded", function() {
+    var disabfromroot = document.getElementById("root_var");
+    disabfromroot.addEventListener("change", handle_agg_funcs);
+    var auto_thr = document.getElementById("auto_thr");
+    auto_thr.addEventListener("change", display_thr)
+});
+</script>
+{% endblock %}
+
+{% block footer %}
+    <div class="modal-footer">
+        <a href="/bias/freqvsfreq/results"><button type="button" class="btn btn-secondary btn-semixl" data-dismiss="modal">Run</button>
+    </div>
+{% endblock %}
