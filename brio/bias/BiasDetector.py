@@ -2,8 +2,8 @@ import numpy as np
 from itertools import chain
 from itertools import combinations as itertools_combinations
 
-class BiasDetector:
 
+class BiasDetector:
 
     def powerset(self, iterable):
         '''
@@ -12,15 +12,14 @@ class BiasDetector:
         '''
         "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
         s = list(iterable)
-        return chain.from_iterable(itertools_combinations(s, r) for r in range(len(s)+1))
-
+        return chain.from_iterable(itertools_combinations(s, r) for r in range(len(s) + 1))
 
     def get_frequencies_list(self,
-            dataframe,
-            target_variable,
-            target_variable_labels,
-            root_variable,
-            root_variable_labels):
+                             dataframe,
+                             target_variable,
+                             target_variable_labels,
+                             root_variable,
+                             root_variable_labels):
         '''
         This function builds a list of numpy arrays, 
         each of them containing the distribution target_variable | root_variable. 
@@ -34,7 +33,7 @@ class BiasDetector:
         abs_freq_list = []
         for label in root_variable_labels:
             dataframe_subset = dataframe.loc[
-                dataframe[root_variable]==label
+                dataframe[root_variable] == label
             ]
 
             freq_list.append(
@@ -52,6 +51,6 @@ class BiasDetector:
             )
 
         return freq_list, abs_freq_list
-    
 
-    
+
+

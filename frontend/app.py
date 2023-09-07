@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from flask_cors import CORS
 import os
+
 from frontend.views import bias, opacity
 
 app = Flask(__name__)
