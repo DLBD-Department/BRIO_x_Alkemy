@@ -62,7 +62,6 @@ Results
 
 
 {% block scripts %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/handle_parameters.js') }}"></script>
 <script type="text/javascript">
 function handle_export() {
   const results_url = "http://" + "{{ local_ip }}" + ":5000/bias/freqvsref/results";
@@ -91,18 +90,7 @@ function handle_export() {
   })
   .catch(error => {
     console.error('Error:', error);
-  });
-}
-
-function display_thr() {
-  var auto_thr = document.getElementById("auto_thr")
-  var params = document.getElementById("a1_params")
-  console.log(auto_thr.checked)
-  if (auto_thr.checked == true) {
-    params.classList.remove("d-none");
-  } else {
-    params.classList.add("d-none");
-  }
+  })
 };
 
 document.addEventListener("DOMContentLoaded", function() {
