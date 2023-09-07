@@ -151,9 +151,9 @@ Our tool takes as input an AI model's output and a set of user's selected parame
 The analyses conducted by our system are of two kinds: 
 
 \begin{enumerate}
-	\item comparison between the behaviour of the AI system and a target desirable behaviour (expressed as "freq-vs-ref" in the implementation), and
+	\item comparison between the behaviour of the AI system and a target desirable behaviour (expressed as ``freq-vs-ref'' in the implementation), and
 	
-	\item comparison between the behaviour of the AI system with respect to a sensitive class $c_1\in F$ and the behaviour of the AI system with respect to another sensitive class $c_2\in F$ related to the same sensitive feature $F$ (expressed as "freq-vs-freq" in the implementation).
+	\item comparison between the behaviour of the AI system with respect to a sensitive class $c_1\in F$ and the behaviour of the AI system with respect to another sensitive class $c_2\in F$ related to the same sensitive feature $F$ (expressed as ``freq-vs-freq'' in the implementation).
 \end{enumerate}
 
 Whenever the second behaviour alerts of a possibly biased behaviour, a subsequent check follow on some (or all) of the subclasses of the considered sensitive classes. This second check is meant to tell us if the bias encountered at the level of the classes can be explained away by other features of the individuals in the sensitive classes considered that are not related to the sensitive feature at hand.
@@ -349,9 +349,9 @@ A set of experiments were performed to understand the behavior of the proposed a
 As first step, three machine learning models were trained to predict the default probability, using all the available features:
 
 \begin{itemize}
-  \item "strong" model: a Random Forest with 200 trees and max depth equals to 12;
-  \item "weak" model: a Random Forest with 10 trees and max depth equals to 37;
-  \item "lame" model: a Classification Tree with max depth equals to 2.
+  \item ``strong'' model: a Random Forest with 200 trees and max depth equals to 12;
+  \item ``weak'' model: a Random Forest with 10 trees and max depth equals to 37;
+  \item ``lame'' model: a Classification Tree with max depth equals to 2.
 \end{itemize}
 
 Training and performance details of the three models are available on the GitHub repository \url{https://github.com/DLBD-Department/BRIO_x_Alkemy/notebooks}. The three models show different performance in terms of accuracy and errors distribution: the aim is to verify if and how our bias detection tool deals with such different models performances. 
@@ -363,7 +363,7 @@ Training and performance details of the three models are available on the GitHub
   \caption{Experiment 1 results.}
   \label{fig:exp1}
 \end{figure}
-Figure \ref{fig:exp1} shows the results of the first experiment. Using TVD and the parametric threshold, no bias is detected for the three models predictions (see output \texttt{True} on all three models), but the different distance magnitude obtained for the "lame" model is noticeable ($0,0278$, rounding off at the fourth decimal digit), and considerably smaller than those of the other two models (respectively $0,0138$ for the strong model and $0,0158$ for the weak model). A simpler, more erroneous model is unable to produce a strongly skewed predictions distribution and so it tends to produce "less bias". The "strong" model obtains the largest distance, suggesting that the more powerful a model is, the more likely it is to exploit predictive signals, producing more skewed predictions distributions. 
+Figure \ref{fig:exp1} shows the results of the first experiment. Using TVD and the parametric threshold, no bias is detected for the three models predictions (see output \texttt{True} on all three models), but the different distance magnitude obtained for the ``lame'' model is noticeable ($0,0278$, rounding off at the fourth decimal digit), and considerably smaller than those of the other two models (respectively $0,0138$ for the strong model and $0,0158$ for the weak model). A simpler, more erroneous model is unable to produce a strongly skewed predictions distribution and so it tends to produce ``less bias''. The ``strong'' model obtains the largest distance, suggesting that the more powerful a model is, the more likely it is to exploit predictive signals, producing more skewed predictions distributions. 
 
 \subsubsection{Experiment 2: freqs-vs-freqs, TVD, A1=low, root-variable=x3-education}
 
@@ -402,9 +402,9 @@ Figure \ref{fig:exp4} shows the results of the fourth experiment. As with Experi
 Figure \ref{fig:exp5} shows the results of the fifth experiment. Keeping JS as distance of choice, we wanted to verify what happens if the sensitive feature is also the single most important feature for the classifiers. In this case, we identified \texttt{x6-pay-0}, namely a categorical feature providing the strongest predictive signal. Clearly, being strongly effective in discriminating between true $0$ and $1$ labels, it produces way bigger distances than those observed in the previous experiments. As commented for \texttt{Education}, we imagine that it would not make sense to consider such a feature a sensitive one. Finally, large standard deviation values are observed, suggesting that some feature categories are more effective and important for the classifiers than others. 
 
 \subsubsection{Experiment 6: freqs-vs-freqs, JS, A1=low, root-variable=x2-sex, conditioning-variable=x6-pay-0 (discrete)}
-For brevity we don't include the numerical outcome of this and the next experiment. The reader can refer to the notebook provided with the online repository (\url{https://github.com/DLBD-Department/BRIO_x_Alkemy/notebooks}). We are now interested in testing the bias detector using a "conditioning variable", i.e. using a further dataset feature to compute the distances with respect to the sensitive feature for each subset of observations realized by the different conditioning variable categories. As conditioning variable we use \texttt{x6-pay-0}, the same feature we used in Experiment 5 as sensitive feature. It seems reasonable to ask whether, given the groups implied by a strong predictor, different bias profiles emerge. The aim is to find potential biases that are balanced out when the check is performed on the overall population, but which emerge when focusing on specific subgroups of individuals. In this experiment we use the JS Divergence. 
+For brevity we don't include the numerical outcome of this and the next experiment. The reader can refer to the notebook provided with the online repository (\url{https://github.com/DLBD-Department/BRIO_x_Alkemy/notebooks}). We are now interested in testing the bias detector using a ``conditioning variable'', i.e. using a further dataset feature to compute the distances with respect to the sensitive feature for each subset of observations realized by the different conditioning variable categories. As conditioning variable we use \texttt{x6-pay-0}, the same feature we used in Experiment 5 as sensitive feature. It seems reasonable to ask whether, given the groups implied by a strong predictor, different bias profiles emerge. The aim is to find potential biases that are balanced out when the check is performed on the overall population, but which emerge when focusing on specific subgroups of individuals. In this experiment we use the JS Divergence. 
 
-It seems clear that the computed distances can vary a lot for the different conditioning variable groups, justifying our interest in this kind of check. This behavior is stronger when the model is particularly accurate in its predictions, e.g. for the "strong" model results. On the other hand, the "lame" model produces distances equal to zero for each subgroup, given that it's not able to use \texttt{x6-pay-0} to discriminate between observations. 
+It seems clear that the computed distances can vary a lot for the different conditioning variable groups, justifying our interest in this kind of check. This behavior is stronger when the model is particularly accurate in its predictions, e.g. for the ``strong'' model results. On the other hand, the ``lame'' model produces distances equal to zero for each subgroup, given that it's not able to use \texttt{x6-pay-0} to discriminate between observations. 
 
 \subsubsection{Experiment 7: freqs-vs-freqs, TVD, A1=low, root-variable=x2-sex, conditioning-variable=x6-pay-0 (discrete)}
 In this final experiment we repeat the same setting of Experiment 6 but using TVD instead of JS. The observed pattern is identical, with the already commented distances magnitude difference due to the different distance used here. 
