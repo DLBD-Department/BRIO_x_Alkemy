@@ -4,7 +4,7 @@ import os
 from subprocess import check_output
 import subprocess
 
-from src.utils.funcs import handle_multiupload, allowed_file
+from brio.utils.funcs import handle_multiupload, allowed_file
 
 bp = Blueprint('bias', __name__,
                template_folder="../templates/bias", url_prefix="/bias")

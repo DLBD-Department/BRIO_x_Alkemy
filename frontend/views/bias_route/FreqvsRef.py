@@ -6,8 +6,8 @@ import os
 from subprocess import check_output
 from statistics import mean, stdev
 
-from src.utils.funcs import write_reference_distributions_html, handle_ref_distributions, order_violations
-from src.bias.FreqVsRefBiasDetector import FreqVsRefBiasDetector
+from brio.utils.funcs import write_reference_distributions_html, handle_ref_distributions, order_violations
+from brio.bias.FreqVsRefBiasDetector import FreqVsRefBiasDetector
 
 
 bp = Blueprint('FreqvsRef', __name__,

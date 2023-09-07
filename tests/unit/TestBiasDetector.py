@@ -5,9 +5,9 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
 
-from src.utils.Preprocessing import Preprocessing
-from src.bias.FreqVsFreqBiasDetector import FreqVsFreqBiasDetector
-from src.bias.FreqVsRefBiasDetector import FreqVsRefBiasDetector
+from brio.utils.Preprocessing import Preprocessing
+from brio.bias.FreqVsFreqBiasDetector import FreqVsFreqBiasDetector
+from brio.bias.FreqVsRefBiasDetector import FreqVsRefBiasDetector
 
 class TestBiasDetector(unittest.TestCase):
 
