@@ -95,9 +95,9 @@ email=christian.quaggio@alkemy.com
 %  6 Joliot-Curie, Dubna, Moscow region, 141980, Russian Federation}
 
 %\fnmark[1]
-\address[1]{LUCI Group, University of Milan, via Festa del Perdono 7, 20122 Milan, Italy}
+\address[1]{LUCI Group, Department of Philosophy, University of Milan, via Festa del Perdono 7, 20122 Milan, Italy}
 \address[2]{Alkemy, Deep Learning \& Big Data Department}
-\address[3]{Ethos Group, Department of Human Sciences, University of Verona, Verona, Italy}
+\address[3]{Ethos Group, Department of Human Sciences, University of Verona, Lungadige Porta Vittoria 17, 37129 Verona, Italy}
 
 %\author[4]{Manfred Jeusfeld}[%
 %orcid=0000-0002-9421-8566,
@@ -124,7 +124,7 @@ we provide the means to compare the action of the user's algorithm of choice on 
 %% Keywords. The author(s) should pick words that accurately describe
 %% the work being presented. Separate the keywords with commas.
 \begin{keywords}
-Bias, Machine Learning
+Bias, Machine Learning, AI
 \end{keywords}
 
 %%
@@ -168,7 +168,7 @@ Consider a database containing details of individuals, with their age, gender, a
 The comparisons above are computed on probability distributions, each taken to express the behaviour of a stochastic system. In order to compute the difference between the behaviour of the AI system under investigation -- denoted by the probability distribution $Q$ -- and a fixed behaviour $P$ (either the optimal behaviour, when available, or the behaviour with respect to a different class) various means of comparison might be considered. Depending on the analysis one wishes to conduct, one or more divergences or distances are made available in the tool. Notice that all divergences and distances are made to take values in $[0,1]$ in order to be compared with the threshold described in \Cref{threshold}.
 
 
-\paragraph{Kullback-Leibner divergence}
+\paragraph{Kullback-Leibler divergence}
 When we wish to compare how the system behaves with respect to an \textit{a priori} optimal behaviour $P$, we use the Kullback–Leibler divergence $D_{\mathrm{KL}}$:
 
 \[D_{\mathrm{KL}}(P\parallel Q)= \sum _{x\in X} P(x)\cdot \log_2 \Big( \frac{P(x)}{Q(x)}\Big)\,.\]
@@ -182,7 +182,7 @@ Notice that this is not symmetric and takes values in $[0,+\infty]$: the asymmet
 \paragraph{Jensen-Shannon divergence}
 When we wish to compare classes, instead, a certain symmetry is required. First, we consider the Jensen-Shannon divergence 
 \[D_{\mathrm{JS}}(P\parallel Q)=\frac{D_{\mathrm{KL}}(P\parallel M)+D_{\mathrm{KL}}(Q\parallel M)}{2},\]
-with $M=(P+Q)/2$. This was introduced in \cite{lin_divergence} as a well-behaved symmetrization of Kullback-Leibner. It takes values in $[0,1]$.
+with $M=(P+Q)/2$. This was introduced in \cite{lin_divergence} as a well-behaved symmetrization of Kullback-Leibler. It takes values in $[0,1]$.
 
 \paragraph{Total variation distance}
 Another choice for comparing classes is provided by the total variation distance of $P$ and $Q$, meaning
@@ -317,7 +317,7 @@ The user can investigate and analyse bias behaviour in a given AI system by acce
 Afterwards, the user can compare the behaviour of the AI system with an ideal behaviour (Frequence vs Frequence), or compare sensitive classes within the AI system itself (Frequence vs Reference), also shown in Figure \ref{fig:bias_upload}.
 
 \subsubsection{FreqVsFreq and FreqVsRef}
-To perform these analyses, a set of parameters have to be chosen. Firstly, the \textbf{distance}: the choice is between \textit{Total Variation Distance} and \textit{Jensen-Shannon Divergence} for \textbf{FreqVsFreq}, and \textit{Kullback-Leibner Divergence} is used for \textbf{FreqVsRef}. Then, the user has to select: 
+To perform these analyses, a set of parameters have to be chosen. Firstly, the \textbf{distance}: the choice is between \textit{Total Variation Distance} and \textit{Jensen-Shannon Divergence} for \textbf{FreqVsFreq}, and \textit{Kullback-Leibler Divergence} is used for \textbf{FreqVsRef}. Then, the user has to select: 
 
 \begin{itemize}
   \item the target feature;
@@ -465,7 +465,8 @@ This research has been partially funded by the Project PRIN2020 ``BRIO - Bias, R
 %  \href{https://www.overleaf.com/latex/templates/template-for-submissions-to-ceur-workshop-proceedings-ceur-ws-dot-org/pkfscdkgkhcq}{Overleaf
 %    template}.
 %\end{itemize}
-The tool.
+
+Both the code for the tool and the notebooks used in analyses in Section~\ref{sec:validation} are available at \href{https://github.com/DLBD-Department/BRIO_x_Alkemy}{https://github.com/DLBD-Department/BRIO\_x\_Alkemy}.
 \end{document}
 
 %%
