@@ -115,9 +115,9 @@ email=christian.quaggio@alkemy.com
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-We present a tool for the detection of biased behaviour in AI systems. Using a specific probability-based algorithm,
+We present a tool for the detection of biased behaviours in AI systems. Using a specific probability-based algorithm,
 %typed $\lambda$-calculus, 
-we provide the means to compare the results of the user's algorithm of choice on a specific feature that they deem ``sensible'' with respect to fixed classes and to a known optimal behaviour.
+we provide the means to compare the action of the user's algorithm of choice on a specific feature that they deem ``sensible'' with respect to fixed classes and to a known optimal behaviour.
 \end{abstract}
 
 %%
@@ -138,16 +138,16 @@ Bias, Machine Learning, AI
 
 The project BRIO aims at developing formal and conceptual frameworks for the analysis of AI systems and for the advancement of the technical and philosophical understanding of the notions of Bias, Risk and Opacity in AI, with the ultimate objective of generally contributing to the development of trustworthy AI.\footnote{\url{sites.unimi.it/brio}} 
 
-The aim of the collaboration between BRIO and Alkemy is to produce software applications for the analysis of bias, risk and opacity with regard to AI technologies which often rely on non-deterministic computations and  are often opaque in nature. One of the most challenging aspects of modern AI systems, indeed, is that they do not guarantee specification correctness, and they are not transparent, in the sense that a general formal description of their behaviour might not be available.
+The aim of the collaboration between BRIO and Alkemy is to produce software applications for the analysis of bias, risk and opacity with regard to AI technologies which often rely on non-deterministic computations and are opaque in nature. One of the most challenging aspects of modern AI systems, indeed, is that they do not guarantee specification correctness, and they are not transparent, in the sense that a general formal description of their behaviour might not be available.
 
-We present a first tool developed within the BRIOxAlkemy collaboration for the detection and analysis of biased behaviours in AI systems. The tool is aimed at developers and data scientists that wish to test their algorithms relying on probabilistic and learning mechanisms in order to detect misbehaviours related to biases and collect data about them. The ultimate goal is to provide them with useful insights and data for the improvement of the AI systems with respect to bias.
+We present a first tool developed within the BRIOxAlkemy collaboration for the detection and analysis of biased behaviours in AI systems. The tool is aimed at developers and data scientists who wish to test their algorithms relying on probabilistic and learning mechanisms in order to detect misbehaviours related to biases and collect data about them. The ultimate goal is to provide them with useful insights and data for the improvement of their AI systems.
 
-The system presented is based on the theoretical, foundational works presented in \cite{dap21}, \cite{dagp22}, and \cite{gp23}, and in this paper we discuss the formal ideas behind its development (Section \ref{sec:theory}), the technical details of its implementation  (\Cref{sec:implementation}), the data obtained from a case study that validates the usefulness of the software (\Cref{sec:validation}), and the projected further developments aimed at integrating the presented software in a more general tool for the analysis of AI systems (\Cref{sec:conclusions}).
+The introduced system is based on the foundational works presented in \cite{dap21,dagp22,gp23}, and in this paper we discuss the formal ideas behind its development (Section \ref{sec:theory}), the technical details of its implementation  (\Cref{sec:implementation}), the data obtained from a case study that validates the usefulness of the software (\Cref{sec:validation}), and planned further developments aimed at integrating the software in larger tool for the analysis of AI systems (\Cref{sec:conclusions}).
 
 \section{Theory}\label{sec:theory}
 
-Our tool takes as input an AI model's output and a set of user's selected parameter settings: the former is encoded as a set of datapoints with their associated features, the latter include the designation of a sensitive feature. The output is an evaluation of the possibility that the AI model under consideration is biased with respect to the features designated as sensitive by the user. The system closely guides the user in the process of setting the parameters and provides it with detailed explanations, remaining customisable with respect to the mathematical details of the analysis. The choices left to the user are those that actually make a conceptual difference in the outcome of the analysis and this difference is explained to the user during the setting of these parameters.
-
+The basic workings of the BrioxAlkemy tool is as follows. It takes as input an AI model's output and a set of user's selected parameter settings: the former is encoded as a set of datapoints with their associated features, the latter include the designation of a sensitive feature. In output our tool returns an evaluation of the possibility that the AI model under consideration is biased with respect to the features designated as sensitive by the user. The system closely guides the user in the process of setting the parameters, whose conceptual significance is illustrated with detailed explanations, remaining customisable with respect to the mathematical details of the analysis. 
+%The choices left to the user are those that actually make a conceptual difference in the outcome of the analysis, and this difference is explained to the user during the setting of these parameters.
 The analyses conducted by our system are of two kinds: 
 
 \begin{enumerate}
@@ -156,16 +156,16 @@ The analyses conducted by our system are of two kinds:
 	\item comparison between the behaviour of the AI system with respect to a sensitive class $c_1\in F$ and the behaviour of the AI system with respect to another sensitive class $c_2\in F$ related to the same sensitive feature $F$ (expressed as ``freq-vs-freq'' in the implementation).
 \end{enumerate}
 
-Whenever the second behaviour alerts of a possibly biased behaviour, a subsequent check follow on some (or all) of the subclasses of the considered sensitive classes. This second check is meant to tell us if the bias encountered at the level of the classes can be explained away by other features of the individuals in the sensitive classes considered that are not related to the sensitive feature at hand.
+Whenever the second analysis alerts of a possibly biased behaviour, a subsequent check follows on some (or all) of the subclasses of the considered sensitive classes. This second check is meant to verify whether the bias encountered at the level of the classes can be explained away by other features of the relevant individuals that are not related to the sensitive feature at hand.
 
 Before we delve into the technical details, let us give a little example: 
 
 \begin{example}
-Consider a database containing details of individuals, with their age, gender, and level of education. Consider an algorithm which tries to predict whether each of them is likely to default on credit. We wish to check if age is a sensitive factor in such prediction. We feed the tool our dataset, the output of the run of the predictive algorithm, and mark the feature of age as sensitive. The program allows us to compare either how the behaviour of the algorithm with respect to age differs from an ``optimal'' behaviour (in this case, we might consider optimal the case where each age group equally succeeds), or how different age groups perform with respect to one another.
+Consider a database containing details of individuals, with their age, gender, and level of education. Consider an algorithm which predicts the likelihood of default on credit. We wish to check if age is a sensitive factor in such prediction. We feed the tool with our dataset, the output of the run of the predictive algorithm, and mark the feature of age as sensitive. The program allows us to compare either how the behaviour of the algorithm with respect to age differs from an ``optimal'' behaviour (in this case, we might consider optimal the case where each age group equally succeeds), or how different age groups perform with respect to one another.
 \end{example}
  
 \subsection{Divergences}
-The comparisons above are computed on probability distributions, each taken to express the behaviour of a stochastic system. In order to compute the difference between the behaviour of the AI system under investigation -- denoted by the probability distribution $Q$ -- and a fixed behaviour $P$ (either the optimal behaviour, when available, or the behaviour with respect to a different class) various means of comparison might be considered. Depending on the analysis one wishes to conduct, one or more divergences or distances are made available in the tool. Notice that all divergences and distances are made to take values in $[0,1]$ in order to be compared with the threshold described in \Cref{threshold}.
+The comparisons above are computed on probability distributions, each taken to express the behaviour of a stochastic system. In order to compute the difference between the behaviour of the AI system under investigation -- denoted by the probability distribution $Q$ -- and a fixed behaviour $P$ (either the optimal behaviour, when available, or the behaviour with respect to a different class) various means of comparison might be considered. Depending on the analysis one wishes to conduct, one or more divergences or distances are made available in the tool. Notice that all divergences and distances are made to take values in $[0,1]$ in order to be compared with the threshold described in \Cref{threshold}. In the following we briefly illustrate them.
 
 
 \paragraph{Kullback-Leibler divergence}
@@ -173,15 +173,15 @@ When we wish to compare how the system behaves with respect to an \textit{a prio
 
 \[D_{\mathrm{KL}}(P\parallel Q)= \sum _{x\in X} P(x)\cdot \log_2 \Big( \frac{P(x)}{Q(x)}\Big)\,.\]
 
-It was first introduced in \cite{dkl} in the context of information theory, and it intuitively indicates the difference, in probabilistic terms, between the input-output behaviour of the AI system at hand and a reference probability distribution. It sums up all the differences computed for each possible output of the AI system weighted by the actual probability of correctly obtaining that output.
-
-Notice that this is not symmetric and takes values in $[0,+\infty]$: the asymmetry accounts for the fact that the behaviour we are monitoring is, in fact, non symmetric -- as $P$ is a theoretical distribution that we know, or consider to be, optimal, while $Q$ is our observed one -- while to make it fit the unit interval we adjust the divergence as follows.
+It was first introduced in \cite{dkl} in the context of information theory, and it intuitively indicates the difference, in probabilistic terms, between the input-output behaviour of the AI system at hand and a reference probability distribution. It sums up all the differences computed for each possible output of the AI system weighted by the actual probability of correctly obtaining that output. Notice that this is not symmetric and takes values in $[0,+\infty]$: the asymmetry accounts for the fact that the behaviour we are monitoring is, in fact, non symmetric -- as $P$ is a theoretical distribution that we know, or consider to be, optimal, while $Q$ is our observed one -- while to make it fit the unit interval we adjust the divergence as follows.
 
 \[D'_{\mathrm{KL}}(P\parallel Q)=1-\exp (- D_{\mathrm{KL}}(P\parallel Q))\]
 
 \paragraph{Jensen-Shannon divergence}
 When we wish to compare classes, instead, a certain symmetry is required. First, we consider the Jensen-Shannon divergence 
+
 \[D_{\mathrm{JS}}(P\parallel Q)=\frac{D_{\mathrm{KL}}(P\parallel M)+D_{\mathrm{KL}}(Q\parallel M)}{2},\]
+
 with $M=(P+Q)/2$. This was introduced in \cite{lin_divergence} as a well-behaved symmetrization of Kullback-Leibler. It takes values in $[0,1]$.
 
 \paragraph{Total variation distance}
@@ -200,7 +200,7 @@ which computes the largest difference between the probability of obtaining an ou
 %
 %\[1-\exp (- D_{\mathrm{KL}}(P\parallel Q))\]where the $\exp(x)$ function is defined as $e^x$. 
 
-The theory provides a perhaps clearer description of total variation, and relates it with Jensen-Shannon as follows.
+How total variation relates to Jensen-Shannon can be formulated as follows:
 
 \begin{theorem*}[{\cite[Prop. 4.2]{levin2017markov}},{\cite[Thm. 3]{lin_divergence}}]
 Let $P$ and $Q$ probability distributions over $X$. Then we have the following:
@@ -215,7 +215,8 @@ Let $P$ and $Q$ probability distributions over $X$. Then we have the following:
 This suggests that Jensen-Shannon is less sensitive to differences in the comparing sets, and can therefore be used for preliminary analyses.
 
 \subsection{How to handle sensitive features corresponding to more than two classes}\label{subsec:aggregation}
-Since the divergences the system uses are binary functions, it is not obvious how to handle the case in which the sensitive feature we are considering partitions the domain in three or more classes. It is, indeed, easy to compute the divergence for pairs of classes, but we also need, in this case, a sensible way of aggregating the obtained results in order to obtain one value describing well how the AI model behaves with respect to the sensitive feature under consideration. It turns out that there are several ways of doing this and each of them tells us something of value if we wish to reach a meaningful conclusion about the AI model.
+
+Since the divergences the system uses are binary functions, it is not obvious how to handle the case in which the sensitive feature we are considering partitions the domain in three or more classes. It is, indeed, easy to compute the divergence for pairs of classes, but we also need, in this case, a sensible way of aggregating the obtained results in one value, to describe how the AI model behaves with respect to the sensitive feature under consideration. Several ways of doing so are possible, and each of them tells us something of value if we wish to reach a meaningful conclusion about the AI model.
 
 Suppose that we are studying the behaviour of the model with respect to the feature $F=\{c_1, \ldots , c_n\}$ which induces a partition of our domain of individuals into the classes $c_1, \ldots , c_n$. The first step is the pairwise calculation of the divergences with respect to the different classes induced by $F$. Hence, for each pair $(c_i\parallel c_j)$ such that $c_i, c_j\in F$, we compute $D(c_i\parallel c_j) $ where $D$ is the  preselected divergence and consider the set $\{D(c_i\parallel c_j) : c_i,c_j\in F\ \&\ i\neq j\}$. For instance, if we are considering age as our feature  $F$ and we partition our domain into three age groups, we might have
 \[F=\{over\_50\_yo, between\_40\_and\_50\_yo, below\_40\_yo\}\]
@@ -253,10 +254,9 @@ First, the user has to decide how much rigour is required when analysing the beh
 
 
 
-The second factor considered in computing the threshold is the number of classes related to the sensitive feature under consideration. We  call this the {\it granularity} of the predicates related to the sensitive feature, and it indicates how specific the predicates determining the studied classes are. Specific predicates describe in more detail the objects of our domain and determine more specific classes. When the classes that we are considering are very specific, the divergence generated by the bias of the model can be spread over several different classes. Hence, we need to be more attentive about the small divergences that appear locally -- that is, when we check pairs of these classes. The threshold should thus be stricter.
+The second factor considered in computing the threshold is the number of classes related to the sensitive feature under consideration. We  call this the {\it granularity} of the predicates related to the sensitive feature, and it indicates how specific the predicates determining the studied classes are. Specific predicates describe in more detail the objects of our domain and determine more specific classes. When the classes under consideration are very specific, the divergence generated by the bias of the model can be spread over several of them. Hence, we need to be more attentive about the small divergences that appear locally -- that is, when we check pairs of these classes. In this case, the threshold should be stricter.
 
-
-Finally, each time we compute a divergence relative to two classes, we scale the threshold with respect to the cardinality of the two classes. Large classes mean a stricter threshold. This is a rather obvious choice related to the fact that statistical data related to a large number of individuals tend to be more precise and fine grained. We already gave an example of this few lines ago.
+Finally, each time we compute a divergence relative to two classes, we scale the threshold with respect to the cardinality of the two classes. Large classes require a stricter threshold. This is a rather obvious choice related to the fact that statistical data related to a large number of individuals tend to be more precise and fine grained. We already gave an example of this few lines ago.
 
 Technically, the threshold is always between $0.05$ and $0.005$, the setting $\mathtt{high}$ restricts this range to the interval $[0.005,0.0275]$ and the setting $\mathtt{low}$ to the interval $[0.0275,0.05]$. The number $n_C$ of classes related to the sensitive feature and the number $n_D$ of individuals in our local domain (that is, the cardinality of the union of the two classes with respect to which we are computing the divergence) are used to decrease the threshold (in other words, to make it stricter) proportionally with respect to the interval selected. The greater the number $n_C$, the smaller the threshold, the greater the number $n_D$, again, the smaller the threshold. The threshold is then computed as
 \[
@@ -272,7 +272,7 @@ A first Minimum Viable Product (MVP) for the outlined bias detection tool has be
 \subsection{Backend}
 \label{subsec:backend}
 
-In terms of software architecture, the tool leverages on Docker in order to reach full portability. Currently it uses a simple python:3.10 image sufficient for early developments. The tool is developed following the Object Oriented Programming (OOP) paradigm in order to make allow easy extension to the upcoming functionalities both for bias and opacity detection. In this section a few details about the implemented classes are provided. 
+In terms of software architecture, the tool leverages on Docker in order to reach full portability. Currently it uses a simple python:3.10 image sufficient for early developments. The tool is developed following the Object Oriented Programming (OOP) paradigm in order to allow easy extensions for the upcoming functionalities both for bias and opacity detection. In this section a few details about the implemented classes are provided. 
 
 \paragraph{\texttt{BiasDetector} class}
 
@@ -314,7 +314,7 @@ The user can investigate and analyse bias behaviour in a given AI system by acce
 \end{figure}
 
 
-Afterwards, the user can compare the behaviour of the AI system with an ideal behaviour (Frequence vs Frequence), or compare sensitive classes within the AI system itself (Frequence vs Reference), also shown in Figure \ref{fig:bias_upload}.
+Afterwards, the user can compare compare sensitive classes within the AI system (Frequence vs Frequence), or compare the behaviour of the AI system with an ideal behaviour (Frequence vs Reference), also shown in Figure \ref{fig:bias_upload}.
 
 \subsubsection{FreqVsFreq and FreqVsRef}
 To perform these analyses, a set of parameters have to be chosen. Firstly, the \textbf{distance}: the choice is between \textit{Total Variation Distance} and \textit{Jensen-Shannon Divergence} for \textbf{FreqVsFreq}, and \textit{Kullback-Leibler Divergence} is used for \textbf{FreqVsRef}. Then, the user has to select: 
@@ -329,7 +329,7 @@ To perform these analyses, a set of parameters have to be chosen. Firstly, the \
 \end{itemize}
 
 \subsubsection{Results}
-Eventually, the tool shows the analysis results, providing insights about whether the AI system under investigations presents behaviour that might be interpreted as bias with respect to the sensitive feature. This is implemented in a boolean variable, which is \textbf{\textcolor{red}{False}} when bias is present and \textbf{\textcolor{green}{True}} otherwise, as it is shown in Figure \ref{fig:results}.
+Eventually, the tool shows the analysis results, providing insights about whether the AI system under investigation presents behaviours that might be interpreted as biased with respect to the sensitive feature. This is implemented in a Boolean variable, which is \textbf{\textcolor{red}{False}} when bias is present and \textbf{\textcolor{green}{True}} otherwise, as it is shown in Figure \ref{fig:results}.
 
 \begin{figure}[h]
   \begin{center}
@@ -339,7 +339,7 @@ Eventually, the tool shows the analysis results, providing insights about whethe
   \label{fig:results}
 \end{figure}
 
-If bias behavior is detected, additional information at the subclass level (if applicable) are also presented, ranked from most severe to less significant. Furthermore, results for each subclass are also displayed, with the possibility to export the data in a csv file for additional studies. 
+If any biased behavior is detected, additional information at the subclass level (if applicable) are also presented, ranked from most severe to less significant. Furthermore, results for each subclass are also displayed, with the possibility to export the data in a csv file for additional studies. 
 
 \section{Validation}
 \label{sec:validation}
@@ -354,7 +354,7 @@ As first step, three machine learning models were trained to predict the default
   \item ``lame'' model: a Classification Tree with max depth equals to 2.
 \end{itemize}
 
-Training and performance details of the three models are available on the GitHub repository \url{https://github.com/DLBD-Department/BRIO_x_Alkemy/notebooks}. The three models show different performance in terms of accuracy and errors distribution: the aim is to verify if and how our bias detection tool deals with such different models performances. 
+Training and performance details of the three models are available on the GitHub repository \url{https://github.com/DLBD-Department/BRIO_x_Alkemy/notebooks}. The three models show different performance in terms of accuracy and errors distribution: the aim is to verify whether and how our bias detection tool deals with such different models performances. 
 
 \subsubsection{Experiment 1: freqs-vs-freqs, TVD, A1=low, root-variable=x2-sex}
 
@@ -372,7 +372,7 @@ Figure \ref{fig:exp1} shows the results of the first experiment. Using TVD and t
   \caption{Experiment 2 results.}
   \label{fig:exp2}
 \end{figure}
-Figure \ref{fig:exp2} shows the results of the second experiment. With this experiment we tried to understand the behavior of the bias detector when dealing with multi-class sensitive features, in this case \texttt{Education}. A potential bias is detected for each model (see output \texttt{False} on all three models), but it is questionable whether using \texttt{Education} as a sensitive feature makes sense in this setting, and with these data. It is more interesting observing that the distances are almost the same for the three models, suggesting that each model is exploiting in some way the predictive signal offered by the feature \texttt{Education}. The standard deviations of the class-vs-class distances (the last values of the output tuples) are also of the same magnitude order.
+Figure \ref{fig:exp2} shows the results of the second experiment. With this experiment we tried to understand the behavior of the bias detector when dealing with multi-class sensitive features, in this case \texttt{Education}. A potential bias is detected for each model (see output \texttt{False} on all three models), but it is questionable whether using \texttt{Education} as a sensitive feature makes sense in this setting, and with these data. More interestingly,  the distances are almost the same for the three models, suggesting that each model is exploiting in some way the predictive signal offered by the feature \texttt{Education}. The standard deviations of the class-vs-class distances (the last values of the output tuples) are also of the same magnitude order.
 
 \subsubsection{Experiment 3: freqs-vs-freqs, JS, A1=low, root-variable=x2-sex}
 
@@ -402,7 +402,7 @@ Figure \ref{fig:exp4} shows the results of the fourth experiment. As with Experi
 Figure \ref{fig:exp5} shows the results of the fifth experiment. Keeping JS as distance of choice, we wanted to verify what happens if the sensitive feature is also the single most important feature for the classifiers. In this case, we identified \texttt{x6-pay-0}, namely a categorical feature providing the strongest predictive signal. Clearly, being strongly effective in discriminating between true $0$ and $1$ labels, it produces way bigger distances than those observed in the previous experiments. As commented for \texttt{Education}, we imagine that it would not make sense to consider such a feature a sensitive one. Finally, large standard deviation values are observed, suggesting that some feature categories are more effective and important for the classifiers than others. 
 
 \subsubsection{Experiment 6: freqs-vs-freqs, JS, A1=low, root-variable=x2-sex, conditioning-variable=x6-pay-0 (discrete)}
-For brevity we don't include the numerical outcome of this and the next experiment. The reader can refer to the notebook provided with the online repository (\url{https://github.com/DLBD-Department/BRIO_x_Alkemy/notebooks}). We are now interested in testing the bias detector using a ``conditioning variable'', i.e. using a further dataset feature to compute the distances with respect to the sensitive feature for each subset of observations realized by the different conditioning variable categories. As conditioning variable we use \texttt{x6-pay-0}, the same feature we used in Experiment 5 as sensitive feature. It seems reasonable to ask whether, given the groups implied by a strong predictor, different bias profiles emerge. The aim is to find potential biases that are balanced out when the check is performed on the overall population, but which emerge when focusing on specific subgroups of individuals. In this experiment we use the JS Divergence. 
+For brevity, we don't include the numerical outcome of this and the next experiment. The reader can refer to the notebook provided with the online repository (\url{https://github.com/DLBD-Department/BRIO_x_Alkemy/notebooks}). We are now interested in testing the bias detector using a ``conditioning variable'', i.e. using a further dataset feature to compute the distances with respect to the sensitive feature for each subset of observations realized by the different conditioning variable categories. As conditioning variable we use \texttt{x6-pay-0}, the same feature we used in Experiment 5 as sensitive feature. It seems reasonable to ask whether, given the groups implied by a strong predictor, different bias profiles emerge. The aim is to find potential biases that are balanced out when the check is performed on the overall population, but which emerge when focusing on specific subgroups of individuals. In this experiment we use the JS Divergence. 
 
 It seems clear that the computed distances can vary a lot for the different conditioning variable groups, justifying our interest in this kind of check. This behavior is stronger when the model is particularly accurate in its predictions, e.g. for the ``strong'' model results. On the other hand, the ``lame'' model produces distances equal to zero for each subgroup, given that it's not able to use \texttt{x6-pay-0} to discriminate between observations. 
 
