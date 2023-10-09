@@ -146,7 +146,12 @@ The introduced system is based on the foundational works presented in \cite{dap2
 
 \section{Theory}\label{sec:theory}
 
-The basic workings of the BrioxAlkemy tool is as follows. It takes as input an AI model's output and a set of user's selected parameter settings: the former is encoded as a set of datapoints with their associated features, the latter include the designation of a sensitive feature. In output our tool returns an evaluation of the possibility that the AI model under consideration is biased with respect to the features designated as sensitive by the user. The system closely guides the user in the process of setting the parameters, whose conceptual significance is illustrated with detailed explanations, remaining customisable with respect to the mathematical details of the analysis. 
+The basic workings of the BrioxAlkemy tool is as follows. It takes as input an AI model's output  and a set of user's selected parameter settings: the former is encoded as a set of datapoints with their associated features, the latter include the designation of a sensitive feature. In output our tool returns an evaluation of the possibility that the AI model under consideration is biased with respect to the features designated as sensitive by the user. 
+%
+%REVISION ADDITION SUGGESTION: Technically, the input consisting in the model's output can either be codified as an already preprocessed dataframe or as a raw dataset together with a customised preprocessing pipeline.
+%
+% 
+The system closely guides the user in the process of setting the parameters, whose conceptual significance is illustrated with detailed explanations, remaining customisable with respect to the mathematical details of the analysis. 
 %The choices left to the user are those that actually make a conceptual difference in the outcome of the analysis, and this difference is explained to the user during the setting of these parameters.
 The analyses conducted by our system are of two kinds: 
 
