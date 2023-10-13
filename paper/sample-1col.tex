@@ -139,7 +139,7 @@ Bias, Machine Learning, AI
 
 The project BRIO aims at developing formal and conceptual frameworks for the analysis of AI systems and for the advancement of the technical and philosophical understanding of the notions of Bias, Risk and Opacity in AI, with the ultimate objective of generally contributing to the development of trustworthy AI.\footnote{\url{sites.unimi.it/brio}} 
 
-The aim of the collaboration between BRIO and Alkemy is to produce software applications for the analysis of bias, risk and opacity with regard to AI technologies which often rely on non-deterministic computations and are opaque in nature. One of the most challenging aspects of modern AI systems, indeed, is that they do not guarantee specification correctness, and they are not transparent, in the sense that a general formal description of their behaviour might not be available.
+The aim of the collaboration between BRIO and Alkemy is to produce software applications for the analysis of bias, risk and opacity with regard to AI technologies which often rely on non-deterministic computations and are opaque in nature. One of the most challenging aspects of modern AI systems, indeed, is that they do not guarantee specification correctness, and they are not transparent, in the sense that a general formal description of their behaviour might not be available. Even in absence of a formally specified correct behaviour, one might want to check whether a system performs as desirable, and even statistical convergence towards the behavior dictated by the training set might be undesirable when the latter is biased or unbalanced.
 
 We present a first tool developed within the BRIOxAlkemy collaboration for the detection and analysis of biased behaviours in AI systems. The tool is aimed at developers and data scientists who wish to test their algorithms relying on probabilistic and learning mechanisms in order to detect misbehaviours related to biases and collect data about them. The ultimate goal is to provide them with useful insights and data for the improvement of their AI systems.
 
@@ -154,6 +154,7 @@ The fact that our tool is not concerned with local mistakes but focuses on the p
 
 Though our approach might seem related, at least in its scope, to what in the literature is often called \emph{feature weighting} \cite{NINOADAN2021115424}, it is in fact very different, and possibly orthogonal in its intention: while feature weighting aims at measuring how much a single feature influences the result of an algorithm, our detection tool wishes to quantify possible imbalances in the output. Mechanisms intimately related to feature weighting, nevertheless, will be a central component of an additional module concerning the measurement of the degree of opacity of a predictive model, which is currently under development by the authors of the present work.
 
+Given the above remarks, the presented tool computes a notion of bias which sits within the quantitative approaches to fairness \cite{Castelnovo_2022, chouldechova2018frontiers, 10.1145/3194770.3194776} and it qualifies as an observational measure which quantify bias only based on \textit{post-hoc} analysis of distributions of predictions based on the features of interest. Moreover, as mentioned, the measure remains blind with respect to the ground truth of the interested labels. Finally for a list of available tools for fairness metrics we refer to \cite{fairness_catalogue}.
 
 \section{Theory}\label{sec:theory}
 
@@ -178,7 +179,7 @@ Whenever the second analysis alerts of a possibly biased behaviour, a subsequent
 Before we delve into the technical details, let us give a little example: 
 
 \begin{example}
-Consider a database containing details of individuals, with their age, gender, and level of education. Consider an algorithm which predicts the likelihood of default on credit. We wish to check if age is a sensitive factor in such prediction. We feed the tool with our dataset, the output of the run of the predictive algorithm, and mark the feature of age as sensitive. The program allows us to compare either how the behaviour of the algorithm with respect to age differs from an ``optimal'' behaviour (in this case, we might consider optimal the case where each age group equally succeeds), or how different age groups perform with respect to one another.
+Consider a database containing details of individuals, with their age, gender, and level of education. Consider an algorithm which predicts the likelihood of default on credit. We wish to check if age is a sensitive factor in such prediction. We feed the tool with our dataset and the output of the run of the predictive algorithm. The user might want to consider whether the feature \texttt{age} as sensitive for the decision making process and therefore selects it in the interface as such. The program allows us to compare either how the behaviour of the algorithm with respect to age differs from an ``optimal'' behaviour (in this case, we might consider optimal the case where each age group equally succeeds), or how different age groups perform with respect to one another.
 \end{example}
  
 \subsection{Divergences}
@@ -428,7 +429,7 @@ In this final experiment we repeat the same setting of Experiment 6 but using TV
 \section{Conclusions and Further Work}
 \label{sec:conclusions}
 
-The tool for the detection of biases in AI systems presented in this paper is meant to be the first module to be integrated into a more complex software application. The complete system will present additionally a module for the evaluation of opacity values. The system will be completed by a third module whose aim will be to take in input the output of the bias and opacity modules, to return the user with a risk evaluation associated with the use of the dataset or model under analysis. We leave the presentation of these two additional modules to future work.
+The tool for the detection of biases in AI systems presented in this paper is meant to be the first module to be integrated into a more complex software application, including an improved interface for a clearer presentation of results. The complete system will present additionally a module for the evaluation of opacity values. The system will be completed by a third module whose aim will be to take in input the output of the bias and opacity modules, to return the user with a risk evaluation associated with the use of the dataset or model under analysis. We leave the presentation of these two additional modules to future work.
 
 
 % consisting of three, partly inter-dependent modules. The complete system will present two autonomous modules for the analysis of bias and opacity of AI systems---the first of which we just presented---and a module depending on these two concerning risk evaluation.
