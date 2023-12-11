@@ -23,7 +23,7 @@
     <legend>Select other parameters:</legend><br><br>
     <a for="slider" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="Threshold" data-bs-content="The threshold value is used to decide when the behaviour of the model should be considered biased.  If the threshold is low (closer to 0 than to 1), then the checks will be strict and only a very unbiased model will pass them.">Threshold:</a>
     <input type="range" name="Slider" min="0" max="1" value="0" step="0.05" oninput="this.form.amountInput.value=this.value" />
-    <input type="number" name="amountInput" min="0" max="1" step="0.05" oninput="this.form.amountRange.value=this.value" />
+    <input type="number" name="amountInput" min="0" max="1" step="0.05" oninput="this.form.Slider.value=this.value" />
     <input type="checkbox" class="form-check-input" name="auto_thr" id="auto_thr" value="active">
     <label class="form-check-label" for="auto_thr">Set automatic threshold</label>
     <div class="container d-none" id="a1_params">
@@ -42,10 +42,8 @@
     </fieldset><br><br>
     <div class="container d-none" id="binning">
       <label for="nbins">Select the number of bins: <label>
-      <input type="range" name="nbins" min="1" max="20" value="5" step="1" oninput="this.form.tgInput.value=this.value" />
-      <input type="number" name="tgInput" min="1" max="20" step="1" oninput="this.form.tgInput.value=this.value" />
-      <input type="checkbox" class="form-check-input" name="auto_nbins" id="auto_nbins" value="active">
-      <label class="form-check-label" for="auto_nbins">Set automatic binning</label>
+      <input type="range" name="nbins" min="1" max="20" value="10" step="1" oninput="this.form.tgInput.value=this.value" />
+      <input type="number" name="tgInput" min="1" max="20" step="1" oninput="this.form.nbins.value=this.value" />
     </div><br>
     <label for="predictions">Predictions:</label>
     <select class="selectpicker" data-style="btn-info" name="predictions" id="predictions">

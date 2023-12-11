@@ -10,7 +10,7 @@
     <legend>Select other parameters:</legend><br><br>
     <a for="slider" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="Threshold" data-bs-content="The threshold value is used to decide when the behaviour of the model should be considered biased.  If the threshold is low (closer to 0 than to 1), then the checks will be strict and only a very unbiased model will pass them.">Threshold:</a>
     <input type="range" name="Slider" min="0" max="1" value="0" step="0.05" oninput="this.form.amountInput.value=this.value" />
-    <input type="number" name="amountInput" min="0" max="1" step="0.05" oninput="this.form.amountRange.value=this.value" />
+    <input type="number" name="amountInput" min="0" max="1" step="0.05" oninput="this.form.Slider.value=this.value" />
     <input type="checkbox" class="form-check-input" name="auto_thr" id="auto_thr" value="active">
     <label class="form-check-label" for="auto_thr">Set automatic threshold <b>{{ thr }}</b></label>
     <div class="container d-none" id="a1_params">

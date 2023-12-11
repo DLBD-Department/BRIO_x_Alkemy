@@ -13,7 +13,7 @@ class FreqVsRefBiasDetector(BiasDetector):
             distance: which distance will be used to compute the bias detection
             A1: sensitivity parameter used to computer the parametric threshold
             target_variable_type: type of the tgt variable. 'class' or 'probability'
-            adjust_kl: when a bin of the observed distribution is 0 the relative combination to KL is inf (ref*log(ref/0)), thus 
+            adjust_div: when a bin of the observed distribution is 0 the relative combination to KL is inf (ref*log(ref/0)), thus 
                 the resulting kl is inf (1 when normalized).
                 adjust_div='no': this default behaviour is kept.
                 adjust_div='zero': if present, inf contributions are forced to zero (not suggested when you have many empty bins)
@@ -75,7 +75,7 @@ class FreqVsRefBiasDetector(BiasDetector):
                     kl = entropy(pk=ref, qk=obs, base=2)
                 else:
                     # add 1 observation to each bin and recompute relative freqs on the modified array. 
-                    # Since the starting point is the array of relative freqs and not that of absolut freqs,
+                    # Since the starting point is the array of relative freqs and not that of absolute freqs,
                     # a bit of algebra is needed to get the desired result
                     n_corr = n + len(obs)
                     obs = np.where(obs==0, 1/n_corr, (obs*n+1)/n_corr)

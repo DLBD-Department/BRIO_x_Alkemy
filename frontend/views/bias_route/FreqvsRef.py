@@ -58,6 +58,7 @@ def freqvsref():
                 dict_vars['thr'] = float(request.form['Slider'])
             else:
                 dict_vars['thr'] = None
+            dict_vars['a1_param'] = "high"
             if 'auto_thr' in list(request.form.keys()):
                 if request.form['auto_thr'] == 'active':
                     if 'a1_param' in list(request.form.keys()):
