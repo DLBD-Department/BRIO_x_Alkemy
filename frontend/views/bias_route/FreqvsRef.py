@@ -64,6 +64,10 @@ def freqvsref():
                     if 'a1_param' in list(request.form.keys()):
                         dict_vars['a1_param'] = request.form['a1_param']
                         dict_vars['thr'] = None
+            dict_vars['adjust_div'] = request.form['adjust_div']
+            dict_vars['target_type'] = request.form['target_type']
+            if 'nbins' in list(request.form.keys()):
+                dict_vars['nbins'] = int(request.form['nbins'])
             dict_vars['cond_vars'] = request.form.getlist('cond_var')
             nroot = len(dict_vars['df'][dict_vars['root_var']].unique())
             ntarget = len(dict_vars['df'][dict_vars['predictions']].unique())
@@ -79,7 +83,10 @@ def freqvsref():
 @bp.route('/results', methods=['GET', 'POST'])
 def results_fvr():
 
-    bd = FreqVsRefBiasDetector(A1=dict_vars['a1_param'])
+    bd = FreqVsRefBiasDetector(
+        A1=dict_vars['a1_param'],
+        adjust_div=dict_vars['adjust_div'],
+        target_variable_type=dict_vars['target_type'])
 
     ref_distribution = handle_ref_distributions(
         dict_vars['root_var'], dict_vars['predictions'], dict_vars['df'], dict_vars)
