@@ -79,7 +79,7 @@
      <rdf:li>Christian Quaggio</rdf:li></rdf:Seq></dc:creator>
    <dc:rights><rdf:Alt><rdf:li xml:lang="x-default">© 2023 Copyright for this paper by its authors. Use permitted under Creative Commons License Attribution 4.0 International (CC BY 4.0).</rdf:li></rdf:Alt></dc:rights>
    <dc:description><rdf:Alt><rdf:li xml:lang="x-default">CEUR Workshop Proceedings (CEUR-WS.org)</rdf:li></rdf:Alt></dc:description>
-   <dc:subject><rdf:Bag><rdf:li>Bias, Machine Learning</rdf:li></rdf:Bag></dc:subject>
+   <dc:subject><rdf:Bag><rdf:li>Bias, Machine Learning, AI</rdf:li></rdf:Bag></dc:subject>
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:prism="http://prismstandard.org/namespaces/basic/2.2/"> 
    <prism:aggregationType>journal</prism:aggregationType>
@@ -93,9 +93,9 @@
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmp="http://ns.adobe.com/xap/1.0/"> 
    <xmp:CreatorTool>LaTeX with hyperref</xmp:CreatorTool> 
-   <xmp:ModifyDate>2023-08-25T12:44:19+02:00</xmp:ModifyDate> 
-   <xmp:CreateDate>2023-08-25T12:44:19+02:00</xmp:CreateDate> 
-   <xmp:MetadataDate>2023-08-25T12:44:19+02:00</xmp:MetadataDate> 
+   <xmp:ModifyDate>2023-10-17T12:39:31+02:00</xmp:ModifyDate> 
+   <xmp:CreateDate>2023-10-17T12:39:31+02:00</xmp:CreateDate> 
+   <xmp:MetadataDate>2023-10-17T12:39:31+02:00</xmp:MetadataDate> 
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmpRights = "http://ns.adobe.com/xap/1.0/rights/"> 
    <xmpRights:Marked>True</xmpRights:Marked>
@@ -104,7 +104,7 @@
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/"> 
    <xmpMM:DocumentID>uuid:D0FAFD88-6B6D-39DB-0E19-5C5EE4525F4C</xmpMM:DocumentID> 
-   <xmpMM:InstanceID>uuid:8B010725-ED62-DD76-208F-BA0DF3F57E5D</xmpMM:InstanceID> 
+   <xmpMM:InstanceID>uuid:6A72CE44-CA89-BACD-988F-9D25718D1725</xmpMM:InstanceID> 
   </rdf:Description> 
  </rdf:RDF> 
 </x:xmpmeta> 

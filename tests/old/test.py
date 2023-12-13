@@ -1,4 +1,4 @@
-from src.bias.TotalVariationDistance import TotalVariationDistance
+from brio.bias.TotalVariationDistance import TotalVariationDistance
 import numpy as np
 from statistics import mean, stdev
 

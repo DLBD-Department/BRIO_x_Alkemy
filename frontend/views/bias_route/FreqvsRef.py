@@ -138,7 +138,6 @@ def results_fvr():
     violations = {k: v for k, v in results2.items() if (
         not v[2][0] or not v[2][1])}
     if request.method == "POST":
-        x = request.json.get('export-data', False)
         csv_data = "condition;num_observations;distance;distance_gt_threshold;threshold\n"
         for key in list(results2.keys()):
             if len(results2[key]) == 3:

@@ -5,8 +5,8 @@ from statistics import mean, stdev
 from subprocess import check_output
 
 import pandas as pd
-from flask import (Blueprint, Flask, current_app, flash, jsonify, redirect,
-                   render_template, request)
+from flask import (Blueprint, current_app, flash, jsonify,
+                   redirect, render_template, request)
 
 from brio.bias.FreqVsFreqBiasDetector import FreqVsFreqBiasDetector
 from brio.utils.funcs import order_violations

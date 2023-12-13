@@ -29,6 +29,7 @@ if os.system("test -f /.dockerenv") == 0:
     print(f"localhost_ip={localhost_ip}", flush=True)
 
 
+
 @bp.route('/', methods=['GET', 'POST'])
 def home_bias():
     global used_df
@@ -72,16 +73,22 @@ def home_bias():
                 dict_vars = {}
                 session.clear()
                 success_status = "text-warning"
-                flash('Unsupported format for notebook or dataset.', 'danger')
+                flash('Unsupported format for notebook or dataset. Supported types for dataset are .pkl, .csv; for notebook supported types are .py, .ipynb', 'danger')
                 return redirect('/bias')
             if request.files['artifacts'].filename != '':
                 handle_multiupload(request, 'artifacts',
                                    current_app.config['UPLOAD_FOLDER'])
-            os.system("jupyter nbconvert --to python " +
-                      os.path.join(current_app.config['UPLOAD_FOLDER'], dict_vars['notebook']))
-            note_name = dict_vars['notebook'].split('.')[0]
-            subprocess.run(["python3", os.path.join(
-                current_app.config['UPLOAD_FOLDER'], note_name + ".py")])
+            notebook_extension = dict_vars['notebook'].split('.')[1]
+            match notebook_extension:
+                case 'ipynb':
+                    os.system("jupyter nbconvert --to python " +
+                              os.path.join(current_app.config['UPLOAD_FOLDER'], dict_vars['notebook']))
+                    note_name = dict_vars['notebook'].split('.')[0]
+                    subprocess.run(["python3", os.path.join(
+                        current_app.config['UPLOAD_FOLDER'], note_name + ".py")])
+                case 'py':
+                    subprocess.run(["python3", os.path.join(
+                        current_app.config['UPLOAD_FOLDER'], dict_vars['notebook'])])
             flash(
                 'Custom preprocessing pipeline uploaded and processed successfully!', 'success')
         return redirect('/bias')

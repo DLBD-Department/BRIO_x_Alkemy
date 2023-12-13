@@ -1,7 +1,7 @@
-from src.bias.TotalVariationDistance import TotalVariationDistance
-from src.bias.KLDivergence import KLDivergence
-from src.data_processing.Preprocessing import Preprocessing
-from src.bias.BiasDetector import BiasDetector
+from brio.bias.TotalVariationDistance import TotalVariationDistance
+from brio.bias.KLDivergence import KLDivergence
+from brio.data_processing.Preprocessing import Preprocessing
+from brio.bias.BiasDetector import BiasDetector
 from sklearn.model_selection import train_test_split
 import numpy as np
 from pickle import dump, load
