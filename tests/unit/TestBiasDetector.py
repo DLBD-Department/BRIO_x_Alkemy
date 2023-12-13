@@ -12,6 +12,7 @@ from brio.bias.FreqVsRefBiasDetector import FreqVsRefBiasDetector
 
 import logging
 
+
 class TestBiasDetector(unittest.TestCase):
 
     def setUp(self):
@@ -37,8 +38,8 @@ class TestBiasDetector(unittest.TestCase):
         predicted_prob = classifier.predict_proba(X_test_ohe)
         predicted_values = classifier.predict(X_test_ohe)
 
-        self.df_with_predictions = pd.concat(
-            [X_test.reset_index(drop=True), pd.Series(predicted_values)], axis=1).rename(columns={0: "predictions"})
+        self.df_with_predictions = X_test.reset_index(drop=True).assign(
+            predictions=predicted_values, predicted_probs=predicted_prob[:, 1])
 
         #### Reference Distribution ####
         male_0_ref = 75 / 100
@@ -49,11 +50,10 @@ class TestBiasDetector(unittest.TestCase):
 
         self.ref = [np.array([male_0_ref, male_1_ref]), np.array([female_0_ref, female_1_ref])]
 
-        #to use when target is a probability (and we split in 10 bins)
-        male_ref_prob = [0.2,0.15,0.15,0.1,0.1,0.1,0.05,0.05,0.05,0.05]
-        female_ref_prob = [0.2,0.15,0.15,0.1,0.1,0.1,0.05,0.05,0.05,0.05]
+        # to use when target is a probability (and we split in 10 bins)
+        male_ref_prob = [0.2, 0.15, 0.15, 0.1, 0.1, 0.1, 0.05, 0.05, 0.05, 0.05]
+        female_ref_prob = [0.2, 0.15, 0.15, 0.1, 0.1, 0.1, 0.05, 0.05, 0.05, 0.05]
         self.ref_prob = [np.array(male_ref_prob), np.array(female_ref_prob)]
-
 
     def test_compare_root_variable_groups_with_TVD(self):
         '''
@@ -88,24 +88,22 @@ class TestBiasDetector(unittest.TestCase):
 
         self.assertEqual(results[0], 0.0011441803173238346)
 
-
     def test_compare_root_variable_groups_probs(self):
         '''
         Test the compare_root_variable_groups method against a 
         known data set and model when the target variable is a probability
         '''
-        for dist, res in zip(["TVD","JS"], [0.05588711, 0.005517027]):
+        for dist, res in zip(["TVD", "JS"], [0.05588711, 0.005517027]):
             bd = FreqVsFreqBiasDetector(distance=dist, aggregating_function=max, A1="high", target_variable_type='probability')
 
             results = bd.compare_root_variable_groups(
-                        dataframe=self.df_with_predictions,
-                        target_variable='predicted_probs',
-                        root_variable='x2_sex',
-                        threshold=0.1,
-                        n_bins=10)
+                dataframe=self.df_with_predictions,
+                target_variable='predicted_probs',
+                root_variable='x2_sex',
+                threshold=0.1,
+                n_bins=10)
             with self.subTest():
                 self.assertAlmostEqual(results[0], res, delta=1e-8)
-
 
     def test_compare_root_variable_groups_with_KL_and_ref_distribution(self):
         '''
@@ -122,7 +120,7 @@ class TestBiasDetector(unittest.TestCase):
             root_variable='x2_sex',
             threshold=0.1,
             reference_distribution=self.ref)
-
+        self.assertEqual(results[0], [0.07485260878313427, 0.11543085607355452])
 
     def test_compare_root_variable_groups_with_KL_and_ref_distribution_probs(self):
         '''
@@ -134,14 +132,14 @@ class TestBiasDetector(unittest.TestCase):
         bd = FreqVsRefBiasDetector(normalization="D1", A1="high", target_variable_type='probability')
 
         results = bd.compare_root_variable_groups(
-                    dataframe=self.df_with_predictions,
-                    target_variable='predicted_probs',
-                    root_variable='x2_sex',
-                    threshold=0.1,
-                    reference_distribution=self.ref_prob,
-                    n_bins=10)
+            dataframe=self.df_with_predictions,
+            target_variable='predicted_probs',
+            root_variable='x2_sex',
+            threshold=0.1,
+            reference_distribution=self.ref_prob,
+            n_bins=10)
         with self.subTest():
-            self.assertAlmostEqual(results[0][0], 0.332536911, delta=1e-8)  
+            self.assertAlmostEqual(results[0][0], 0.332536911, delta=1e-8)
         with self.subTest():
             self.assertAlmostEqual(results[0][1], 0.395066879, delta=1e-8)
 
@@ -189,7 +187,6 @@ class TestBiasDetector(unittest.TestCase):
 
         self.assertEqual(len(violations), 0)
 
-
     def test_compare_root_variable_conditioned_groups_probs(self):
         '''
         Test the compare_root_variable_conditioned_groups method against
@@ -197,8 +194,7 @@ class TestBiasDetector(unittest.TestCase):
         It uses max as aggregating function.
         '''
 
-
-        for dist, result in zip(["TVD","JS"], [4,2]):
+        for dist, result in zip(["TVD", "JS"], [4, 2]):
             bd = FreqVsFreqBiasDetector(distance=dist, aggregating_function=max, A1="high", target_variable_type='probability')
 
             results = bd.compare_root_variable_conditioned_groups(
@@ -213,7 +209,6 @@ class TestBiasDetector(unittest.TestCase):
             violations = {k: v for k, v in results.items() if not v[2]}
             with self.subTest():
                 self.assertEqual(len(violations), result)
-
 
     def test_compare_root_variable_conditioned_groups_with_KL_and_ref_distribution(self):
         '''
@@ -237,7 +232,6 @@ class TestBiasDetector(unittest.TestCase):
 
         violations = {k: v for k, v in results.items() if (not v[2][0] or not v[2][1])}
         self.assertEqual(len(violations), 9)
-        
 
     def test_compare_root_variable_conditioned_groups_with_KL_and_ref_distribution_probs(self):
         '''
@@ -248,7 +242,7 @@ class TestBiasDetector(unittest.TestCase):
         It uses a reference distribution for the bias detection. 
         '''
 
-        for adjust_div,res in zip(['no', 'zero'], [16,12,16]):
+        for adjust_div, res in zip(['no', 'zero'], [16, 12, 16]):
             bd = FreqVsRefBiasDetector(normalization="D1", adjust_div=adjust_div, A1="high", target_variable_type='probability')
 
             results = bd.compare_root_variable_conditioned_groups(
@@ -265,14 +259,13 @@ class TestBiasDetector(unittest.TestCase):
             with self.subTest():
                 self.assertEqual(len(violations), res)
 
-
     def test_compare_freqvsfreq_distances_from_proba_and_distances_from_classes(self):
         '''
         Check that the freqvsfreq distances computed from the predicted probabilities, with two bins, 
         equal those computed using the predicted classes (for a binary classification problem)
         '''
-                
-        for dist in ["TVD","JS"]:
+
+        for dist in ["TVD", "JS"]:
             bd_class_freq = FreqVsFreqBiasDetector(distance=dist, target_variable_type='class')
             results_class = bd_class_freq.compare_root_variable_groups(
                 dataframe=self.df_with_predictions,
@@ -296,7 +289,7 @@ class TestBiasDetector(unittest.TestCase):
         Check that the freqvsfref distances computed from the predicted probabilities, with two bins, 
         equal those computed using the predicted classes (for a binary classification problem)
         '''
-                
+
         for adjust_div in ['no', 'zero', 'laplace']:
             bd_class_freq = FreqVsRefBiasDetector(adjust_div=adjust_div, target_variable_type='class')
             results_class = bd_class_freq.compare_root_variable_groups(
@@ -323,17 +316,18 @@ class TestBiasDetector(unittest.TestCase):
         '''
         test that kl div and relative corrections gives the expected results on known distributions
         '''
-        ref = [np.array([0.5,0.3,0.2])]*2
-        obs = [np.array([0.5,0.5,0]), np.array([0.5,0.4,0.1])]
+        ref = [np.array([0.5, 0.3, 0.2])] * 2
+        obs = [np.array([0.5, 0.5, 0]), np.array([0.5, 0.4, 0.1])]
         n_obs = [400, 500]
-        for adjust_div, res in zip(['no','zero','laplace'], [1,-0.283844843, 0.511794884]):
+        for adjust_div, res in zip(['no', 'zero', 'laplace'], [1, -0.283844843, 0.511794884]):
             bd = FreqVsRefBiasDetector(normalization="D1", adjust_div=adjust_div)
             result = bd.compute_distance_from_reference(
                 reference_distribution=ref,
                 observed_distribution=obs,
                 n_obs=n_obs)
             with self.subTest():
-                self.assertAlmostEqual(result[1], 0.070190181, delta=1e-8) # if no bins are empty, corrections shouldn't have effect: always same result
+                # if no bins are empty, corrections shouldn't have effect: always same result
+                self.assertAlmostEqual(result[1], 0.070190181, delta=1e-8)
             with self.subTest():
                 self.assertAlmostEqual(result[0], res, delta=1e-8)
 
