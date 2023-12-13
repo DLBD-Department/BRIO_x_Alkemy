@@ -6,7 +6,7 @@ from flask import (Blueprint, Flask, Response, current_app, flash, jsonify,
                    redirect, render_template, request, session, url_for)
 
 from frontend.views.bias_route import FreqvsFreq, FreqvsRef
-from src.utils.funcs import allowed_file, handle_multiupload
+from brio.utils.funcs import allowed_file, handle_multiupload
 
 bp = Blueprint('bias', __name__,
                template_folder="../templates/bias", url_prefix="/bias")

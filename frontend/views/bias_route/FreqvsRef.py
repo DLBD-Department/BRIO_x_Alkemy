@@ -8,8 +8,8 @@ import pandas as pd
 from flask import (Blueprint, Flask, current_app, flash, jsonify, redirect,
                    render_template, request)
 
-from src.bias.FreqVsRefBiasDetector import FreqVsRefBiasDetector
-from src.utils.funcs import (handle_ref_distributions, order_violations,
+from brio.bias.FreqVsRefBiasDetector import FreqVsRefBiasDetector
+from brio.utils.funcs import (handle_ref_distributions, order_violations,
                              write_reference_distributions_html)
 
 bp = Blueprint('FreqvsRef', __name__,
