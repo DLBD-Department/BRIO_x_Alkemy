@@ -26,10 +26,23 @@ function handle_refs() {
     var rootvar = document.getElementById("root_var");
     var selected_option_rv = rootvar.options[rootvar.selectedIndex];
     var predvar = document.getElementById("predictions");
-    var selected_option_pr = predvar.options[predvar.selectedIndex];
+    var selected_option_pr = predvar.options[predvar.selectedIndex];  
+    var target_type1 = document.getElementById("target_type1");
+    var target_type2 = document.getElementById('target_type2');
+    if (target_type1.checked) {
+      var selected_option_tt = target_type1;
+    } else {
+      var selected_option_tt = target_type2;
+    }
+    var nbins = document.getElementById("binning");
+    var selected_option_nb = nbins.querySelector('input[name="nbins"]');
+    
     if (selected_option_pr.value != "id" && selected_option_rv.value != "id") {
       data.append("rv_selected", selected_option_rv.value);
       data.append("pr_selected", selected_option_pr.value);
+
+      data.append("tt_selected", selected_option_tt.value);
+      data.append("nb_selected", selected_option_nb.value);
       const freqvsref_url = "http://" + "{{ local_ip }}" + ":5000/bias/freqvsref";
       const preds_id = document.getElementById("ref_dist");
       fetch(freqvsref_url, {
