@@ -20,7 +20,7 @@
       <label class="form-check-label" for="a1_low">A1=low</label>
     </div><br><br>
     <div class="container" id="adj_div">
-        <p id="explanationText" title="When a bin of the observed distribution is 0 the relative combination to KL is inf. If you want to avoid this, select zero (if present, inf contributions are forced to zero - not suggested when you have many empty bins) or laplace (implement add-1 Laplace smoothing only if empty bins are present - add 1 to each bin and recompute frequencies)">Empty bin adjustment:
+        <a for="adj_div" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-container="body" data-bs-placement="top" title="Adjust div" data-bs-content="When a bin of the observed distribution is 0 the relative combination to KL is inf. If you want to avoid this, select zero (if present, inf contributions are forced to zero - not suggested when you have many empty bins) or laplace (implement add-1 Laplace smoothing only if empty bins are present - add 1 to each bin and recompute frequencies)">Empty bin adjustment:</a>
         <input type="radio" class="form-check-input" name="adjust_div" id="adj_div_no" value="no" checked>
         <label class="form-check-label" for="adj_div_no">no</label>
         <input type="radio" class="form-check-input" name="adjust_div" id="adj_div_zero" value="zero">
