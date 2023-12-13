@@ -1,14 +1,16 @@
-from flask import Flask, render_template, request, redirect, flash, url_for, jsonify, Blueprint, current_app
-import pickle
-import pandas as pd
 import glob
 import os
-from subprocess import check_output
+import pickle
 from statistics import mean, stdev
+from subprocess import check_output
 
-from brio.utils.funcs import write_reference_distributions_html, handle_ref_distributions, order_violations
+import pandas as pd
+from flask import (Blueprint, Flask, current_app, flash, jsonify, redirect,
+                   render_template, request)
+
 from brio.bias.FreqVsRefBiasDetector import FreqVsRefBiasDetector
-
+from brio.utils.funcs import (handle_ref_distributions, order_violations,
+                             write_reference_distributions_html)
 
 bp = Blueprint('FreqvsRef', __name__,
                template_folder="../../templates/bias", url_prefix="/freqvsref")
@@ -44,11 +46,14 @@ def freqvsref():
             dict_vars['df'] = pd.read_csv(latest_file)
     list_var = dict_vars['df'].columns
     if request.method == 'POST':
-        if list(request.form.keys()):
-            if ('pr_selected' and 'rv_selected') in list(request.form.keys()):
+        if list(request.form.keys()):       
+            if ('pr_selected' and 'rv_selected' and 'nb_selected' and 'tt_selected') in list(request.form.keys()):
                 rvar = request.form['rv_selected']
                 pvar = request.form['pr_selected']
-                return {'response_refs': write_reference_distributions_html(rvar, pvar, dict_vars['df'])}
+                tvar = request.form['tt_selected']
+                nvar = int(request.form['nb_selected'])
+                return {'response_refs': write_reference_distributions_html(rootvar=rvar, targetvar=pvar, df=dict_vars['df'], target_type=tvar, n_bins=nvar)}
+                #return {'response_refs': write_reference_distributions_html(rvar, pvar, dict_vars['df'])}
             dict_vars['root_var'] = request.form['root_var']
             dict_vars['predictions'] = request.form['predictions']
             dict_vars['distance'] = request.form['distance']
@@ -56,14 +61,22 @@ def freqvsref():
                 dict_vars['thr'] = float(request.form['Slider'])
             else:
                 dict_vars['thr'] = None
+            dict_vars['a1_param'] = "high"
             if 'auto_thr' in list(request.form.keys()):
                 if request.form['auto_thr'] == 'active':
                     if 'a1_param' in list(request.form.keys()):
                         dict_vars['a1_param'] = request.form['a1_param']
                         dict_vars['thr'] = None
+            dict_vars['adjust_div'] = request.form['adjust_div']
+            dict_vars['target_type'] = request.form['target_type']
+            if 'nbins' in list(request.form.keys()):
+                dict_vars['nbins'] = int(request.form['nbins'])
             dict_vars['cond_vars'] = request.form.getlist('cond_var')
             nroot = len(dict_vars['df'][dict_vars['root_var']].unique())
-            ntarget = len(dict_vars['df'][dict_vars['predictions']].unique())
+            if dict_vars['target_type'] == 'probability':
+                ntarget = dict_vars['nbins']
+            else:
+                ntarget = len(dict_vars['df'][dict_vars['predictions']].unique())
             for i in range(nroot):
                 for j in range(ntarget):
                     cat = f'prob_{i}_{j}'
@@ -76,27 +89,51 @@ def freqvsref():
 @bp.route('/results', methods=['GET', 'POST'])
 def results_fvr():
 
-    bd = FreqVsRefBiasDetector(A1=dict_vars['a1_param'])
+    bd = FreqVsRefBiasDetector(
+        A1=dict_vars['a1_param'],
+        adjust_div=dict_vars['adjust_div'],
+        target_variable_type=dict_vars['target_type'])
 
     ref_distribution = handle_ref_distributions(
         dict_vars['root_var'], dict_vars['predictions'], dict_vars['df'], dict_vars)
 
-    results1 = bd.compare_root_variable_groups(
-        dataframe=dict_vars['df'],
-        target_variable=dict_vars['predictions'],
-        root_variable=dict_vars['root_var'],
-        reference_distribution=ref_distribution,
-        threshold=dict_vars['thr']
-    )
-    results2 = bd.compare_root_variable_conditioned_groups(
-        dataframe=dict_vars['df'],
-        target_variable=dict_vars['predictions'],
-        root_variable=dict_vars['root_var'],
-        conditioning_variables=dict_vars['cond_vars'],
-        reference_distribution=ref_distribution,
-        threshold=dict_vars['thr'],
-        min_obs_per_group=30
-    )
+    if dict_vars['target_type'] == 'probability':
+        results1 = bd.compare_root_variable_groups(
+            dataframe=dict_vars['df'],
+            target_variable=dict_vars['predictions'],
+            root_variable=dict_vars['root_var'],
+            reference_distribution=ref_distribution,
+            threshold=dict_vars['thr'],
+            n_bins=dict_vars['nbins']
+        )
+
+        results2 = bd.compare_root_variable_conditioned_groups(
+            dataframe=dict_vars['df'],
+            target_variable=dict_vars['predictions'],
+            root_variable=dict_vars['root_var'],
+            conditioning_variables=dict_vars['cond_vars'],
+            reference_distribution=ref_distribution,
+            threshold=dict_vars['thr'],
+            min_obs_per_group=30,
+            n_bins=dict_vars['nbins']
+        )
+    else:
+        results1 = bd.compare_root_variable_groups(
+            dataframe=dict_vars['df'],
+            target_variable=dict_vars['predictions'],
+            root_variable=dict_vars['root_var'],
+            reference_distribution=ref_distribution,
+            threshold=dict_vars['thr']
+        )
+        results2 = bd.compare_root_variable_conditioned_groups(
+            dataframe=dict_vars['df'],
+            target_variable=dict_vars['predictions'],
+            root_variable=dict_vars['root_var'],
+            conditioning_variables=dict_vars['cond_vars'],
+            reference_distribution=ref_distribution,
+            threshold=dict_vars['thr'],
+            min_obs_per_group=30
+        )
 
     violations = {k: v for k, v in results2.items() if (
         not v[2][0] or not v[2][1])}

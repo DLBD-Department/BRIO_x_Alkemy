@@ -52,6 +52,9 @@ def freqvsfreq():
                 if len(dict_vars['df'][rvar].unique()) < 3:
                     return {'response': 'True'}
                 return {'response': 'False'}
+            dict_vars['target_type'] = request.form['target_type']
+            if 'nbins' in list(request.form.keys()):
+                dict_vars['nbins'] = int(request.form['nbins'])
             dict_vars['root_var'] = request.form['root_var']
             dict_vars['distance'] = request.form['distance']
             dict_vars['predictions'] = request.form['predictions']
@@ -75,23 +78,46 @@ def freqvsfreq():
 
 @bp.route('/results', methods=['GET', 'POST'])
 def results_fvf():
-    bd = FreqVsFreqBiasDetector(distance=dict_vars['distance'], A1=dict_vars['a1_param']
-                                )
 
-    results1 = bd.compare_root_variable_groups(
-        dataframe=dict_vars['df'],
-        target_variable=dict_vars['predictions'],
-        root_variable=dict_vars['root_var'],
-        threshold=dict_vars['thr']
+    bd = FreqVsFreqBiasDetector(
+        distance=dict_vars['distance'],
+        A1=dict_vars['a1_param'],
+        target_variable_type=dict_vars['target_type']
     )
-    results2 = bd.compare_root_variable_conditioned_groups(
-        dataframe=dict_vars['df'],
-        target_variable=dict_vars['predictions'],
-        root_variable=dict_vars['root_var'],
-        conditioning_variables=dict_vars['cond_vars'],
-        threshold=dict_vars['thr'],
-        min_obs_per_group=30
-    )
+
+    if dict_vars['target_type'] == 'probability':
+        results1 = bd.compare_root_variable_groups(
+            dataframe=dict_vars['df'],
+            target_variable=dict_vars['predictions'],
+            root_variable=dict_vars['root_var'],
+            threshold=dict_vars['thr'],
+            n_bins=dict_vars['nbins']
+        )
+        results2 = bd.compare_root_variable_conditioned_groups(
+            dataframe=dict_vars['df'],
+            target_variable=dict_vars['predictions'],
+            root_variable=dict_vars['root_var'],
+            conditioning_variables=dict_vars['cond_vars'],
+            threshold=dict_vars['thr'],
+            min_obs_per_group=30,
+            n_bins=dict_vars['nbins']
+        )
+    else:
+        results1 = bd.compare_root_variable_groups(
+            dataframe=dict_vars['df'],
+            target_variable=dict_vars['predictions'],
+            root_variable=dict_vars['root_var'],
+            threshold=dict_vars['thr']
+        )
+        results2 = bd.compare_root_variable_conditioned_groups(
+            dataframe=dict_vars['df'],
+            target_variable=dict_vars['predictions'],
+            root_variable=dict_vars['root_var'],
+            conditioning_variables=dict_vars['cond_vars'],
+            threshold=dict_vars['thr'],
+            min_obs_per_group=30
+        )
+
     violations = {k: v for k, v in results2.items() if not v[2]}
 
     if request.method == "POST":
