@@ -5,10 +5,12 @@ from statistics import mean, stdev
 from subprocess import check_output
 
 import pandas as pd
+import numpy as np
 from flask import (Blueprint, current_app, flash, jsonify,
                    redirect, render_template, request)
 
 from brio.bias.FreqVsFreqBiasDetector import FreqVsFreqBiasDetector
+from brio.bias.BiasDetector import BiasDetector
 from brio.utils.funcs import order_violations
 
 bp = Blueprint('FreqvsFreq', __name__,
@@ -133,10 +135,21 @@ def results_fvf():
     return render_template('results_freqvsfreq.html', results1=results1, results2=results2, violations=order_violations(violations), local_ip=localhost_ip)
 
 
-@bp.route('/results/<violation>')
+@bp.route('/results/<violation>') # USA IN QUALCHE MODO get_frequencies_list_from_probs O I SUO CONTENUTO
 def details_fvf(violation):
     focus_df = dict_vars['df'].query(violation)
 
-    results_viol2 = focus_df.groupby(dict_vars['root_var'])[
-        dict_vars['predictions']].value_counts(normalize=True)
+    if dict_vars['target_type'] == 'probability':
+        bd = BiasDetector()
+        freqs, _ = bd.get_frequencies_list_from_probs(focus_df, dict_vars['predictions'], 
+                                dict_vars['root_var'], sorted(focus_df[dict_vars['root_var']].unique()), dict_vars['nbins'])
+        #transform list of frequencies in a Series with multiindex
+        predicted_probs_limits = np.round(np.arange(0, 1 + 1/dict_vars['nbins'], 1/dict_vars['nbins']),2)
+        predicted_probs_range = [f'{start}-{end}' for start, end in zip(predicted_probs_limits[:-1], predicted_probs_limits[1:])]
+        # Create a multi-index
+        multi_index = pd.MultiIndex.from_product([sorted(focus_df[dict_vars['root_var']].unique()), predicted_probs_range], names=[dict_vars['root_var'], dict_vars['predictions']])
+        results_viol2 = pd.Series(np.concatenate(freqs), index=multi_index, name='freqs')
+    else:
+        results_viol2 = focus_df.groupby(dict_vars['root_var'])[
+            dict_vars['predictions']].value_counts(normalize=True)
     return render_template('violation_specific_fvf.html', viol=violation, res2=results_viol2.to_frame().to_html(classes=['table table-hover mx-auto w-75']))
