@@ -1,6 +1,13 @@
 IMAGE_NAME="brio_frontend"
 CONTAINER_NAME="brio"
 
+UNAME := $(shell uname -o)
+ifeq ($(UNAME), GNU/Linux)
+    HOST_IP=$(shell hostname -I | cut -d ' ' -f1)
+endif
+ifeq ($(UNAME), Darwin)
+    HOST_IP=$(shell osascript -e "IPv4 address of (system info)")
+endif
 
 .PHONY: help build test shell stop
 
@@ -24,7 +31,7 @@ build:
 frontend: build
 	@docker run -dp 5000:5000 \
 		--name ${CONTAINER_NAME} \
-		--env HOST_IP=$(shell hostname -I | cut -d ' ' -f1) \
+		--env HOST_IP=$(HOST_IP) \
 		${IMAGE_NAME}
 
 .PHONY: shell
