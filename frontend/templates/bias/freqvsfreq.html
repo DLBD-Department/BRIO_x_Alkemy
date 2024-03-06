@@ -66,12 +66,28 @@ function display_thr() {
   }
 };
 
+function display_nbins() {
+  var target_type1 = document.getElementById("target_type1")
+  var target_type2 = document.getElementById("target_type2")
+  var nbins = document.getElementById("binning")
+  if (target_type2.checked == true) {
+    nbins.classList.remove("d-none");
+  } else if (target_type1.checked == true) {
+    nbins.classList.add("d-none");
+  }
+};
+
 document.addEventListener("DOMContentLoaded", function() {
     var disabfromroot = document.getElementById("root_var");
     disabfromroot.addEventListener("change", handle_agg_funcs);
     var auto_thr = document.getElementById("auto_thr");
     auto_thr.addEventListener("change", display_thr)
+    var tgtype1= document.getElementById("target_type1");
+    tgtype1.addEventListener("change", display_nbins)
+    var tgtype2= document.getElementById("target_type2");
+    tgtype2.addEventListener("change", display_nbins)
 });
+
 </script>
 {% endblock %}
 

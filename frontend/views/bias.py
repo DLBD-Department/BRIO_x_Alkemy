@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request, redirect, flash, session, Blueprint, current_app
-from frontend.views.bias_route import FreqvsFreq, FreqvsRef
 import os
-from subprocess import check_output
 import subprocess
+from subprocess import check_output
 
-from brio.utils.funcs import handle_multiupload, allowed_file
+from flask import (Blueprint, Flask, Response, current_app, flash, jsonify,
+                   redirect, render_template, request, session, url_for)
+
+from frontend.views.bias_route import FreqvsFreq, FreqvsRef
+from brio.utils.funcs import allowed_file, handle_multiupload
 
 bp = Blueprint('bias', __name__,
                template_folder="../templates/bias", url_prefix="/bias")
@@ -18,6 +20,14 @@ comp_thr = ""
 success_status = "text-warning"
 ips = check_output(['hostname', '-I'])
 localhost_ip = ips.decode().split(" ")[0]
+print(f"localhost_ip={localhost_ip}", flush=True)
+# check if this script is being run inside a docker container
+# if so, then the localhost_ip will be read from an environment variable
+if os.system("test -f /.dockerenv") == 0:
+    print("Running inside a docker container", flush=True)
+    localhost_ip = os.environ['HOST_IP']
+    print(f"localhost_ip={localhost_ip}", flush=True)
+
 
 
 @bp.route('/', methods=['GET', 'POST'])

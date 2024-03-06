@@ -30,6 +30,7 @@
 \newtheorem*{theorem*}{Theorem}
 
 \newcommand{\red}[1]{\color{red}#1}
+\newcommand{\quot}[1]{``#1''}
 
 %% end of the preamble, start of the body of the document source.
 \begin{document}
@@ -95,7 +96,7 @@ email=christian.quaggio@alkemy.com
 %  6 Joliot-Curie, Dubna, Moscow region, 141980, Russian Federation}
 
 %\fnmark[1]
-\address[1]{LUCI Group, Department of Philosophy, University of Milan, via Festa del Perdono 7, 20122 Milan, Italy}
+\address[1]{LUCI Lab, Department of Philosophy, University of Milan, via Festa del Perdono 7, 20122 Milan, Italy}
 \address[2]{Alkemy, Deep Learning \& Big Data Department}
 \address[3]{Ethos Group, Department of Human Sciences, University of Verona, Lungadige Porta Vittoria 17, 37129 Verona, Italy}
 
@@ -138,15 +139,32 @@ Bias, Machine Learning, AI
 
 The project BRIO aims at developing formal and conceptual frameworks for the analysis of AI systems and for the advancement of the technical and philosophical understanding of the notions of Bias, Risk and Opacity in AI, with the ultimate objective of generally contributing to the development of trustworthy AI.\footnote{\url{sites.unimi.it/brio}} 
 
-The aim of the collaboration between BRIO and Alkemy is to produce software applications for the analysis of bias, risk and opacity with regard to AI technologies which often rely on non-deterministic computations and are opaque in nature. One of the most challenging aspects of modern AI systems, indeed, is that they do not guarantee specification correctness, and they are not transparent, in the sense that a general formal description of their behaviour might not be available.
+The aim of the collaboration between BRIO and Alkemy is to produce software applications for the analysis of bias, risk and opacity with regard to AI technologies which often rely on non-deterministic computations and are opaque in nature. One of the most challenging aspects of modern AI systems, indeed, is that they do not guarantee specification correctness, and they are not transparent, in the sense that a general formal description of their behaviour might not be available. Even in absence of a formally specified correct behaviour, one might want to check whether a system performs as desirable, and even statistical convergence towards the behavior dictated by the training set might be undesirable when the latter is biased or unbalanced.
 
 We present a first tool developed within the BRIOxAlkemy collaboration for the detection and analysis of biased behaviours in AI systems. The tool is aimed at developers and data scientists who wish to test their algorithms relying on probabilistic and learning mechanisms in order to detect misbehaviours related to biases and collect data about them. The ultimate goal is to provide them with useful insights and data for the improvement of their AI systems.
 
 The introduced system is based on the foundational works presented in \cite{dap21,dagp22,gp23}, and in this paper we discuss the formal ideas behind its development (Section \ref{sec:theory}), the technical details of its implementation  (\Cref{sec:implementation}), the data obtained from a case study that validates the usefulness of the software (\Cref{sec:validation}), and planned further developments aimed at integrating the software in larger tool for the analysis of AI systems (\Cref{sec:conclusions}).
 
+\subsection*{Related literature}
+We conclude this introduction with a brief comparison with other projects having similar purposes. Given the sensitivity and the urgency of the topic, with an ever-growing literature, our exposition has no claim of being exhaustive, although we point to a few surveys that might help systematize known approaches.
+
+Our tool is of the so-called \quot{post-processing} kind \cite{dAlessandro2017ConscientiousCA}, meaning that the algorithm is treated as a black box and one can only observe its behaviour and intervene \textit{ex post}. Many post-processing tools define appropriate loss/cost functions $\{0,1\}^2\to\mathbb{R}$ meant to measure at each pair of labels $(\hat{y},y)$ the \quot{undesirability} of predicting $\hat{y}$ when the correct label is $y$, and then try to minimize that. This is the case, for example, of \cite{NIPS2016_9d268236,NIPS2017_b8b9c74a,6413831} and others. This approach requires that such a comparison can be made,  while we do not assume anything on the \quot{correct} label and we only relate \emph{frequencies}, having no suppositions on single outputs but instead comparing them (either with one another, or with respect to a single, optimal one) according to what is usually called \quot{(conditional) statistical parity} or \quot{demographic parity} \cite{fuetal2020}.
+
+The fact that our tool is not concerned with local mistakes but focuses on the presence of biases at the abstract level of the predictive model's global behaviour on a whole input dataset implies also that our tool does not come equipped with any native mitigation mechanism, as the outcome of our analysis does not necessarily make it clear \textit{on which points} one should focus to solve one's problem.
+
+Though our approach might seem related, at least in its scope, to what in the literature is often called \emph{feature weighting} \cite{NINOADAN2021115424}, it is in fact very different, and possibly orthogonal in its intention: while feature weighting aims at measuring how much a single feature influences the result of an algorithm, our detection tool wishes to quantify possible imbalances in the output. Mechanisms intimately related to feature weighting, nevertheless, will be a central component of an additional module concerning the measurement of the degree of opacity of a predictive model, which is currently under development by the authors of the present work.
+
+Given the above remarks, the presented tool computes a notion of bias which sits within the quantitative approaches to fairness \cite{Castelnovo_2022, chouldechova2018frontiers, 10.1145/3194770.3194776} and it qualifies as an observational measure which quantifies bias only based on \textit{post-hoc} analysis of prediction distributions. Moreover, as mentioned, the measure remains blind with respect to the ground truth of the interested labels. Finally, for a list of available tools for fairness metrics we refer to \cite{fairness_catalogue}.
+
 \section{Theory}\label{sec:theory}
 
-The basic workings of the BrioxAlkemy tool is as follows. It takes as input an AI model's output and a set of user's selected parameter settings: the former is encoded as a set of datapoints with their associated features, the latter include the designation of a sensitive feature. In output our tool returns an evaluation of the possibility that the AI model under consideration is biased with respect to the features designated as sensitive by the user. The system closely guides the user in the process of setting the parameters, whose conceptual significance is illustrated with detailed explanations, remaining customisable with respect to the mathematical details of the analysis. 
+The basic workflow of the BRIOxAlkemy tool is the following. It takes as input an AI model's output  and a set of user's selected parameter settings: the former is encoded as a set of datapoints with their associated features, the latter include the designation of a \emph{sensitive feature}. In output our tool returns an evaluation of the possibility that the AI model under consideration is biased with respect to the features designated as sensitive by the user. Note that what we call \quot{sensitive feature} also appears with the name of \emph{protected attribute} \cite{hrw}: we keep the specific name because we do not wish to impress any normative connotation to our work, and because in our case it is in fact a feature in the dataset.
+
+%
+%REVISION ADDITION SUGGESTION: Technically, the input consisting in the model's output can either be codified as an already preprocessed dataframe or as a raw dataset together with a customised preprocessing pipeline.
+%
+% 
+The system closely guides the user in the process of setting the parameters, whose conceptual significance is illustrated with detailed explanations, remaining customisable with respect to the mathematical details of the analysis. 
 %The choices left to the user are those that actually make a conceptual difference in the outcome of the analysis, and this difference is explained to the user during the setting of these parameters.
 The analyses conducted by our system are of two kinds: 
 
@@ -161,7 +179,7 @@ Whenever the second analysis alerts of a possibly biased behaviour, a subsequent
 Before we delve into the technical details, let us give a little example: 
 
 \begin{example}
-Consider a database containing details of individuals, with their age, gender, and level of education. Consider an algorithm which predicts the likelihood of default on credit. We wish to check if age is a sensitive factor in such prediction. We feed the tool with our dataset, the output of the run of the predictive algorithm, and mark the feature of age as sensitive. The program allows us to compare either how the behaviour of the algorithm with respect to age differs from an ``optimal'' behaviour (in this case, we might consider optimal the case where each age group equally succeeds), or how different age groups perform with respect to one another.
+Consider a database containing details of individuals, with their age, gender, and level of education. Consider an algorithm which predicts the likelihood of default on credit. We wish to check if age is a sensitive factor in such prediction. We feed the tool with our dataset and the output of the run of the predictive algorithm. The user might want to consider whether the feature \texttt{age} as sensitive for the decision making process and therefore selects it in the interface as such. The program allows us to compare either how the behaviour of the algorithm with respect to age differs from an ``optimal'' behaviour (in this case, we might consider optimal the case where each age group equally succeeds), or how different age groups perform with respect to one another.
 \end{example}
  
 \subsection{Divergences}
@@ -203,7 +221,7 @@ which computes the largest difference between the probability of obtaining an ou
 How total variation relates to Jensen-Shannon can be formulated as follows:
 
 \begin{theorem*}[{\cite[Prop. 4.2]{levin2017markov}},{\cite[Thm. 3]{lin_divergence}}]
-Let $P$ and $Q$ probability distributions over $X$. Then we have the following:
+Let $P$ and $Q$ probability distributions over $X$. Then the following two statements are true:
 \begin{enumerate}
 \item $D_{\mathrm{TV}}(P,Q)=\frac{1}{2}\sum_{x\in X}\vert P(x)-Q(x)\vert$;
 \vspace{0.2cm}
@@ -219,7 +237,7 @@ This suggests that Jensen-Shannon is less sensitive to differences in the compar
 Since the divergences the system uses are binary functions, it is not obvious how to handle the case in which the sensitive feature we are considering partitions the domain in three or more classes. It is, indeed, easy to compute the divergence for pairs of classes, but we also need, in this case, a sensible way of aggregating the obtained results in one value, to describe how the AI model behaves with respect to the sensitive feature under consideration. Several ways of doing so are possible, and each of them tells us something of value if we wish to reach a meaningful conclusion about the AI model.
 
 Suppose that we are studying the behaviour of the model with respect to the feature $F=\{c_1, \ldots , c_n\}$ which induces a partition of our domain of individuals into the classes $c_1, \ldots , c_n$. The first step is the pairwise calculation of the divergences with respect to the different classes induced by $F$. Hence, for each pair $(c_i\parallel c_j)$ such that $c_i, c_j\in F$, we compute $D(c_i\parallel c_j) $ where $D$ is the  preselected divergence and consider the set $\{D(c_i\parallel c_j) : c_i,c_j\in F\ \&\ i\neq j\}$. For instance, if we are considering age as our feature  $F$ and we partition our domain into three age groups, we might have
-\[F=\{over\_50\_yo, between\_40\_and\_50\_yo, below\_40\_yo\}\]
+\[F=\{\tt over\_50\_yo, between\_40\_and\_50\_yo, below\_40\_yo\}.\]
 We can then use the following ways of aggregating the obtained values.
 
 \paragraph{Maximal divergence}
@@ -243,26 +261,26 @@ This measure indicates the variability of the bias expressed by the AI system we
 
 \subsection{Parametrisation of the threshold for the divergence}\label{threshold}
 
-Whenever the system computes a divergence between the results of the model and a reference distribution or the results of the model for distinct classes, a threshold is employed to check whether the divergence is significant -- in which case it should be treated as a possible violation of our fairness criteria -- or negligible -- in which case should be simply ignored. Obviously, fixing this threshold once and for all would give a rather inflexible system. For instance, setting the threshold to $1/100$ might be reasonable if we are considering the results of the model on a set of $100$ individuals, but it is clearly too strict if our domain only contains $40$ individuals. In the latter case, even a difference only concerning one individual would constitute a mistake much greater than the one admitted by the threshold. This is why we parametrise the threshold on the basis of several factors. 
+Whenever the system computes a divergence between the results of the model and a reference distribution or the results of the model for distinct classes, a threshold is employed to check whether the divergence is significant -- in which case it should be treated as a possible violation of our fairness criteria -- or negligible -- in which case should be simply ignored. Obviously, fixing this threshold once and for all would give a rather inflexible system. For instance, setting the threshold to $1/100$ might be reasonable if we are considering the results of the model on a set of $100$ individuals, but it is clearly too strict if our domain only contains $40$ individuals. In the latter case, even a difference only concerning one individual would constitute a mistake much greater than the one admitted by the threshold. This is why we parametrise the threshold on the basis of several factors. The resulting threshold $\epsilon$ will be computed as a function of three parameters: $\epsilon = f( r ,n_C , n_D)$.
 
 First, the user has to decide how much rigour is required when analysing the behaviour of the model with respect to the feature indicated as sensitive for the present analysis. Two settings are possible: 
 
 \begin{itemize}
-\item $\mathtt{high}$: it implies that the considered feature is very sensitive and that the system should be extra attentive about the behaviour of the model in relation to it;
-\item $\mathtt{low}$: it implies that differences in the behaviour of the model with respect to the considered feature are significant only if they are particularly strong or extreme. This setting distinguishes between a thorough and rigorous investigation and a simple routine check, one might say.
+\item $r=\mathtt{high}$: it implies that the considered feature is very sensitive and that the system should be extra attentive about the behaviour of the model in relation to it;
+\item $r=\mathtt{low}$: it implies that differences in the behaviour of the model with respect to the considered feature are significant only if they are particularly strong or extreme. This setting distinguishes between a thorough and rigorous investigation and a simple routine check, one might say.
 \end{itemize}
 
 
 
-The second factor considered in computing the threshold is the number of classes related to the sensitive feature under consideration. We  call this the {\it granularity} of the predicates related to the sensitive feature, and it indicates how specific the predicates determining the studied classes are. Specific predicates describe in more detail the objects of our domain and determine more specific classes. When the classes under consideration are very specific, the divergence generated by the bias of the model can be spread over several of them. Hence, we need to be more attentive about the small divergences that appear locally -- that is, when we check pairs of these classes. In this case, the threshold should be stricter.
+The second factor considered in computing the threshold is the number $n_C$ of classes related to the sensitive feature under consideration. We  call this the {\it granularity} of the predicates related to the sensitive feature, and it indicates how specific the predicates determining the studied classes are. Specific predicates describe in more detail the objects of our domain and determine more specific classes. When the classes under consideration are very specific, the divergence generated by the bias of the model can be spread over several of them. Hence, we need to be more attentive about the small divergences that appear locally -- that is, when we check pairs of these classes. In this case, the threshold should be stricter.
 
-Finally, each time we compute a divergence relative to two classes, we scale the threshold with respect to the cardinality of the two classes. Large classes require a stricter threshold. This is a rather obvious choice related to the fact that statistical data related to a large number of individuals tend to be more precise and fine grained. We already gave an example of this few lines ago.
+Finally, each time we compute a divergence relative to two classes, we scale the threshold with respect to the cardinality $n_D$ of the two classes. Large classes require a stricter threshold. This is a rather obvious choice related to the fact that statistical data related to a large number of individuals tend to be more precise and fine grained. We already gave an example of this few lines ago.
 
-Technically, the threshold is always between $0.05$ and $0.005$, the setting $\mathtt{high}$ restricts this range to the interval $[0.005,0.0275]$ and the setting $\mathtt{low}$ to the interval $[0.0275,0.05]$. The number $n_C$ of classes related to the sensitive feature and the number $n_D$ of individuals in our local domain (that is, the cardinality of the union of the two classes with respect to which we are computing the divergence) are used to decrease the threshold (in other words, to make it stricter) proportionally with respect to the interval selected. The greater the number $n_C$, the smaller the threshold, the greater the number $n_D$, again, the smaller the threshold. The threshold is then computed as
+Technically, the threshold is always between $0.05$ and $0.005$, the setting  $r=\mathtt{high}$ restricts this range to the interval $[0.005,0.0275]$ and the setting  $r=\mathtt{low}$ to the interval $[0.0275,0.05]$. The number $n_C$ of classes related to the sensitive feature and the number $n_D$ of individuals in our local domain (that is, the cardinality of the union of the two classes with respect to which we are computing the divergence) are used to decrease the threshold (in other words, to make it stricter) proportionally with respect to the interval selected. The greater the number $n_C$, the smaller the threshold, the greater the number $n_D$, again, the smaller the threshold. The threshold is then computed as
 \[
-\epsilon = (n_C \cdot n_D) \cdot m + (1-(n_C \cdot n_D)) \cdot M
+\epsilon = f(r,n_C, n_D) = (n_C \cdot n_D) \cdot m + (1-(n_C \cdot n_D)) \cdot M
 \]
-where $m$ is the lower limit of our interval and $M$ is its upper limit.
+where $m$ is the lower limit of our interval (determined by the argument $r\in\{\mathtt{high}, \mathtt{low}\}$) and $M$ is its upper limit.
 
 \section{Implementation}
 \label{sec:implementation}
@@ -412,7 +430,7 @@ In this final experiment we repeat the same setting of Experiment 6 but using TV
 \section{Conclusions and Further Work}
 \label{sec:conclusions}
 
-The tool for the detection of biases in AI systems presented in this paper is meant to be the first module to be integrated into a more complex software application. The complete system will present additionally a module for the evaluation of opacity values. The system will be completed by a third module whose aim will be to take in input the output of the bias and opacity modules, to return the user with a risk evaluation associated with the use of the dataset or model under analysis. We leave the presentation of these two additional modules to future work.
+The tool for the detection of biases in AI systems presented in this paper is meant to be the first module to be integrated into a more complex software application, including an improved interface for a clearer presentation of results. The complete system will present additionally a module for the evaluation of opacity values. The system will be completed by a third module whose aim will be to take in input the output of the bias and opacity modules, to return the user with a risk evaluation associated with the use of the dataset or model under analysis. We leave the presentation of these two additional modules to future work.
 
 
 % consisting of three, partly inter-dependent modules. The complete system will present two autonomous modules for the analysis of bias and opacity of AI systems---the first of which we just presented---and a module depending on these two concerning risk evaluation.
