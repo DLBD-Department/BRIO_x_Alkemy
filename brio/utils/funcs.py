@@ -20,7 +20,10 @@ def handle_multiupload(req: request, label: str, path: str) -> None:
 
 def handle_ref_distributions(rootvar: str, targetvar: str, df: pd.DataFrame, dict_vars: dict) -> list:
     nroot = len(df[rootvar].unique())
-    ntarget = len(df[targetvar].unique())
+    if dict_vars['target_type'] == 'probability':
+        ntarget = dict_vars['nbins']
+    else:
+        ntarget = len(df[targetvar].unique())
     final_list = []
     intermediate_list = []
     for i in range(nroot):
@@ -40,23 +43,26 @@ def order_violations(viol: dict) -> dict:
         return middle_value
 
     # Sort entries with valid middle values
-    sorted_entries_with_middle_values = sorted(((key, value) for key, value in viol.items(
-    ) if get_middle_value(value) is not None), key=lambda x: get_middle_value(x[1]), reverse=True)
+    sorted_entries_with_middle_values = sorted(((key, value) for key, value in viol.items() if get_middle_value(value) is not None),
+                                               key=lambda x: get_middle_value(x[1]), reverse=True)
 
     # Sort entries with None middle values and append them at the end
-    sorted_dict = dict(sorted_entries_with_middle_values +
-                       [(key, value) for key, value in viol.items() if get_middle_value(value) is None])
+    sorted_dict = dict(sorted_entries_with_middle_values + [(key, value)
+                       for key, value in viol.items() if get_middle_value(value) is None])
     return sorted_dict
 
 
-def write_reference_distributions_html(rootvar: str, targetvar: str, df: pd.DataFrame) -> str:
+def write_reference_distributions_html(rootvar: str, targetvar: str, df: pd.DataFrame, target_type: str, n_bins: int) -> str:
     nroot = len(df[rootvar].unique())
-    ntarget = len(df[targetvar].unique())
+    if target_type == 'probability':
+        ntarget = n_bins
+    else:
+        ntarget = len(df[targetvar].unique())
     tot_refs = nroot * ntarget
     tot_html = ""
     nrows = tot_refs // 4
-    if nrows == 0:
-        nrows = 1
+    if nrows % 4 != 0:
+        nrows += 1
     c = 0
     d = 0
     for n in range(nrows):

@@ -22,6 +22,40 @@ Using the max as aggregating function, you are checking the "worst case scenario
 <script type="text/javascript" src="{{ url_for('static', filename='js/handle_parameters.js') }}"></script>
 <script type="text/javascript">
 function handle_refs() {
+    let data = new FormData();
+    var rootvar = document.getElementById("root_var");
+    var selected_option_rv = rootvar.options[rootvar.selectedIndex];
+    var predvar = document.getElementById("predictions");
+    var selected_option_pr = predvar.options[predvar.selectedIndex];  
+    var target_type1 = document.getElementById("target_type1");
+    var target_type2 = document.getElementById('target_type2');
+    if (target_type1.checked) {
+      var selected_option_tt = target_type1;
+    } else {
+      var selected_option_tt = target_type2;
+    }
+    var nbins = document.getElementById("binning");
+    var selected_option_nb = nbins.querySelector('input[name="nbins"]');
+    
+    if (selected_option_pr.value != "id" && selected_option_rv.value != "id") {
+      data.append("rv_selected", selected_option_rv.value);
+      data.append("pr_selected", selected_option_pr.value);
+
+      data.append("tt_selected", selected_option_tt.value);
+      data.append("nb_selected", selected_option_nb.value);
+      const freqvsref_url = "http://" + "{{ local_ip }}" + ":5000/bias/freqvsref";
+      const preds_id = document.getElementById("ref_dist");
+      fetch(freqvsref_url, {
+      "method": "POST",
+      "body": data
+          }).then((response) => response.json())
+        .then((data) => {
+          preds_id.innerHTML = data.response_refs;
+        })
+  } 
+};
+
+function handle_agg_funcs() {
   let data = new FormData();
   var rootvar = document.getElementById("root_var");
   var selected_option_rv = rootvar.options[rootvar.selectedIndex];
@@ -53,6 +87,17 @@ function display_thr() {
   }
 };
 
+function display_nbins() {
+  var target_type1 = document.getElementById("target_type1")
+  var target_type2 = document.getElementById("target_type2")
+  var nbins = document.getElementById("binning")
+  if (target_type2.checked == true) {
+    nbins.classList.remove("d-none");
+  } else if (target_type1.checked == true) {
+    nbins.classList.add("d-none");
+  }
+};
+
 document.addEventListener("DOMContentLoaded", function() {
     var fromroot = document.getElementById("root_var");
     var frompred = document.getElementById("predictions");
@@ -60,6 +105,10 @@ document.addEventListener("DOMContentLoaded", function() {
     frompred.addEventListener("change", handle_refs);
     var auto_thr = document.getElementById("auto_thr");
     auto_thr.addEventListener("change", display_thr)
+    var tgtype1= document.getElementById("target_type1");
+    tgtype1.addEventListener("change", display_nbins)
+    var tgtype2= document.getElementById("target_type2");
+    tgtype2.addEventListener("change", display_nbins)
 });
 </script>
 {% endblock %}
