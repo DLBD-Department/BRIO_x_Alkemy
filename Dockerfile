@@ -8,6 +8,6 @@ COPY . /app
 ENV PYTHONPATH=/app
 WORKDIR /app/frontend
 
-EXPOSE 5000
+EXPOSE 5001
 
 CMD ["python", "app.py"]
