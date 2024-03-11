@@ -29,7 +29,7 @@ build:
 
 .PHONY: frontend
 frontend: build
-	@docker run -dp 5000:5000 \
+	@docker run -dp 5001:5001 \
 		--name ${CONTAINER_NAME} \
 		--env HOST_IP=$(HOST_IP) \
 		${IMAGE_NAME}

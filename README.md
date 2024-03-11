@@ -15,7 +15,7 @@ Provided that you have Docker up and running, to build the application (needed o
 - `make build`
 To run the application:
 - `make frontend`
-Using your preferred web browser, navigate to `localhost:5000` in order to access the tool frontend.
+Using your preferred web browser, navigate to `localhost:5001` in order to access the tool frontend.
 
 To stop the application, run:
 - `make stop`
