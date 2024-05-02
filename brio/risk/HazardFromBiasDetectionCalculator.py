@@ -42,6 +42,7 @@ class HazardFromBiasDetectionCalculator:
         for k in np.arange(0, num_iterations):
         
             # test result, threshold, num_samples, boolean, num_used_features
+            #TODO use dict instead, and use explicit keys for readibility
             test_results = []
             test_results.append((
                             self.as_list(overall_result[0])[k], 

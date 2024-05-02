@@ -45,7 +45,12 @@ class FreqVsFreqBiasDetector(BiasDetector):
             for pair in combinations(observed_distribution, 2):
                 # Squaring JS given that the scipy implementation has square root
                 distance = jensenshannon(p=pair[0], q=pair[1], base=2)**2
-                distances.append(distance)
+                # If no observation are present for one class, the JS distance will be a nan.
+                # Changing into None to keep the functionalities of Risk Measurement. 
+                if np.isnan(distance):
+                    distances.append(None)
+                else:
+                    distances.append(distance)
         else:
             raise Exception("Only TVD or JS are supported as distances for freq_vs_freq analysis")
 
