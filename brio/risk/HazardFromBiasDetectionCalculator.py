@@ -88,7 +88,7 @@ class HazardFromBiasDetectionCalculator:
                 delta = 1 if line[3]==False else 0
                 q = line[2]/tot_observations
                 e = line[0] - line[1]
-                hazard += delta * weight * q * e * line[1]
+                hazard += delta * weight * q * abs(e)**(1./3.) * line[1]**(1./3.)
                 
             hazard_overall+= hazard
             

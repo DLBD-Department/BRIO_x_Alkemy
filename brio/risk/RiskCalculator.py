@@ -15,6 +15,6 @@ class RiskCalculator:
         '''
         # test_hazards = [list_of_hazards]
             
-        risk = np.sum(test_hazards)/len(test_hazards)**2
+        risk = np.sum(test_hazards)/len(test_hazards)
         
         return risk
