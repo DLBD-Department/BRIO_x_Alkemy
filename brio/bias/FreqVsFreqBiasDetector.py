@@ -1,7 +1,7 @@
 from .BiasDetector import BiasDetector
 from .threshold_calculator import threshold_calculator
 from sklearn.utils.extmath import cartesian
-from itertools import combinations
+from itertools import combinations, compress
 from scipy.spatial.distance import jensenshannon
 import numpy as np
 
@@ -54,21 +54,15 @@ class FreqVsFreqBiasDetector(BiasDetector):
         else:
             raise Exception("Only TVD or JS are supported as distances for freq_vs_freq analysis")
 
-        #TODO should we use any or all? For binary classes it's the same,
-        #but for multi-classes it's not.
-        #Currently, if for any class the distance is undefined (None), we return 
-        #an overall None distance and a None standard deviation. 
-        if any(d is None for d in distances):
-            overall_distance = None
-            return overall_distance, None
+        #Keeping all the not None distances (relevant for multi-classe root variable scenarios) 
+        distances_not_none = list(compress(distances, [d is not None for d in distances]))
+        overall_distance = self.aggregating_function(distances_not_none) if len(distances_not_none) > 0 else None
+        if len(distances_not_none) > 1:
+            ## Computing the standard deviation of the distances in case of 
+            # multi-class root_variable
+            return overall_distance, np.std(distances_not_none)
         else:
-            overall_distance = self.aggregating_function(distances)
-            if len(distances) > 1:
-                ## Computing the standard deviation of the distances in case of 
-                # multi-class root_variable
-                return overall_distance, np.std(distances)
-            else:
-                return overall_distance, None
+            return overall_distance, None
 
 
     def compare_root_variable_groups(self,
