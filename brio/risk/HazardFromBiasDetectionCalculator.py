@@ -53,7 +53,7 @@ class HazardFromBiasDetectionCalculator:
                         ))
 
             for group_name, group in conditioned_results.items():
-                if (group[1] is not None):
+                if (self.as_list(group[1])[k] is not None):
                     test_results.append(
                                         (
                                         self.as_list(group[1])[k], #test result
