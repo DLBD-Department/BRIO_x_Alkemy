@@ -93,8 +93,13 @@ class FreqVsRefBiasDetector(BiasDetector):
                 kl = kl_elementwise.sum()
             else:
                 raise Exception("Only 'no','zero' and 'laplace' are supported as divergence adjustment methods.")
+            
             divergence = self.normalization_function(kl)
-            divergences.append(divergence)
+
+            if np.isnan(divergence):
+                divergences.append(None)
+            else:
+                divergences.append(divergence)
 
         return divergences
 
@@ -230,34 +235,30 @@ class FreqVsRefBiasDetector(BiasDetector):
                 dataframe_subset = dataframe.query(condition)
                 num_of_obs = dataframe_subset.shape[0]
 
-                if num_of_obs >= min_obs_per_group:
-                    if self.target_variable_type == 'class':
-                        freqs, abs_freqs = self.get_frequencies_list(
-                                            dataframe_subset,
-                                            target_variable,
-                                            target_variable_labels,
-                                            root_variable,
-                                            root_variable_labels)
-                        conditioned_frequencies[condition] = (
-                                num_of_obs, 
-                                freqs,
-                                [sum(x) for x in abs_freqs]
-                                )
-                    elif self.target_variable_type == 'probability':
-                        freqs, abs_freqs = self.get_frequencies_list_from_probs(
-                                            dataframe_subset,
-                                            target_variable,
-                                            root_variable,
-                                            root_variable_labels,
-                                            n_bins)
-                        conditioned_frequencies[condition] = (
-                                num_of_obs, 
-                                freqs,
-                                [sum(x) for x in abs_freqs]
-                                )
-
-                else:
-                    conditioned_frequencies[condition] = (num_of_obs, None)
+                if self.target_variable_type == 'class':
+                    freqs, abs_freqs = self.get_frequencies_list(
+                                        dataframe_subset,
+                                        target_variable,
+                                        target_variable_labels,
+                                        root_variable,
+                                        root_variable_labels)
+                    conditioned_frequencies[condition] = (
+                            num_of_obs, 
+                            freqs,
+                            [sum(x) for x in abs_freqs]
+                            )
+                elif self.target_variable_type == 'probability':
+                    freqs, abs_freqs = self.get_frequencies_list_from_probs(
+                                        dataframe_subset,
+                                        target_variable,
+                                        root_variable,
+                                        root_variable_labels,
+                                        n_bins)
+                    conditioned_frequencies[condition] = (
+                            num_of_obs, 
+                            freqs,
+                            [sum(x) for x in abs_freqs]
+                            )
         
         distances = {
                 group: (
@@ -266,17 +267,28 @@ class FreqVsRefBiasDetector(BiasDetector):
                         self.compute_distance_from_reference(observed_distribution=obs_and_freqs[1], 
                                                              reference_distribution=reference_distribution, 
                                                              n_obs=obs_and_freqs[2])
-                    ) if obs_and_freqs[1] is not None else (obs_and_freqs[0], None)
+                    ) 
                 ) for group, obs_and_freqs in conditioned_frequencies.items()
             }
-
-        results = {group: (
-                (
-                    obs_and_dist[0], 
-                    obs_and_dist[1], 
-                    [d<=threshold_calculator(A1=self.A1, A2=A2, A3=obs_and_dist[0], default_threshold=threshold) for d in obs_and_dist[1]],
+        
+        results = {}
+        for group, obs_and_dist in distances.items():
+            # Too small groups
+            if obs_and_dist[0] < min_obs_per_group:
+                result = (obs_and_dist[0], [None for d in obs_and_dist[1]], 'Not enough observations')
+            else:
+                result = (
+                    obs_and_dist[0], #obs
+                    obs_and_dist[1], #distance
+                    [d<=threshold_calculator(
+                        A1=self.A1,
+                        A2=A2, 
+                        A3=obs_and_dist[0], 
+                        default_threshold=threshold
+                        ) if d is not None else 'Distance not defined' for d in obs_and_dist[1]],
                     threshold_calculator(A1=self.A1, A2=A2, A3=obs_and_dist[0], default_threshold=threshold)
-                ) if obs_and_dist[1] is not None else (obs_and_dist[0], obs_and_dist[1], 'Not enough observations')
-            ) for group, obs_and_dist in distances.items()}
+                )
+
+            results[group] = result
     
         return results

@@ -53,8 +53,13 @@ The method `compare_root_variable_conditioned_groups` performs the same calculat
 
 For both methods the output is a tuple similar to the ones described for the FreqsVsRef method, but with an additional element given by the standard deviation of the distances, provided only when the root variable is a multi-class feature. 
 
+## Focus on the Risk Analysis
+With the latest version (1.2) we introduce a Risk measurement, based on the results of the Bias Detector. Currently it's only accessible via the python API, but we plan to add a frontend option for it. It is implemented in the `brio/risk` sub-module.
+
+The methodology behind the risk computation will be soon published with a scientific paper. If you want to experiment with it already, you can use the method `compute_hazard_from_freqvsfreq_or_freqvsref` of the class `HazardFromBiasDetectionCalculator` upon each results from FreqVsFreq and FreqVsRef. The computed hazards need to be passed to `compute_risk` from `RiskCalculator`: this function will provide an overall measure of risk.  
+
 ## What's next
-Currently (September 2023) we plan to implement functionalities for the Opacity section, which is now empty. Furthermore, we want to introduce a risk measurement analysis, which will provide an overall risk assessment of a model using a series of bias and opacity checks.
+Currently (June 2024) we plan to implement functionalities for the Opacity section, which is now empty, and a more refined and accessible Risk section. 
 
 ## Call to action!
 We hope to raise interest in the data science community and ask for support! Anyone interested in expanding and improving our tool is more than welcome! You can do that opening a pull request for a functionality you wish to include. Also bugs warnings are very important and welcome. 
