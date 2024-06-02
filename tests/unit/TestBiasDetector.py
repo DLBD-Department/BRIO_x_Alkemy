@@ -1,6 +1,6 @@
 import unittest
 import sys
-from pickle import load
+from pickle import load, dump
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
@@ -68,8 +68,13 @@ class TestBiasDetector(unittest.TestCase):
             target_variable='predictions',
             root_variable='x2_sex',
             threshold=0.1)
+        
+        # Saving results for Risk tests
+        with open("./tests/unit/test_data/results_test_compare_root_variable_groups_with_TVD.pkl", "wb") as file:
+            dump(results, file)
 
         self.assertEqual(results[0], 0.025269625352224545)
+
 
     def test_compare_root_variable_groups_with_JS(self):
         '''
@@ -85,6 +90,10 @@ class TestBiasDetector(unittest.TestCase):
             target_variable='predictions',
             root_variable='x2_sex',
             threshold=0.1)
+        
+        # Saving results for Risk tests
+        with open("./tests/unit/test_data/results_test_compare_root_variable_groups_with_JS.pkl", "wb") as file:
+            dump(results, file)
 
         self.assertEqual(results[0], 0.0011441803173238346)
 
@@ -120,6 +129,11 @@ class TestBiasDetector(unittest.TestCase):
             root_variable='x2_sex',
             threshold=0.1,
             reference_distribution=self.ref)
+        
+        # Saving results for Risk tests
+        with open("./tests/unit/test_data/results_test_compare_root_variable_groups_with_KL_and_ref_distribution.pkl", "wb") as file:
+            dump(results, file)
+
         self.assertEqual(results[0], [0.07485260878313427, 0.11543085607355452])
 
     def test_compare_root_variable_groups_with_KL_and_ref_distribution_probs(self):
@@ -160,6 +174,10 @@ class TestBiasDetector(unittest.TestCase):
             ['x3_education', 'x4_marriage'],
             0.1,
             min_obs_per_group=30)
+        
+        # Saving results for Risk tests
+        with open("./tests/unit/test_data/results_test_compare_root_variable_conditioned_groups_with_TVD.pkl", "wb") as file:
+            dump(results, file)
 
         violations = {k: v for k, v in results.items() if not v[2]}
 
@@ -229,6 +247,10 @@ class TestBiasDetector(unittest.TestCase):
             reference_distribution=self.ref,
             min_obs_per_group=30,
             threshold=0.1)
+        
+        # Saving results for Risk tests
+        with open("./tests/unit/test_data/results_test_compare_root_variable_conditioned_groups_with_KL_and_ref_distribution.pkl", "wb") as file:
+            dump(results, file)
 
         violations = {k: v for k, v in results.items() if (not v[2][0] or not v[2][1])}
         self.assertEqual(len(violations), 9)
