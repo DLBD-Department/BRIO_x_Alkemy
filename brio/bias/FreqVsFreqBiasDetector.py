@@ -1,7 +1,7 @@
 from .BiasDetector import BiasDetector
 from .threshold_calculator import threshold_calculator
 from sklearn.utils.extmath import cartesian
-from itertools import combinations
+from itertools import combinations, compress
 from scipy.spatial.distance import jensenshannon
 import numpy as np
 
@@ -45,16 +45,22 @@ class FreqVsFreqBiasDetector(BiasDetector):
             for pair in combinations(observed_distribution, 2):
                 # Squaring JS given that the scipy implementation has square root
                 distance = jensenshannon(p=pair[0], q=pair[1], base=2)**2
-                distances.append(distance)
+                # If no observation are present for one class, the JS distance will be a nan.
+                # Changing into None to keep the functionalities of Risk Measurement. 
+                if np.isnan(distance):
+                    distances.append(None)
+                else:
+                    distances.append(distance)
         else:
             raise Exception("Only TVD or JS are supported as distances for freq_vs_freq analysis")
 
-        overall_distance = self.aggregating_function(distances)
-    
-        if len(distances) > 1:
+        #Keeping all the not None distances (relevant for multi-classe root variable scenarios) 
+        distances_not_none = list(compress(distances, [d is not None for d in distances]))
+        overall_distance = self.aggregating_function(distances_not_none) if len(distances_not_none) > 0 else None
+        if len(distances_not_none) > 1:
             ## Computing the standard deviation of the distances in case of 
             # multi-class root_variable
-            return overall_distance, np.std(distances)
+            return overall_distance, np.std(distances_not_none)
         else:
             return overall_distance, None
 
@@ -158,13 +164,11 @@ class FreqVsFreqBiasDetector(BiasDetector):
         
         # Second parameter for threshold calculator
         A2 = len(root_variable_labels)
-
-        conditioned_frequencies = {}
-
         conditioning_variables_subsets = list(self.powerset(conditioning_variables))
 
         # All the possible subsets of conditioning variables are inspected. The first one
         # is excluded being the empty set. 
+        conditioned_frequencies = {}
         for conditioning_variables_subset in conditioning_variables_subsets[1:]:
 
             combinations = cartesian([dataframe[v].unique() for v in conditioning_variables_subset])
@@ -177,48 +181,52 @@ class FreqVsFreqBiasDetector(BiasDetector):
                 dataframe_subset = dataframe.query(condition)
                 num_of_obs = dataframe_subset.shape[0]
 
-                if num_of_obs >= min_obs_per_group:
-                    if self.target_variable_type == 'class':
-                        conditioned_frequencies[condition] = (
-                                num_of_obs, 
-                                self.get_frequencies_list(
-                                    dataframe_subset,
-                                    target_variable,
-                                    target_variable_labels,
-                                    root_variable,
-                                    root_variable_labels)[0] #taking the relative freqs, the absolute freqs are not needed here
-                                )
-                    elif self.target_variable_type == 'probability':
-                        conditioned_frequencies[condition] = (
-                                num_of_obs, 
-                                self.get_frequencies_list_from_probs(
-                                    dataframe_subset,
-                                    target_variable,
-                                    root_variable,
-                                    root_variable_labels,
-                                    n_bins)[0] #taking the relative freqs, the absolute freqs are not needed here
-                                )
-
-                else:
-                    conditioned_frequencies[condition] = (num_of_obs, None)
+                if self.target_variable_type == 'class':
+                    conditioned_frequencies[condition] = (
+                            num_of_obs, 
+                            self.get_frequencies_list(
+                                dataframe_subset,
+                                target_variable,
+                                target_variable_labels,
+                                root_variable,
+                                root_variable_labels)[0] #taking the relative freqs, the absolute freqs are not needed here
+                            )
+                elif self.target_variable_type == 'probability':
+                    conditioned_frequencies[condition] = (
+                            num_of_obs, 
+                            self.get_frequencies_list_from_probs(
+                                dataframe_subset,
+                                target_variable,
+                                root_variable,
+                                root_variable_labels,
+                                n_bins)[0] #taking the relative freqs, the absolute freqs are not needed here
+                            )
             
         distances = {
                 # group: (number_of_observations, (overall_distance, standard_deviations) )
                 group: (
                         (obs_and_freqs[0], 
                             self.compute_distance_between_frequencies(obs_and_freqs[1]) # (distance, standard_deviations)
-                        ) if obs_and_freqs[1] is not None else (obs_and_freqs[0], None)
+                        )
                     ) for group, obs_and_freqs in conditioned_frequencies.items()
                 }
-
-        results = {group: (
-                (
+        
+        results = {}
+        for group, obs_and_dist in distances.items():
+            # Too small groups
+            if obs_and_dist[0] < min_obs_per_group:
+                result = (obs_and_dist[0], None, 'Not enough observations')
+            # Groups for which distance is not defined (only one class available, JS computed)
+            elif obs_and_dist[1][0] is None:
+                result = (obs_and_dist[0], None, 'Distance non defined')
+            else:
+                result = (
                     obs_and_dist[0], #This will also be the A3 for threshold_calculator, being it the number of obs of the group
                     obs_and_dist[1][0], #distance
                     obs_and_dist[1][0]<=threshold_calculator(A1=self.A1, A2=A2, A3=obs_and_dist[0], default_threshold=threshold),
                     threshold_calculator(A1=self.A1, A2=A2, A3=obs_and_dist[0], default_threshold=threshold),
                     obs_and_dist[1][1] #standard deviation
-                ) if obs_and_dist[1] is not None else (obs_and_dist[0], obs_and_dist[1], 'Not enough observations')
-            ) for group, obs_and_dist in distances.items()}
+                )
+            results[group] = result
             
         return results

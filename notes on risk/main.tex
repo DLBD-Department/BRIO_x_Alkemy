@@ -1,0 +1,109 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{cleveref}
+\usepackage{color}
+\usepackage{url}
+
+
+
+\newcommand{\ehi}{\color{red}}
+\newcommand{\brio}{BRIO}
+
+\title{Notes on risk}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Overview}
+The \brio{} system features a module devoted to the measurement of the risk related to fairness violations by AI systems. The risk measure produced aggregates the results of all available relevant tests detecting fairness violations relative to an AI system. The risk module, therefore, takes in input a series of $n$ different test results, relative to possibly different sensitive features, and returns one value in the real unit interval $[0,1]$ which represents how high in the interval $[0,1]$ is the risk that the tested AI system behaves in an unfair manner.
+
+As the \brio{} bias detection module does not only compare the behaviour of the AI algorithm on the  classes relative to the sensitive feature but can also execute similar checks on possibly several subclasses, in general the result of one fairness test will consist of $m$ lines. Each one of these lines will be relative to a subclass of the considered classes. Suppose, for example, that our sensitive feature is \texttt{gender}, the detection module of \brio{}  will not only compare the behaviour of the AI algorithm on the classes obtained by selecting a particular value of \texttt{gender}, but will also compare the behaviour of the AI algorithm on the subclasses obtained by fixing the values of features different from \texttt{gender} and by varying the value of \texttt{gender}. For instance, one line of the output will be about the behaviour of the AI system on the class of male individuals as compared to its behaviour on the class of female individuals, another line will be about the behaviour of the AI system on the subclass of rich male individuals as compared to its behaviour on the class of rich female individuals, yet another line will be about the behaviour on the subclass of poor male individuals as compared to its behaviour on the class of poor female individuals, and so on.
+
+Therefore, each line of the output will provide the following information:
+
+\begin{itemize}
+\item the set of non-sensitive feature values used to determine the considered subclasses, if any,
+
+\item the number of elements of the union of all considered (sub)-classes,
+
+\item the value of the divergence for the considered (sub)-classes,
+
+\item the threshold employed.
+\end{itemize}
+
+This information will be used to compute the risk measure emerging from a series of tests. In computing this measure, it is also possible to choose whether to focus on group fairness or individual fairness. Intuitively, focusing on {\it group fairness} means deeming more serious a discrimination based on very little information. For instance, a choice made only on the basis of the value of the sensitive feature will be a group discrimination. Focusing on {\it individual fairness}, on the other hand, means deeming more serious a discrimination between two individuals which have many values in common but a different value relatively to the sensitive feature.
+
+\subsection{Risk associated to a single test}\label{risk_single}
+If $n$ tests are available, the risk coefficient for a given test $i\in\{1,\dots,n\}$ is computed as follows,
+\[\mathrm{R}_i=\sum^m_{j=1} \delta (i,j)\cdot q(i,j)\cdot \sqrt[3]{|e(i,j)|}\cdot \sqrt[3]{\varepsilon (i,j)}\cdot w(i,j) \]where $m$ is the number of lines in the output of test $i$ and 
+\begin{enumerate}
+\item $\delta (i,j)=1 $ if line $j$ of test $i$ is about a violation of fairness, and $\delta (i,j)=0 $ otherwise,
+
+\item $q(i,j)$ is the number of elements in the union of the two classes (or subclasses) used for the comparison relative to line $j$ over the total number of datapoints,
+
+\item $e(i,j)$ is the distance between the divergence and the threshold relative to line $j$, 
+
+\item $\varepsilon (i,j)$ is the threshold employed at line $j$,
+
+\item $w(i,j)$ is the weight of the possible fairness violation relative to line $j$.
+\end{enumerate}
+
+Hence, $\delta (i,j)$ simply sets the addend relative to line $j$ to $0$ if line $j$ does not correspond to a fairness violation, $q(i,j)$ makes the addend proportional to the number of individuals involved in the possible violation over all individuals, $e(i,j)$ makes the addend proportional to the gravity of the violation in terms of distance from the threshold, $\varepsilon (i,j)$ makes the addend inversely proportional to the strictness of the threshold employed. Factors involving $e$ and $\varepsilon$ are typically\footnote{Using the automated threshold they are, but it is always possible to use customized thresholds. Notice that the closer that is to $1$, the smaller is the effect of taking the cube root.} two or three orders of magnitude smaller than the others, so we scale their weight taking their cube root.
+
+The weight $w(i,j)$  of the violation depends, in turn, on whether one focuses on {\it group fairness} or on {\it individual fairness}. In the first case, the weight increases if the possible fairness violation concerns a class determined by a few features (thus, a rather general class). In the second case, the weight increases if the possible fairness violation concerns a class determined by many features (thus, a rather specific class).
+
+\subsection{Risk associated to a battery of tests}
+The risk measurement function can be formally defined as follows:
+\[\frac{1}{n}\cdot \sum ^n_{i=1}\mathrm{R}_i\]
+where $n$ is the number of executed tests and $R_i$ is as above.
+
+\section{Execution of the module}
+The risk module can be executed in two modes,
+\begin{enumerate}
+\item the \emph{standard} mode: the user is only required to provide which features in the database are deemed `sensitive',
+\item the \emph{customizable} mode: the user is required to provide the sensitive features, the tolerance (\texttt{high}/\texttt{low}), the choice to favour either \texttt{group} or \texttt{individual} fairness, the aggregating function for featured with multiple classes (\texttt{max}/\texttt{average}/\texttt{min}).
+\end{enumerate}
+The standard mode is simply an execution of the customizable mode with fixed parameters: \texttt{high} and \texttt{average}, and a message calculating the average and \texttt{group} and \texttt{individual}, with it broken down to each.
+
+\subsection{Pipeline}
+Assume then that all parameters in the section above are defined. We only describe the process of checking \emph{one} sensitive feature \texttt{f}: when more are required, the user gets in output a list of each individual risks and their minimum, maximum, and average.
+
+Moreover, assume that we have
+\begin{itemize}
+\item a fixed upper bound for the execution time of single checks (=test line computations, cf. \ref{strategy}), and call this \texttt{T},
+\item a fixed lower bound for meaningful correlation indexes, and call this $\texttt{C}_0$.
+\end{itemize}.
+
+Then the risk module
+
+\begin{enumerate}
+\item computes the correlation between the features and the output, and orders the features in order of decreasing correlation;
+\item selects only features that show correlation above $\texttt{C}_0$;\label{qui}
+\item computes the greatest maximum runtime (cf. \ref{strategy}) of the algorithm with sensitive feature \texttt{f} and conditioning those selected in \ref{qui};\label{qui2}
+\item returns a message showing the number of conditioning features and the upper bound in \ref{qui2}, and asks the user if they want to proceed;
+\item if the user wants to proceed, it executes the module and returns the risk value, if not, it asks the user to select a new $\texttt{C}>\texttt{C}_0$ and returns to \ref{qui}.
+\end{enumerate}
+
+\subsection{Strategy}\label{strategy}
+Now we only need to provide a suitable way of using the \texttt{freqvfreq} option in our bias module. The check proceeds breadth first. For a line in the output (that is, the $j$s in \ref{risk_single}) the algorithm
+\begin{enumerate}
+\item starts computing the line,\label{quy}
+\item if it succeeds in time $\leq\texttt{T}$, it moves on to \ref{quy2}, if not
+\item it records the `bad' combination of features, and closes it for extension\footnote{Meaning that if we have conditioning $\{a,b,c,d,e\}$ and it fails at $abc$, then to the `bad' record one adds $\{abc, abcd, abce\}$, then iterate\dots},\label{bad_record}
+\item $j=j+1$,\label{quy2}
+\item if the combination in $j$ is in the `bad' record, go straight to \ref{quy2},
+\item go back to \ref{quy}.
+\end{enumerate}
+This way, it is possible to combinatorially estimate an upper bound for the computation time\footnote{Modulo everything else, that should not account for much.} (possible combinations $\times$ \texttt{T}), and depending on the user's computational capability they can decide whether they want to proceed to the calculus or not. This procedure also guarantees that failure of a check aborts all possible checks that are `extensions' of it, so that, all in all, the runtime will usually be \emph{way below} that calculated. 
+
+\bibliography{temp}
+\bibliographystyle{alpha}
+
+\end{document}
+
+

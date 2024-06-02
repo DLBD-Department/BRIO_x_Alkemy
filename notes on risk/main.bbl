@@ -1,0 +1,26 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{CDG{\etalchar{+}}23}
+
+\bibitem[CDG{\etalchar{+}}23]{DBLP:conf/beware/CoragliaDGGPPQ23}
+Greta Coraglia, Fabio~Aurelio D'Asaro, Francesco~Antonio Genco, Davide
+  Giannuzzi, Davide Posillipo, Giuseppe Primiero, and Christian Quaggio.
+\newblock Brioxalkemy: a bias detecting tool.
+\newblock In Guido Boella, Fabio~Aurelio D'Asaro, Abeer Dyoub, Laura Gorrieri,
+  Francesca~A. Lisi, Chiara Manganini, and Giuseppe Primiero, editors, {\em
+  Proceedings of the 2nd Workshop on Bias, Ethical AI, Explainability and the
+  role of Logic and Logic Programming co-located with the 22nd International
+  Conference of the Italian Association for Artificial Intelligence (AI*IA
+  2023), Rome, Italy, November 6, 2023}, volume 3615 of {\em {CEUR} Workshop
+  Proceedings}, pages 44--60. CEUR-WS.org, 2023.
+
+\bibitem[KL51]{dkl}
+S.~Kullback and R.~A. Leibler.
+\newblock {On Information and Sufficiency}.
+\newblock {\em The Annals of Mathematical Statistics}, 22(1):79 -- 86, 1951.
+
+\bibitem[Lin91]{lin_divergence}
+J.~Lin.
+\newblock Divergence measures based on the shannon entropy.
+\newblock {\em IEEE Transactions on Information Theory}, 37(1):145--151, 1991.
+
+\end{thebibliography}
