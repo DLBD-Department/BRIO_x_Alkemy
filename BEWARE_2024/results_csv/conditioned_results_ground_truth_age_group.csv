@@ -1,0 +1,24 @@
+condition,num_observations,hazard,distance,distance_gt_threshold,threshold,standard_deviation
+Attribute3==2,202,0.005517211876906451,0.030179298032753207,FALSE,0.011812320856732367,0.012289426201977227
+Attribute3==1,20,0,None,Not enough observations,,
+Attribute3==0,15,0,None,Not enough observations,,
+Attribute3==4,135,0.0063864207810548764,0.1054171972561927,FALSE,0.012077368754827782,0.04119132094502061
+Attribute3==3,28,0,None,Not enough observations,,
+Attribute10==1,356,0.0126817597482942,0.05330508107096172,FALSE,0.011519373211255367,0.018669955164368993
+Attribute10==2,23,0,None,Not enough observations,,
+Attribute10==3,21,0,None,Not enough observations,,
+Attribute3==2 & Attribute10==1,179,0.002965719850663945,0.044480677989359015,FALSE,0.011886296719018892,0.01566287503310474
+Attribute3==2 & Attribute10==2,11,0,None,Not enough observations,,
+Attribute3==2 & Attribute10==3,12,0,None,Not enough observations,,
+Attribute3==1 & Attribute10==1,16,0,None,Not enough observations,,
+Attribute3==1 & Attribute10==2,1,0,None,Not enough observations,,
+Attribute3==1 & Attribute10==3,3,0,None,Not enough observations,,
+Attribute3==0 & Attribute10==1,15,0,None,Not enough observations,,
+Attribute3==0 & Attribute10==2,0,0,None,Not enough observations,,
+Attribute3==0 & Attribute10==3,0,0,None,Not enough observations,,
+Attribute3==4 & Attribute10==1,119,0.003471733130087462,0.1859507097766307,FALSE,0.012171928713735108,0.07229473229004806
+Attribute3==4 & Attribute10==2,10,0,None,Not enough observations,,
+Attribute3==4 & Attribute10==3,6,0,None,Not enough observations,,
+Attribute3==3 & Attribute10==1,27,0,None,Not enough observations,,
+Attribute3==3 & Attribute10==2,1,0,None,Not enough observations,,
+Attribute3==3 & Attribute10==3,0,0,None,Not enough observations,,
