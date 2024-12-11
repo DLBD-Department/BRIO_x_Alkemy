@@ -22,5 +22,13 @@ def home():
     return render_template('homepage.html')
 
 
+@app.route("/freqvsfreq")
+def freqvsfreq():
+    return render_template("/bias/freqvsfreq.html")
+
+@app.route("/freqvsref")
+def freqvsref():
+    return render_template("/bias/freqvsref.html")
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5001)
