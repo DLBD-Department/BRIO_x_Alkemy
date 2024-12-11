@@ -62,6 +62,8 @@ def freqvsfreq():
             dict_vars['predictions'] = request.form['predictions']
             if 'agg_func' in list(request.form.keys()):
                 dict_vars['agg_func'] = request.form['agg_func']
+            else:
+                dict_vars['agg_func'] = max
             if float(request.form['Slider']) > 0:
                 dict_vars['thr'] = float(request.form['Slider'])
             else:
@@ -83,6 +85,7 @@ def results_fvf():
 
     bd = FreqVsFreqBiasDetector(
         distance=dict_vars['distance'],
+        aggregating_function=dict_vars['agg_func'],
         A1=dict_vars['a1_param'],
         target_variable_type=dict_vars['target_type']
     )
